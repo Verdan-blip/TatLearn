@@ -1,0 +1,47 @@
+-- Local progress storage. Timestamps are epoch millis; day numbers are epoch days (UTC).
+
+CREATE TABLE LessonProgress (
+    lessonId TEXT NOT NULL PRIMARY KEY,
+    status TEXT NOT NULL,             -- LessonStatus enum name: NotStarted | InProgress | Completed
+    bestScore INTEGER NOT NULL DEFAULT 0, -- percent 0..100
+    updatedAt INTEGER NOT NULL
+);
+
+-- Single-row table (id is always 1).
+CREATE TABLE UserStats (
+    id INTEGER NOT NULL PRIMARY KEY CHECK (id = 1),
+    xp INTEGER NOT NULL DEFAULT 0,
+    streak INTEGER NOT NULL DEFAULT 0,
+    lastActiveDay INTEGER
+);
+
+CREATE TABLE CompletedExercise (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    lessonId TEXT NOT NULL,
+    exerciseType TEXT NOT NULL,
+    correct INTEGER NOT NULL,
+    total INTEGER NOT NULL,
+    xpEarned INTEGER NOT NULL,
+    completedAt INTEGER NOT NULL
+);
+
+selectStats:
+SELECT xp, streak, lastActiveDay FROM UserStats WHERE id = 1;
+
+upsertStats:
+INSERT OR REPLACE INTO UserStats (id, xp, streak, lastActiveDay) VALUES (1, ?, ?, ?);
+
+selectLessonProgress:
+SELECT lessonId, status, bestScore, updatedAt FROM LessonProgress;
+
+selectLessonProgressById:
+SELECT lessonId, status, bestScore, updatedAt FROM LessonProgress WHERE lessonId = ?;
+
+upsertLessonProgress:
+INSERT OR REPLACE INTO LessonProgress (lessonId, status, bestScore, updatedAt) VALUES (?, ?, ?, ?);
+
+insertCompletedExercise:
+INSERT INTO CompletedExercise (lessonId, exerciseType, correct, total, xpEarned, completedAt) VALUES (?, ?, ?, ?, ?, ?);
+
+selectCompletedExercises:
+SELECT id, lessonId, exerciseType, correct, total, xpEarned, completedAt FROM CompletedExercise WHERE lessonId = ? ORDER BY completedAt DESC;

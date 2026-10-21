@@ -1,0 +1,9 @@
+TEAM_ID=6LK789G59X
+
+PRODUCT_NAME=TatLearn
+PRODUCT_BUNDLE_IDENTIFIER=ru.tatarcha.tatlearn.TatLearn$(TEAM_ID)
+
+CURRENT_PROJECT_VERSION=1
+MARKETING_VERSION=1.0
+// Нативному драйверу SQLDelight нужен системный SQLite, когда фреймворк Kotlin статический.
+OTHER_LDFLAGS=$(inherited) -lsqlite3

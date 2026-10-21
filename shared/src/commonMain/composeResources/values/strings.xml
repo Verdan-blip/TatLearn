@@ -1,0 +1,154 @@
+<resources>
+    <string name="app_name">Тамыр</string>
+
+    
+    <!-- Общие состояния (экраны дизайна 07, 08) -->
+    <string name="loading_message">Мыраужан ищет твои уроки…</string>
+    <string name="error_title">Бәй! Элемтә юк</string>
+    <string name="error_message">Не получилось загрузить уроки. Проверь интернет — Мыраужан подождёт.</string>
+    <string name="error_code">код ошибки: %1$s</string>
+    <string name="error_retry">Кабатларга · Повторить</string>
+    <string name="error_offline">Офлайн-режим (скачанные уроки)</string>
+
+    <!-- Компоненты UI kit только для отладки -->
+    <string name="showcase_open">UI kit</string>
+    <string name="showcase_close">Назад</string>
+    <string name="showcase_section_buttons">Кнопки</string>
+    <string name="showcase_section_tags">Теги</string>
+    <string name="showcase_section_progress">Прогресс и жизни</string>
+    <string name="showcase_section_diamonds">Ромбики и лоадер</string>
+    <string name="showcase_section_card">Карточка</string>
+    <string name="showcase_section_states">Состояния</string>
+    <string name="showcase_section_glyphs">Татарские буквы</string>
+    <string name="showcase_primary">Тикшерергә · Проверить</string>
+    <string name="showcase_accent">Аңладым · Понятно</string>
+    <string name="showcase_secondary">Продолжить с Google</string>
+    <string name="showcase_secondary_accent">Офлайн-режим</string>
+    <string name="showcase_disabled">Тикшерергә · Проверить</string>
+    <string name="showcase_link">У меня уже есть аккаунт</string>
+    <string name="showcase_tag_listen">Тыңла · аудирование</string>
+    <string name="showcase_tag_build">Җөмлә төзе · сборка</string>
+    <string name="showcase_tag_write">Яз · письмо</string>
+    <string name="showcase_card_title">Гаилә · Семья</string>
+    <string name="showcase_glyphs_lower">ә ө ү җ ң һ</string>
+    <string name="showcase_glyphs_upper">Ә Ө Ү Җ Ң Һ</string>
+    <string name="showcase_glyphs_sample">Исәнме! Хәерле иртә. Мин татарча өйрәнәм.</string>
+    <string name="showcase_show_loading">Показать загрузку</string>
+    <string name="showcase_show_error">Показать ошибку</string>
+    <string name="showcase_section_data">Данные (отладка)</string>
+    <string name="showcase_stats">XP: %1$d · серия: %2$d · уровень: %3$d</string>
+    <string name="showcase_home_loading">Загрузка главной…</string>
+    <string name="showcase_home_loaded">Урок %1$d · %2$s, модулей: %3$d</string>
+    <string name="showcase_reload_home">Перезагрузить главную</string>
+    <string name="showcase_record_result">Записать результат (+9 XP)</string>
+    <string name="showcase_errors_on">Ошибки сети: включены</string>
+    <string name="showcase_errors_off">Ошибки сети: выключены</string>
+
+    <!-- 01 Онбординг. Страниц 2 и 3 нет в макете; «Исәнме» и все тексты — needs native-speaker review -->
+    <string name="onboarding_title_1">Исәнме! Я — Мыраужан</string>
+    <string name="onboarding_body_1">Помогу заговорить по-татарски: с семьёй, друзьями и дома</string>
+    <string name="onboarding_title_2">10 минут в день — и слова запоминаются</string>
+    <string name="onboarding_body_2">Короткие уроки: слушай, говори и собирай фразы. Без зубрёжки и скучных правил</string>
+    <string name="onboarding_title_3">Первые фразы — уже на этой неделе</string>
+    <string name="onboarding_body_3">Копи опыт, не прерывай серию дней и открывай новые темы. Я буду рядом</string>
+    <string name="onboarding_start">Начать учиться</string>
+    <string name="onboarding_next">Далее</string>
+    <string name="onboarding_skip">Пропустить</string>
+    <string name="onboarding_back_description">Назад</string>
+    <string name="onboarding_close_description">Закрыть</string>
+
+    <!-- 02 Вход -->
+    <string name="auth_title_sign_in">Кереү · Вход</string>
+    <string name="auth_title_sign_up">Теркәлү · Регистрация</string>
+    <string name="auth_tab_sign_in">Вход</string>
+    <string name="auth_tab_sign_up">Регистрация</string>
+    <string name="auth_email_label">Электрон почта</string>
+    <string name="auth_password_label">Пароль</string>
+    <string name="auth_show_password">показать</string>
+    <string name="auth_hide_password">скрыть</string>
+    <string name="auth_forgot_password">Забыли пароль?</string>
+    <string name="auth_submit_sign_in">Керергә · Войти</string>
+    <string name="auth_submit_sign_up">Теркәлергә · Зарегистрироваться</string>
+    <string name="auth_or">яки · или</string>
+    <string name="auth_google">Продолжить с Google</string>
+    <string name="auth_vk">Продолжить с VK ID</string>
+    <string name="auth_legal">Продолжая, вы соглашаетесь с условиями использования и политикой конфиденциальности</string>
+    <string name="auth_back">←</string>
+    <string name="auth_error_email_empty">Введите электронную почту</string>
+    <string name="auth_error_email_invalid">Проверьте адрес электронной почты</string>
+    <string name="auth_error_password_short">Пароль — не меньше 6 символов</string>
+    <string name="auth_error_request">Не получилось войти. Код ошибки: %1$s</string>
+
+    <!-- 03 Главная -->
+    <string name="home_greeting">Хәерле көн!</string>
+    <string name="home_streak_days">%1$d көн рәттән</string>
+    <string name="home_xp">%1$d XP</string>
+    <string name="home_level_left">До уровня %1$d — ещё %2$d XP</string>
+    <string name="home_continue_tag">Дәвам ит · Продолжить</string>
+    <string name="home_lesson_progress">%1$d / %2$d</string>
+    <string name="home_lesson_button">Урок %1$d · %2$s</string>
+    <string name="home_modules">Модули</string>
+    <string name="home_modules_all">Все</string>
+    <string name="home_chip_alphabet">Аа</string>
+    <string name="home_chip_numbers">7</string>
+    <string name="home_module_done">Тәмам · %1$d%</string>
+    <string name="home_nav_home">Өй</string>
+    <string name="home_nav_dictionary">Сүзлек</string>
+    <string name="home_nav_contest">Ярыш</string>
+    <string name="home_nav_profile">Профиль</string>
+
+    <!-- 06 Результат -->
+    <string name="result_title">Дәрес тәмам!</string>
+    <string name="result_subtitle">Урок пройден. Молодец, %1$s!</string>
+    <string name="result_xp">XP</string>
+    <string name="result_accuracy">Точность</string>
+    <string name="result_time">Время</string>
+    <string name="result_streak_title">Стрик продлён: %1$d көн!</string>
+    <string name="result_streak_body">Возвращайся завтра, чтобы не потерять серию</string>
+    <string name="result_continue">Дәвам итәргә · Продолжить</string>
+    <string name="result_retry_mistakes">Кабатларга · Повторить ошибки (%1$d)</string>
+    <string name="result_xp_value">+%1$d</string>
+    <string name="result_accuracy_value">%1$d%</string>
+    <string name="result_time_value">%1$s</string>
+    <string name="result_fallback_name">друг</string>
+
+    <!-- Упражнения: общее -->
+    <string name="exercise_close">✕</string>
+    <string name="exercise_check">Тикшерергә · Проверить</string>
+    <string name="exercise_continue">Дәвам итәргә</string>
+    <string name="exercise_understood">Аңладым · Понятно</string>
+    <string name="exercise_correct">Дөрес! · Верно!</string>
+    <string name="exercise_wrong">Ялгыш · Ошибка</string>
+    <string name="exercise_xp_gain">+%1$d XP</string>
+    <string name="exercise_correct_answer">Правильный ответ: %1$s</string>
+    <string name="exercise_spell_hint">Правильно пишется: %1$s</string>
+    <string name="exercise_exit_title">Выйти из урока?</string>
+    <string name="exercise_exit_message">Уже проверенные ответы и XP сохранятся, остальное придётся пройти заново.</string>
+    <string name="exercise_exit_confirm">Выйти</string>
+    <string name="exercise_exit_stay">Остаться</string>
+    <string name="exercise_lesson_empty">В этом уроке пока нет упражнений</string>
+
+    <!-- 04 Сопоставление -->
+    <string name="matching_title">Сүзләрне парлаштыр</string>
+    <string name="matching_subtitle">Соедини слово с переводом</string>
+
+    <!-- 05 Квиз -->
+    <string name="quiz_tag_new_word">Яңа сүз · новое слово</string>
+    <string name="quiz_title">Как переводится это слово?</string>
+
+    <!-- 09 Аудирование -->
+    <string name="listening_tag">Тыңла · аудирование</string>
+    <string name="listening_title">Что ты услышал?</string>
+    <string name="listening_slower">Помедленнее</string>
+
+    <!-- 10 Сборка предложения -->
+    <string name="sentence_tag">Җөмлә төзе · сборка</string>
+    <string name="sentence_title">Переведи предложение</string>
+    <string name="sentence_prompt_format">«%1$s»</string>
+
+    <!-- 11 Перевод -->
+    <string name="translation_tag">Яз · письмо</string>
+    <string name="translation_title">Напиши по-татарски</string>
+    <string name="translation_caption">Специальные татарские буквы — под полем ввода</string>
+    <string name="translation_letters">ә ө ү җ ң һ</string>
+</resources>

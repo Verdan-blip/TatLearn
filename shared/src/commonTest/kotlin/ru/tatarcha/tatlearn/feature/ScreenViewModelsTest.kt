@@ -1,0 +1,281 @@
+package ru.tatarcha.tatlearn.feature
+
+import com.russhwolf.settings.MapSettings
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import ru.tatarcha.tatlearn.core.common.AppException
+import ru.tatarcha.tatlearn.core.common.LoadState
+import ru.tatarcha.tatlearn.data.local.OnboardingStorage
+import ru.tatarcha.tatlearn.domain.model.CurrentLesson
+import ru.tatarcha.tatlearn.domain.model.ExerciseOutcome
+import ru.tatarcha.tatlearn.domain.model.ExerciseResult
+import ru.tatarcha.tatlearn.domain.model.HomeContent
+import ru.tatarcha.tatlearn.domain.model.Lesson
+import ru.tatarcha.tatlearn.domain.model.LessonContent
+import ru.tatarcha.tatlearn.domain.model.LessonProgress
+import ru.tatarcha.tatlearn.domain.model.UserSession
+import ru.tatarcha.tatlearn.domain.model.UserStats
+import ru.tatarcha.tatlearn.domain.repository.AuthRepository
+import ru.tatarcha.tatlearn.domain.repository.LessonsRepository
+import ru.tatarcha.tatlearn.domain.repository.ProgressRepository
+import ru.tatarcha.tatlearn.feature.auth.AuthMode
+import ru.tatarcha.tatlearn.feature.auth.AuthUiEffect
+import ru.tatarcha.tatlearn.feature.auth.AuthUiEvent
+import ru.tatarcha.tatlearn.feature.auth.AuthValidator
+import ru.tatarcha.tatlearn.feature.auth.AuthViewModel
+import ru.tatarcha.tatlearn.feature.auth.EmailError
+import ru.tatarcha.tatlearn.feature.auth.PasswordError
+import ru.tatarcha.tatlearn.feature.auth.SocialProvider
+import ru.tatarcha.tatlearn.feature.home.HomeUiEffect
+import ru.tatarcha.tatlearn.feature.home.HomeUiEvent
+import ru.tatarcha.tatlearn.feature.home.HomeViewModel
+import ru.tatarcha.tatlearn.feature.onboarding.OnboardingUiEffect
+import ru.tatarcha.tatlearn.feature.onboarding.OnboardingUiEvent
+import ru.tatarcha.tatlearn.feature.onboarding.OnboardingViewModel
+import ru.tatarcha.tatlearn.feature.result.ResultUiEffect
+import ru.tatarcha.tatlearn.feature.result.ResultUiEvent
+import ru.tatarcha.tatlearn.feature.result.ResultViewModel
+import ru.tatarcha.tatlearn.navigation.AuthKey
+import ru.tatarcha.tatlearn.navigation.HomeKey
+import ru.tatarcha.tatlearn.navigation.OnboardingKey
+import ru.tatarcha.tatlearn.navigation.ResultKey
+import ru.tatarcha.tatlearn.navigation.StartDestinationResolver
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertIs
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
+
+private class FakeAuth(
+    initial: UserSession? = null,
+    var failure: Throwable? = null,
+) : AuthRepository {
+    private val _session = MutableStateFlow(initial)
+    override val session: StateFlow<UserSession?> = _session
+    val calls = mutableListOf<String>()
+
+    override suspend fun signIn(email: String, password: String): Result<UserSession> = authenticate("in", email)
+    override suspend fun signUp(email: String, password: String): Result<UserSession> = authenticate("up", email)
+    override fun signOut() { _session.value = null }
+
+    private fun authenticate(kind: String, email: String): Result<UserSession> {
+        calls += "$kind:$email"
+        failure?.let { return Result.failure(it) }
+        return Result.success(UserSession("User", email).also { _session.value = it })
+    }
+}
+
+private class HomeLessons(var result: Result<HomeContent>) : LessonsRepository {
+    var calls = 0
+    override suspend fun getHome(): Result<HomeContent> { calls++; return result }
+    override suspend fun getLessonContent(lessonId: String): Result<LessonContent> = error("unused")
+}
+
+private class StatsProgress(initial: UserStats = UserStats.Empty) : ProgressRepository {
+    val stats = MutableStateFlow(initial)
+    override fun observeStats(): Flow<UserStats> = stats
+    override fun observeLessonProgress(): Flow<List<LessonProgress>> = stats.map { emptyList() }
+    override suspend fun recordExerciseResult(result: ExerciseResult): ExerciseOutcome = error("unused")
+    override suspend fun completeLesson(lessonId: String, scorePercent: Int) = Unit
+}
+
+private fun homeContent() = HomeContent(
+    modules = emptyList(),
+    currentLesson = CurrentLesson(Lesson("lesson_4", 4, "Туганнар", "Родные"), "Гаилә", "Семья", 2, 8),
+)
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class ScreenViewModelsTest {
+    @BeforeTest fun setUp() = Dispatchers.setMain(UnconfinedTestDispatcher())
+
+    @AfterTest fun tearDown() = Dispatchers.resetMain()
+
+    // --- Вход ---
+
+    @Test fun validatorChecksEmailAndPassword() {
+        assertEquals(EmailError.Empty, AuthValidator.email("  "))
+        assertEquals(EmailError.Invalid, AuthValidator.email("aliya@"))
+        assertNull(AuthValidator.email(" aliya@mail.ru "))
+        assertEquals(PasswordError.TooShort, AuthValidator.password("12345"))
+        assertNull(AuthValidator.password("123456"))
+    }
+
+    @Test fun invalidFormDoesNotCallRepository() = runTest {
+        val auth = FakeAuth()
+        val vm = AuthViewModel(AuthMode.SignIn, auth)
+        vm.onEvent(AuthUiEvent.EmailChanged("bad"))
+        vm.onEvent(AuthUiEvent.PasswordChanged("1"))
+        vm.onEvent(AuthUiEvent.SubmitClicked)
+        assertEquals(EmailError.Invalid, vm.state.value.emailError)
+        assertEquals(PasswordError.TooShort, vm.state.value.passwordError)
+        assertTrue(auth.calls.isEmpty())
+    }
+
+    @Test fun editingFieldClearsItsError() = runTest {
+        val vm = AuthViewModel(AuthMode.SignIn, FakeAuth())
+        vm.onEvent(AuthUiEvent.SubmitClicked)
+        assertEquals(EmailError.Empty, vm.state.value.emailError)
+        vm.onEvent(AuthUiEvent.EmailChanged("a"))
+        assertNull(vm.state.value.emailError)
+        assertEquals(PasswordError.TooShort, vm.state.value.passwordError)
+    }
+
+    @Test fun signInSuccessNavigatesHome() = runTest {
+        val auth = FakeAuth()
+        val vm = AuthViewModel(AuthMode.SignIn, auth)
+        vm.onEvent(AuthUiEvent.EmailChanged(" aliya@mail.ru "))
+        vm.onEvent(AuthUiEvent.PasswordChanged("secret1"))
+        vm.onEvent(AuthUiEvent.SubmitClicked)
+        assertEquals(listOf("in:aliya@mail.ru"), auth.calls)
+        assertFalse(vm.state.value.isSubmitting)
+        assertEquals(AuthUiEffect.NavigateToHome, vm.effects.first())
+    }
+
+    @Test fun signUpModeCallsSignUp() = runTest {
+        val auth = FakeAuth()
+        val vm = AuthViewModel(AuthMode.SignUp, auth)
+        vm.onEvent(AuthUiEvent.EmailChanged("a@b.ru"))
+        vm.onEvent(AuthUiEvent.PasswordChanged("secret1"))
+        vm.onEvent(AuthUiEvent.SubmitClicked)
+        assertEquals(listOf("up:a@b.ru"), auth.calls)
+    }
+
+    @Test fun requestFailureShowsErrorCodeAndStaysOnScreen() = runTest {
+        val vm = AuthViewModel(AuthMode.SignIn, FakeAuth(failure = AppException("NET_TIMEOUT")))
+        vm.onEvent(AuthUiEvent.EmailChanged("a@b.ru"))
+        vm.onEvent(AuthUiEvent.PasswordChanged("secret1"))
+        vm.onEvent(AuthUiEvent.SubmitClicked)
+        assertEquals("NET_TIMEOUT", vm.state.value.requestErrorCode)
+        assertFalse(vm.state.value.isSubmitting)
+        vm.onEvent(AuthUiEvent.PasswordChanged("secret12"))
+        assertNull(vm.state.value.requestErrorCode)
+    }
+
+    @Test fun socialLoginSignsInWithoutForm() = runTest {
+        val auth = FakeAuth()
+        val vm = AuthViewModel(AuthMode.SignUp, auth)
+        vm.onEvent(AuthUiEvent.SocialClicked(SocialProvider.Vk))
+        assertEquals(1, auth.calls.size)
+        assertTrue(auth.calls.single().startsWith("in:"))
+        assertEquals(AuthUiEffect.NavigateToHome, vm.effects.first())
+    }
+
+    @Test fun passwordVisibilityAndModeToggle() = runTest {
+        val vm = AuthViewModel(AuthMode.SignIn, FakeAuth())
+        vm.onEvent(AuthUiEvent.TogglePasswordVisibility)
+        assertTrue(vm.state.value.passwordVisible)
+        vm.onEvent(AuthUiEvent.ModeChanged(AuthMode.SignUp))
+        assertEquals(AuthMode.SignUp, vm.state.value.mode)
+    }
+
+    // --- Главная ---
+
+    @Test fun homeLoadsContentAndStats() = runTest {
+        val progress = StatsProgress(UserStats(xp = 120, streak = 3))
+        val vm = HomeViewModel(HomeLessons(Result.success(homeContent())), progress, FakeAuth(UserSession("Алия", "a@b.ru")))
+        assertEquals("Алия", vm.state.value.userName)
+        assertIs<LoadState.Content<HomeContent>>(vm.state.value.content)
+        assertEquals(3, vm.state.value.stats.streak)
+        progress.stats.value = UserStats(130, 3)
+        assertEquals(130, vm.state.value.stats.xp)
+    }
+
+    @Test fun homeErrorThenRetrySucceeds() = runTest {
+        val lessons = HomeLessons(Result.failure(AppException("NET_TIMEOUT")))
+        val vm = HomeViewModel(lessons, StatsProgress(), FakeAuth())
+        assertEquals(LoadState.Error("NET_TIMEOUT"), vm.state.value.content)
+        lessons.result = Result.success(homeContent())
+        vm.onEvent(HomeUiEvent.RetryClicked)
+        assertIs<LoadState.Content<HomeContent>>(vm.state.value.content)
+        assertEquals(2, lessons.calls)
+    }
+
+    @Test fun startLessonNavigatesOnlyWhenLoaded() = runTest {
+        val lessons = HomeLessons(Result.failure(AppException("NET_ERROR")))
+        val vm = HomeViewModel(lessons, StatsProgress(), FakeAuth())
+        vm.onEvent(HomeUiEvent.StartLessonClicked)
+        lessons.result = Result.success(homeContent())
+        vm.onEvent(HomeUiEvent.RetryClicked)
+        vm.onEvent(HomeUiEvent.StartLessonClicked)
+        assertEquals(HomeUiEffect.NavigateToLesson("lesson_4"), vm.effects.first())
+    }
+
+    // --- Результат ---
+
+    private val resultKey = ResultKey("lesson_4", xpEarned = 24, accuracyPercent = 75, durationSeconds = 130, mistakeStepIds = listOf("quiz-1", "sentence-0"))
+
+    @Test fun resultStateComesFromKey() = runTest {
+        val vm = ResultViewModel(resultKey, FakeAuth(UserSession("Алия", "a@b.ru")), StatsProgress(UserStats(50, 4)))
+        val state = vm.state.value
+        assertEquals("Алия", state.userName)
+        assertEquals(24, state.xpEarned)
+        assertEquals(75, state.accuracyPercent)
+        assertEquals(2, state.mistakes)
+        assertEquals(4, state.streak)
+    }
+
+    @Test fun resultEffects() = runTest {
+        val vm = ResultViewModel(resultKey, FakeAuth(), StatsProgress())
+        vm.onEvent(ResultUiEvent.RetryMistakesClicked)
+        assertEquals(ResultUiEffect.NavigateToMistakes("lesson_4", listOf("quiz-1", "sentence-0")), vm.effects.first())
+        vm.onEvent(ResultUiEvent.ContinueClicked)
+        assertEquals(ResultUiEffect.NavigateHome, vm.effects.first())
+    }
+
+    // --- Онбординг и стартовый экран ---
+
+    @Test fun onboardingNextWalksPagesThenSignsUp() = runTest {
+        val storage = OnboardingStorage(MapSettings())
+        val vm = OnboardingViewModel(storage)
+        vm.onEvent(OnboardingUiEvent.NextClicked)
+        vm.onEvent(OnboardingUiEvent.NextClicked)
+        assertEquals(2, vm.state.value.currentPage)
+        assertTrue(vm.state.value.isLastPage)
+        assertFalse(storage.isSeen())
+        vm.onEvent(OnboardingUiEvent.NextClicked)
+        assertTrue(storage.isSeen())
+        assertEquals(OnboardingUiEffect.NavigateToAuth(AuthMode.SignUp), vm.effects.first())
+    }
+
+    @Test fun onboardingBackStopsAtFirstPageAndSkipSignsIn() = runTest {
+        val storage = OnboardingStorage(MapSettings())
+        val vm = OnboardingViewModel(storage)
+        vm.onEvent(OnboardingUiEvent.BackClicked)
+        assertEquals(0, vm.state.value.currentPage)
+        vm.onEvent(OnboardingUiEvent.NextClicked)
+        vm.onEvent(OnboardingUiEvent.BackClicked)
+        assertEquals(0, vm.state.value.currentPage)
+        vm.onEvent(OnboardingUiEvent.SkipClicked)
+        assertTrue(storage.isSeen())
+        assertEquals(OnboardingUiEffect.NavigateToAuth(AuthMode.SignIn), vm.effects.first())
+    }
+
+    @Test fun onboardingKeepsCurrentPageInState() = runTest {
+        val vm = OnboardingViewModel(OnboardingStorage(MapSettings()))
+        assertEquals(0, vm.state.value.currentPage)
+        vm.onEvent(OnboardingUiEvent.PageChanged(2))
+        assertEquals(2, vm.state.value.currentPage)
+        assertFalse(OnboardingStorage(MapSettings()).isSeen())
+    }
+
+    @Test fun startDestinationFollowsSessionAndOnboarding() {
+        val settings = MapSettings()
+        val onboarding = OnboardingStorage(settings)
+        assertEquals(OnboardingKey, StartDestinationResolver(FakeAuth(), onboarding).resolve())
+        onboarding.markSeen()
+        assertEquals(AuthKey(), StartDestinationResolver(FakeAuth(), onboarding).resolve())
+        assertEquals(HomeKey, StartDestinationResolver(FakeAuth(UserSession("A", "a@b.ru")), onboarding).resolve())
+    }
+}

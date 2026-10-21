@@ -1,0 +1,152 @@
+{
+  "lesson": {
+    "id": "lesson_4",
+    "number": 4,
+    "titleTt": "Туганнар",
+    "titleRu": "Семья"
+  },
+  "needsNativeReview": true,
+  "matching": {
+    "pairs": [
+      {
+        "tatar": "әни",
+        "russian": "мама"
+      },
+      {
+        "tatar": "ипи",
+        "russian": "хлеб"
+      },
+      {
+        "tatar": "су",
+        "russian": "вода"
+      },
+      {
+        "tatar": "мәктәп",
+        "russian": "школа"
+      },
+      {
+        "tatar": "дус",
+        "russian": "друг"
+      }
+    ],
+    "notes": {
+      "ипи": "Мыраужан: «Ипи» — хлеб. В деревне говорят: «Ипи — барыннан да олы» — хлеб всему голова."
+    }
+  },
+  "quiz": [
+    {
+      "word": "китап",
+      "transcription": "[китáп]",
+      "options": [
+        "книга",
+        "стол",
+        "окно",
+        "ручка"
+      ],
+      "correctIndex": 0,
+      "isNewWord": true
+    },
+    {
+      "word": "әти",
+      "options": [
+        "папа",
+        "дедушка",
+        "брат",
+        "друг"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "word": "әби",
+      "options": [
+        "сестра",
+        "бабушка",
+        "мама",
+        "учительница"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "word": "бабай",
+      "options": [
+        "дедушка",
+        "папа",
+        "друг",
+        "брат"
+      ],
+      "correctIndex": 0
+    }
+  ],
+  "listening": [
+    {
+      "audioUrl": null,
+      "options": [
+        "Рәхмәт",
+        "Рәхим ит",
+        "Исәнме"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "audioUrl": null,
+      "options": [
+        "Исәнме",
+        "Хәерле иртә",
+        "Саубулыгыз"
+      ],
+      "correctIndex": 1
+    }
+  ],
+  "sentences": [
+    {
+      "promptRu": "Я иду в школу",
+      "wordBank": [
+        "Мин",
+        "барам",
+        "мәктәпкә",
+        "китап",
+        "өйгә"
+      ],
+      "answer": [
+        "Мин",
+        "мәктәпкә",
+        "барам"
+      ]
+    },
+    {
+      "promptRu": "Я иду домой",
+      "wordBank": [
+        "Мин",
+        "барам",
+        "өйгә",
+        "китап",
+        "мәктәпкә"
+      ],
+      "answer": [
+        "Мин",
+        "өйгә",
+        "барам"
+      ]
+    }
+  ],
+  "translations": [
+    {
+      "promptRu": "Доброе утро",
+      "acceptedAnswers": [
+        "Хәерле иртә"
+      ]
+    },
+    {
+      "promptRu": "Здравствуйте",
+      "acceptedAnswers": [
+        "Исәнмесез"
+      ]
+    },
+    {
+      "promptRu": "Спасибо",
+      "acceptedAnswers": [
+        "Рәхмәт"
+      ]
+    }
+  ]
+}
