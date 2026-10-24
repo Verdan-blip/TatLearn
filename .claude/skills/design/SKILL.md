@@ -11,7 +11,7 @@ description: Что в проекте Тамыр (TatLearn) называется
 
 | Путь | Что это |
 |---|---|
-| `design/Tatar App Screens.dc.html` | Источник истины для UI: 13 экранов 390×844 на одном холсте (HTML, сгенерирован Claude Design) |
+| `design/Tatar App Screens.dc.html` | Источник истины для UI: 14 экранов 390×844 на одном холсте (HTML, сгенерирован Claude Design) |
 | `design/support.js` | Скрипт поддержки холста `.dc.html`, подключается самим макетом. Не менять без необходимости |
 | `design/screens/NN.png` | Эталонные рендеры экранов (Playwright + системный Chrome) |
 | `design/icons/*` | Логотипы сторонних сервисов (Google, VK) для кнопок входа; те же файлы лежат в `composeResources/drawable` |
