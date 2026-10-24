@@ -281,6 +281,27 @@ class ScreenViewModelsTest {
         assertEquals(4, state.streak)
     }
 
+    @Test fun resultBelowThresholdIsNotPassed() = runTest {
+        val key = resultKey.copy(accuracyPercent = 70, correctAnswers = 7, totalAnswers = 10, mistakeStepIds = listOf("a", "b", "c"))
+        val state = ResultViewModel(key, FakeAuth(), StatsProgress()).state.value
+        assertEquals(false, state.passed)
+        assertEquals(1, state.missingAnswers)
+        assertEquals(false, state.isMistakesRun)
+    }
+
+    @Test fun resultAtThresholdIsPassed() = runTest {
+        val key = resultKey.copy(accuracyPercent = 80, correctAnswers = 8, totalAnswers = 10)
+        assertTrue(ResultViewModel(key, FakeAuth(), StatsProgress()).state.value.passed)
+    }
+
+    @Test fun mistakesRunShowsUnfixedMistakes() = runTest {
+        val key = resultKey.copy(accuracyPercent = 50, isMistakesRun = true, mistakeStepIds = listOf("quiz-1"))
+        val state = ResultViewModel(key, FakeAuth(), StatsProgress()).state.value
+        assertEquals(false, state.passed)
+        assertEquals(1, state.missingAnswers)
+        assertTrue(state.isMistakesRun)
+    }
+
     @Test fun resultEffects() = runTest {
         val vm = ResultViewModel(resultKey, FakeAuth(), StatsProgress())
         vm.onEvent(ResultUiEvent.RetryMistakesClicked)

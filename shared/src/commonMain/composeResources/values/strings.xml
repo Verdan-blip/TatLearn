@@ -116,6 +116,14 @@
     <string name="result_accuracy_value">%1$d%</string>
     <string name="result_time_value">%1$s</string>
     <string name="result_fallback_name">друг</string>
+    <string name="result_failed_title">Хорошая попытка, %1$s!</string>
+    <string name="result_failed_subtitle">Урок пока не засчитан.\nДавай разберём ошибки.</string>
+    <string name="result_missing_answers">Нужно ещё верных ответов: %1$d</string>
+    <string name="result_missing_mistakes">Осталось исправить: %1$d</string>
+    <string name="result_threshold">нужно %1$d%</string>
+    <string name="result_failed_reward">+%1$d XP за верные ответы</string>
+    <string name="result_failed_reward_streak">+%1$d XP за верные ответы · серия %2$d көн</string>
+    <string name="result_home">На главную</string>
 
     <!-- Упражнения: общее -->
     <string name="exercise_close">✕</string>

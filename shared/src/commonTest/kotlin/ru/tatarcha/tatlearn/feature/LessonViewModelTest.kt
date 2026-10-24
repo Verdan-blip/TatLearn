@@ -226,12 +226,17 @@ class LessonViewModelTest {
         assertIs<ExerciseStep.SentenceBuilder>(vm.step())
     }
 
-    @Test fun lessonIsCompletedAtPassThreshold() = runTest {
+    @Test fun mistakesRunIsCompletedWhenAllFixed() = runTest {
         val vm = viewModel(listOf("quiz-0", "quiz-1"))
         vm.onEvent(LessonUiEvent.OptionSelected(0)); vm.onEvent(LessonUiEvent.CheckClicked); vm.onEvent(LessonUiEvent.ContinueClicked)
         vm.onEvent(LessonUiEvent.OptionSelected(1)); vm.onEvent(LessonUiEvent.CheckClicked); vm.onEvent(LessonUiEvent.ContinueClicked)
-        assertEquals(100, (vm.effects.first() as LessonUiEffect.NavigateToResult).key.accuracyPercent)
-        assertEquals("lesson_t" to 100, progress.completed)
+        val result = (vm.effects.first() as LessonUiEffect.NavigateToResult).key
+        assertEquals(100, result.accuracyPercent)
+        assertTrue(result.isMistakesRun)
+        assertEquals(2, result.correctAnswers)
+        assertEquals(2, result.totalAnswers)
+        // Повтор ошибок засчитывается как порог, а не как 100%, чтобы не завышать лучший результат.
+        assertEquals("lesson_t" to XpRules.PASS_THRESHOLD_PERCENT, progress.completed)
     }
 
     @Test fun exitNeedsConfirmation() = runTest {

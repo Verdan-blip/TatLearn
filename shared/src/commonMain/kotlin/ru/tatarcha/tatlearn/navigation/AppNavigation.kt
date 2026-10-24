@@ -24,7 +24,7 @@ import ru.tatarcha.tatlearn.feature.auth.AuthScene
 import ru.tatarcha.tatlearn.feature.home.HomeRoute
 import ru.tatarcha.tatlearn.feature.lesson.LessonRoute
 import ru.tatarcha.tatlearn.feature.onboarding.OnboardingScene
-import ru.tatarcha.tatlearn.feature.result.ResultRoute
+import ru.tatarcha.tatlearn.feature.result.ResultScene
 import ru.tatarcha.tatlearn.feature.showcase.ShowcaseScreen
 import tatlearn.shared.generated.resources.Res
 import tatlearn.shared.generated.resources.showcase_open
@@ -92,7 +92,7 @@ fun AppNavigation(showDebugTools: Boolean = false) {
                     )
                 }
                 entry<ResultKey> { key ->
-                    ResultRoute(
+                    ResultScene(
                         key = key,
                         onContinue = { resetTo(HomeKey) },
                         onRetryMistakes = { lessonId, stepIds -> backStack.add(LessonKey(lessonId, stepIds)) },

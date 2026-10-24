@@ -11,6 +11,12 @@ data class ResultUiState(
     val durationSeconds: Int,
     val mistakes: Int,
     val mistakeStepIds: List<String> = emptyList(),
+    /** Урок засчитан: точность не ниже порога или исправлены все ошибки при повторе. */
+    val passed: Boolean = true,
+    /** Сколько верных ответов не хватило до порога; в повторе ошибок это число неисправленных ошибок. */
+    val missingAnswers: Int = 0,
+    /** Это повтор ошибок: вместо «нужно ещё верных ответов» показывается число неисправленных ошибок. */
+    val isMistakesRun: Boolean = false,
     /** Текущая серия из базы прогресса; 0 скрывает карточку серии. */
     val streak: Int = 0,
 ) : UiState

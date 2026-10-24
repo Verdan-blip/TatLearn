@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import ru.tatarcha.tatlearn.core.common.MviViewModel
+import ru.tatarcha.tatlearn.domain.exercise.PassRules
 import ru.tatarcha.tatlearn.domain.repository.AuthRepository
 import ru.tatarcha.tatlearn.domain.repository.ProgressRepository
 import ru.tatarcha.tatlearn.navigation.ResultKey
@@ -20,6 +21,9 @@ class ResultViewModel(
         durationSeconds = key.durationSeconds,
         mistakes = key.mistakeStepIds.size,
         mistakeStepIds = key.mistakeStepIds,
+        passed = PassRules.isPassed(key.accuracyPercent, key.isMistakesRun, key.mistakeStepIds.size),
+        isMistakesRun = key.isMistakesRun,
+        missingAnswers = if (key.isMistakesRun) key.mistakeStepIds.size else PassRules.missingAnswers(key.correctAnswers, key.totalAnswers),
     ),
 ) {
     init {

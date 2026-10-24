@@ -38,6 +38,11 @@ object TamyrSizes {
     val providerMark = 18.dp
     val toastIcon = 26.dp
     val spinner = 22.dp
+    val resultMascot = 140.dp
+    val resultMascotCompact = 110.dp
+    val thresholdBar = 14.dp
+    val thresholdMarkerWidth = 3.dp
+    val thresholdMarkerHeight = 22.dp
     val spinnerStroke = 3.dp
     val toastClose = 32.dp
     val toastCloseIcon = 24.dp

@@ -18,6 +18,10 @@ data class ResultKey(
     val accuracyPercent: Int,
     val durationSeconds: Int,
     val mistakeStepIds: List<String>,
+    val correctAnswers: Int = 0,
+    val totalAnswers: Int = 0,
+    /** Это повтор ошибок (урок запущен с `stepIds`). */
+    val isMistakesRun: Boolean = false,
 ) : NavKey
 
 /** Каталог дизайн-системы только для отладки. */

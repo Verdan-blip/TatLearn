@@ -15,6 +15,7 @@ import ru.tatarcha.tatlearn.core.common.errorCode
 import ru.tatarcha.tatlearn.domain.exercise.AnswerNormalizer
 import ru.tatarcha.tatlearn.domain.exercise.ExerciseStep
 import ru.tatarcha.tatlearn.domain.exercise.LessonPlanner
+import ru.tatarcha.tatlearn.domain.exercise.PassRules
 import ru.tatarcha.tatlearn.domain.exercise.XpRules
 import ru.tatarcha.tatlearn.domain.model.ExerciseResult
 import ru.tatarcha.tatlearn.domain.repository.LessonsRepository
@@ -229,9 +230,12 @@ class LessonViewModel(
     private fun finishLesson() {
         viewModelScope.launch {
             val accuracy = if (checkedSteps == 0) 0 else correctSteps * 100 / checkedSteps
-            if (accuracy >= XpRules.PASS_THRESHOLD_PERCENT) progress.completeLesson(key.lessonId, accuracy)
+            val isMistakesRun = key.stepIds.isNotEmpty()
+            if (PassRules.isPassed(accuracy, isMistakesRun, mistakeIds.size)) {
+                progress.completeLesson(key.lessonId, if (isMistakesRun) XpRules.PASS_THRESHOLD_PERCENT else accuracy)
+            }
             val seconds = ((time.nowMillis() - startedAtMillis) / MILLIS_PER_SECOND).toInt().coerceAtLeast(0)
-            sendEffect(LessonUiEffect.NavigateToResult(ResultKey(key.lessonId, xpEarned, accuracy, seconds, mistakeIds.toList())))
+            sendEffect(LessonUiEffect.NavigateToResult(ResultKey(key.lessonId, xpEarned, accuracy, seconds, mistakeIds.toList(), correctSteps, checkedSteps, isMistakesRun)))
         }
     }
 

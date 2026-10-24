@@ -105,10 +105,15 @@ fun TamyrButton(
 
 /** Жирная терракотовая ссылка без рамки, например «У меня уже есть аккаунт». */
 @Composable
-fun TamyrTextButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun TamyrTextButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    color: Color = TamyrTheme.colors.accentText,
+) {
     Text(
         text = text,
-        color = TamyrTheme.colors.accentText,
+        color = color,
         style = TamyrTheme.typography.body15Bold,
         textAlign = TextAlign.Center,
         modifier = modifier.clickable(role = Role.Button, onClick = onClick).padding(TamyrTheme.spacing.s),
