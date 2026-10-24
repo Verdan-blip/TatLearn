@@ -13,6 +13,7 @@ enum class PasswordError { Empty, TooShort }
 enum class SocialProvider { Google, Vk }
 sealed interface AuthToast {
     data object SocialUnavailable : AuthToast
+    data object ForgotPasswordUnavailable : AuthToast
     data class RequestFailed(val mode: AuthMode, val code: String) : AuthToast
 }
 
@@ -32,6 +33,7 @@ sealed interface AuthUiEvent : UiEvent {
     data class EmailChanged(val value: String) : AuthUiEvent
     data class PasswordChanged(val value: String) : AuthUiEvent
     data object TogglePasswordVisibility : AuthUiEvent
+    data object ForgotPasswordClicked : AuthUiEvent
     data object SubmitClicked : AuthUiEvent
     data class SocialClicked(val provider: SocialProvider) : AuthUiEvent
     data object ToastDismissed : AuthUiEvent

@@ -65,6 +65,7 @@ import tatlearn.shared.generated.resources.auth_error_sign_in_network
 import tatlearn.shared.generated.resources.auth_error_sign_up_code
 import tatlearn.shared.generated.resources.auth_error_sign_up_network
 import tatlearn.shared.generated.resources.auth_forgot_password
+import tatlearn.shared.generated.resources.auth_forgot_password_unavailable
 import tatlearn.shared.generated.resources.auth_google
 import tatlearn.shared.generated.resources.auth_hide_password
 import tatlearn.shared.generated.resources.auth_legal
@@ -155,7 +156,9 @@ fun AuthContent(state: AuthUiState, onEvent: (AuthUiEvent) -> Unit) {
                         style = TamyrTheme.typography.body14Bold,
                         color = TamyrTheme.colors.accent,
                         textAlign = TextAlign.End,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(role = Role.Button) { onEvent(AuthUiEvent.ForgotPasswordClicked) },
                     )
                 }
                 TamyrButton(
@@ -193,6 +196,10 @@ fun AuthContent(state: AuthUiState, onEvent: (AuthUiEvent) -> Unit) {
 private fun authToastData(toast: AuthToast): TamyrToastData = when (toast) {
     AuthToast.SocialUnavailable -> TamyrToastData(
         text = stringResource(Res.string.auth_social_unavailable),
+        kind = TamyrToastKind.Info,
+    )
+    AuthToast.ForgotPasswordUnavailable -> TamyrToastData(
+        text = stringResource(Res.string.auth_forgot_password_unavailable),
         kind = TamyrToastKind.Info,
     )
     is AuthToast.RequestFailed -> {

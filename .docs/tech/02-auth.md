@@ -38,7 +38,7 @@
 | Ошибка запроса | `uiState.toast = AuthToast.RequestFailed(mode, code)` (код из `AppException`), вид `TamyrToastKind.Error`. Сеть (`NET_TIMEOUT`/`NET_ERROR`) -> «Проверьте интернет…», иначе «Код ошибки: …»; тексты отдельно для входа и регистрации. Новая отправка вызывает `hideToast()`. `TODO(backend)`: коды авторизации (неверный пароль, занятый e-mail). |
 | Соцвход (Google/VK) | **Заглушка:** репозиторий не вызывается, в `uiState.toast` ставится `AuthToast.SocialUnavailable`. `TODO(backend)`: настоящий OAuth. |
 | Уведомление (`TamyrToast`) | `AuthViewModel` держит `toastJob`: показ → `delay(TamyrMotion.TOAST_VISIBLE_MS)` (5 с) → `toast = null`. Новое уведомление отменяет предыдущий таймер и заменяет текст. `ToastDismissed` (крестик/свайп вверх) сразу скрывает. |
-| «Забыли пароль?» | Просто текст, не кликабелен (`TODO(design)`). |
+| «Забыли пароль?» | **Заглушка:** `uiState.toast = AuthToast.ForgotPasswordUnavailable`, репозиторий не вызывается. `TODO(backend)`: настоящее восстановление, `TODO(design)`: целевого экрана нет. |
 
 ### Что делает fake-бэкенд
 `FakeAuthRepository` принимает **любые** данные (и для входа, и для регистрации), ждёт 300–800 мс, имя берёт из e-mail до `@` с заглавной буквы (`aliya@…` → «Aliya»), сохраняет сессию в `SessionStorage` (переживает перезапуск). При включённых «ошибках сети» отвечает `NET_TIMEOUT`.

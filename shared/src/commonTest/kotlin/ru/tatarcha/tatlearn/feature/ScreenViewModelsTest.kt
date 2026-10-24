@@ -194,6 +194,14 @@ class ScreenViewModelsTest {
         assertTrue(auth.calls.isEmpty())
     }
 
+    @Test fun forgotPasswordShowsToastWithoutCallingRepository() = runTest {
+        val auth = FakeAuth()
+        val vm = AuthViewModel(AuthMode.SignIn, auth)
+        vm.onEvent(AuthUiEvent.ForgotPasswordClicked)
+        assertEquals(AuthToast.ForgotPasswordUnavailable, vm.state.value.toast)
+        assertTrue(auth.calls.isEmpty())
+    }
+
     @Test fun toastDisappearsAfterFiveSeconds() = runTest {
         val vm = AuthViewModel(AuthMode.SignIn, FakeAuth())
         vm.onEvent(AuthUiEvent.SocialClicked(SocialProvider.Google))

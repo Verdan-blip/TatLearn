@@ -23,6 +23,8 @@ class AuthViewModel(
             is AuthUiEvent.PasswordChanged -> setState { copy(password = event.value, passwordError = null) }
             AuthUiEvent.TogglePasswordVisibility -> setState { copy(passwordVisible = !passwordVisible) }
             AuthUiEvent.SubmitClicked -> submit()
+            // TODO(backend): восстановление пароля. Пока кнопка только сообщает, что оно недоступно.
+            AuthUiEvent.ForgotPasswordClicked -> showToast(AuthToast.ForgotPasswordUnavailable)
             // TODO(backend): настоящий OAuth. Пока кнопки соцсетей только сообщают, что вход недоступен.
             is AuthUiEvent.SocialClicked -> showToast(AuthToast.SocialUnavailable)
             AuthUiEvent.ToastDismissed -> hideToast()
