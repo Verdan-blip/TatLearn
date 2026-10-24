@@ -12,7 +12,12 @@ data class TamyrSpacing(
     val s: Dp = 8.dp,
     val m: Dp = 12.dp,
     val l: Dp = 16.dp,
+    /** Интервал между однотипными кнопками, например кнопками входа через соцсети. */
+    val tight: Dp = 10.dp,
+    /** Интервал между блоками формы и верхний отступ шапки на экране входа. */
+    val section: Dp = 18.dp,
     val xl: Dp = 20.dp,
+    val sectionInset: Dp = 22.dp,
     val screen: Dp = 24.dp,
     val xxl: Dp = 32.dp,
     val bottomInset: Dp = 36.dp,
@@ -32,6 +37,7 @@ object TamyrSizes {
     val loaderGap = 8.dp
     val borderThin = 1.dp
     val borderAccent = 2.dp
+    val providerMark = 18.dp
     val toastIcon = 26.dp
     val spinner = 22.dp
     val spinnerStroke = 3.dp

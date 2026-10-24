@@ -1,21 +1,8 @@
 package ru.tatarcha.tatlearn.feature.auth
 
-import kotlinx.serialization.Serializable
 import ru.tatarcha.tatlearn.core.common.UiEffect
 import ru.tatarcha.tatlearn.core.common.UiEvent
 import ru.tatarcha.tatlearn.core.common.UiState
-
-@Serializable
-enum class AuthMode { SignIn, SignUp }
-
-enum class EmailError { Empty, Invalid }
-enum class PasswordError { Empty, TooShort }
-enum class SocialProvider { Google, Vk }
-sealed interface AuthToast {
-    data object SocialUnavailable : AuthToast
-    data object ForgotPasswordUnavailable : AuthToast
-    data class RequestFailed(val mode: AuthMode, val code: String) : AuthToast
-}
 
 data class AuthUiState(
     val mode: AuthMode = AuthMode.SignIn,

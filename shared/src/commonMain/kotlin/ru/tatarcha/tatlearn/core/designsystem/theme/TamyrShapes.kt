@@ -15,5 +15,6 @@ data class TamyrShapes(
     val card: Shape = RoundedCornerShape(16.dp),
     val tile: Shape = RoundedCornerShape(14.dp),
     val progress: Shape = RoundedCornerShape(5.dp),
+    val mark: Shape = RoundedCornerShape(5.dp),
     val circle: Shape = CircleShape,
 )

@@ -34,7 +34,7 @@ fun TamyrSpinner(
         animationSpec = infiniteRepeatable(tween(TamyrMotion.SPINNER_MS, easing = LinearEasing), RepeatMode.Restart),
         label = "spinnerRotation",
     )
-    Canvas(modifier.size(size)) {
+    Canvas(modifier = modifier.size(size)) {
         val strokeWidth = TamyrSizes.spinnerStroke.toPx()
         val topLeft = Offset(strokeWidth / 2, strokeWidth / 2)
         val arcSize = Size(this.size.width - strokeWidth, this.size.height - strokeWidth)

@@ -21,5 +21,8 @@ fun AuthScene(
         }
     }
     val state by viewModel.state.collectAsState()
-    AuthContent(state, viewModel::onEvent)
+    AuthContent(
+        state = state,
+        onEvent = viewModel::onEvent,
+    )
 }

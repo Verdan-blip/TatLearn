@@ -16,6 +16,7 @@
 - **При регистрации нет второго поля пароля и подсказки о правиле**: опечатку ловит ссылка «показать», лишнее поле замедляет регистрацию. Рассматривали подсказку «не меньше 6 символов» под полем и второе поле, отложили.
 - **На экране нет кнопки «назад»**: когда онбординг уже просмотрен, Auth стоит в корне стека и кнопка ничего не делала; возвращаться из входа в онбординг смысла нет. Убраны `BackClicked`/`NavigateBack` и строка `auth_back`. Системный «назад» не трогали: он по-прежнему возвращает на онбординг, если пользователь пришёл оттуда (`AppNavigation.pop`). Если его тоже надо запретить, добавить `NavigationBackHandler` в `AuthScene`.
 - Компоненты уведомления лежат в `core/designsystem/component` (`TamyrToast`, `TamyrToastHost`, `TamyrToastData`, `TamyrToastKind`); здесь используются виды `Info` (соцвход) и `Error` (ошибка запроса).
+- Файлы по скиллу `compose-style`: каждый тип отдельно (`AuthMode`, `AuthToast`, `EmailError`, `PasswordError`, `SocialProvider`), в `AuthContract.kt` только `UiState/UiEvent/UiEffect`. Размеры экрана взяты из токенов (`spacing.section/sectionInset/tight`, `TamyrSizes.providerMark`, `shapes.mark`), числовых литералов в `AuthContent` нет.
 - Имена `AuthScene`/`AuthContent` по скиллу `compose-style` (в остальных фичах пока `XRoute`/`XScreen`).
 
 ## Открытые вопросы

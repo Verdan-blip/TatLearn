@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
@@ -31,7 +32,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import kotlin.math.roundToInt
-import androidx.compose.foundation.layout.offset
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import ru.tatarcha.tatlearn.core.designsystem.component.icon.CloseIcon
@@ -168,7 +168,7 @@ private fun toastPalette(kind: TamyrToastKind): ToastPalette = when (kind) {
 @Preview(name = "Info, 1 line")
 @Composable
 private fun TamyrToastInfoPreview() = PreviewFrame {
-    Column(Modifier.padding(TamyrTheme.spacing.screen)) {
+    Column(modifier = Modifier.padding(TamyrTheme.spacing.screen)) {
         TamyrToast(
             data = TamyrToastData(text = "Вход через Google и VK ID пока недоступен", kind = TamyrToastKind.Info),
             onDismiss = {},
@@ -179,7 +179,7 @@ private fun TamyrToastInfoPreview() = PreviewFrame {
 @Preview(name = "Error, 2 lines")
 @Composable
 private fun TamyrToastErrorPreview() = PreviewFrame {
-    Column(Modifier.padding(TamyrTheme.spacing.screen)) {
+    Column(modifier = Modifier.padding(TamyrTheme.spacing.screen)) {
         TamyrToast(
             data = TamyrToastData(text = "Не получилось войти. Проверьте интернет и попробуйте ещё раз", kind = TamyrToastKind.Error),
             onDismiss = {},
@@ -190,7 +190,7 @@ private fun TamyrToastErrorPreview() = PreviewFrame {
 @Preview(name = "Success, 1 line")
 @Composable
 private fun TamyrToastSuccessPreview() = PreviewFrame {
-    Column(Modifier.padding(TamyrTheme.spacing.screen)) {
+    Column(modifier = Modifier.padding(TamyrTheme.spacing.screen)) {
         TamyrToast(
             data = TamyrToastData(text = "Пароль изменён", kind = TamyrToastKind.Success),
             onDismiss = {},
