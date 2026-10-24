@@ -20,7 +20,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrTextButton
-import ru.tatarcha.tatlearn.feature.auth.AuthRoute
+import ru.tatarcha.tatlearn.feature.auth.AuthScene
 import ru.tatarcha.tatlearn.feature.home.HomeRoute
 import ru.tatarcha.tatlearn.feature.lesson.LessonRoute
 import ru.tatarcha.tatlearn.feature.onboarding.OnboardingScene
@@ -72,7 +72,7 @@ fun AppNavigation(showDebugTools: Boolean = false) {
                     OnboardingScene(onNavigateToAuth = { mode -> backStack.add(AuthKey(mode)) })
                 }
                 entry<AuthKey> { key ->
-                    AuthRoute(
+                    AuthScene(
                         mode = key.mode,
                         onNavigateToHome = { resetTo(HomeKey) },
                         onNavigateBack = ::pop,

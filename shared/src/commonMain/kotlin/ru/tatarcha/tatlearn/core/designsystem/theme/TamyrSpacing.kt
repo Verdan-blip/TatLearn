@@ -32,6 +32,10 @@ object TamyrSizes {
     val loaderGap = 8.dp
     val borderThin = 1.dp
     val borderAccent = 2.dp
+    val toastIcon = 26.dp
+    val toastClose = 32.dp
+    val toastCloseIcon = 24.dp
+    val toastSwipeThreshold = 24.dp
 }
 
 /** Тайминги анимаций; макет статичный, поэтому они наши собственные (короткие и спокойные). */
@@ -39,4 +43,5 @@ object TamyrMotion {
     const val FAST_MS = 150
     const val STEP_MS = 280
     const val PROGRESS_MS = 400
+    const val TOAST_VISIBLE_MS = 5_000L
 }

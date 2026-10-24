@@ -24,10 +24,12 @@ import ru.tatarcha.tatlearn.domain.model.LessonContent
 import ru.tatarcha.tatlearn.domain.model.LessonProgress
 import ru.tatarcha.tatlearn.domain.model.UserSession
 import ru.tatarcha.tatlearn.domain.model.UserStats
+import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
 import ru.tatarcha.tatlearn.domain.repository.AuthRepository
 import ru.tatarcha.tatlearn.domain.repository.LessonsRepository
 import ru.tatarcha.tatlearn.domain.repository.ProgressRepository
 import ru.tatarcha.tatlearn.feature.auth.AuthMode
+import ru.tatarcha.tatlearn.feature.auth.AuthToast
 import ru.tatarcha.tatlearn.feature.auth.AuthUiEffect
 import ru.tatarcha.tatlearn.feature.auth.AuthUiEvent
 import ru.tatarcha.tatlearn.feature.auth.AuthValidator
@@ -163,13 +165,37 @@ class ScreenViewModelsTest {
         assertNull(vm.state.value.requestErrorCode)
     }
 
-    @Test fun socialLoginSignsInWithoutForm() = runTest {
+    @Test fun socialClickShowsToastWithoutCallingRepository() = runTest {
         val auth = FakeAuth()
         val vm = AuthViewModel(AuthMode.SignUp, auth)
         vm.onEvent(AuthUiEvent.SocialClicked(SocialProvider.Vk))
-        assertEquals(1, auth.calls.size)
-        assertTrue(auth.calls.single().startsWith("in:"))
-        assertEquals(AuthUiEffect.NavigateToHome, vm.effects.first())
+        assertEquals(AuthToast.SocialUnavailable, vm.state.value.toast)
+        assertTrue(auth.calls.isEmpty())
+    }
+
+    @Test fun toastDisappearsAfterFiveSeconds() = runTest {
+        val vm = AuthViewModel(AuthMode.SignIn, FakeAuth())
+        vm.onEvent(AuthUiEvent.SocialClicked(SocialProvider.Google))
+        testScheduler.advanceTimeBy(TamyrMotion.TOAST_VISIBLE_MS - 1)
+        assertEquals(AuthToast.SocialUnavailable, vm.state.value.toast)
+        testScheduler.advanceTimeBy(2)
+        assertNull(vm.state.value.toast)
+    }
+
+    @Test fun toastCanBeDismissedManually() = runTest {
+        val vm = AuthViewModel(AuthMode.SignIn, FakeAuth())
+        vm.onEvent(AuthUiEvent.SocialClicked(SocialProvider.Google))
+        vm.onEvent(AuthUiEvent.ToastDismissed)
+        assertNull(vm.state.value.toast)
+    }
+
+    @Test fun repeatedToastRestartsTimer() = runTest {
+        val vm = AuthViewModel(AuthMode.SignIn, FakeAuth())
+        vm.onEvent(AuthUiEvent.SocialClicked(SocialProvider.Google))
+        testScheduler.advanceTimeBy(TamyrMotion.TOAST_VISIBLE_MS - 1000)
+        vm.onEvent(AuthUiEvent.SocialClicked(SocialProvider.Vk))
+        testScheduler.advanceTimeBy(TamyrMotion.TOAST_VISIBLE_MS - 1000)
+        assertEquals(AuthToast.SocialUnavailable, vm.state.value.toast)
     }
 
     @Test fun passwordVisibilityAndModeToggle() = runTest {

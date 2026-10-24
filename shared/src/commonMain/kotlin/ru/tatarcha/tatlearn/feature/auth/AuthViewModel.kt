@@ -1,15 +1,20 @@
 package ru.tatarcha.tatlearn.feature.auth
 
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.tatarcha.tatlearn.core.common.MviViewModel
 import ru.tatarcha.tatlearn.core.common.errorCode
+import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
 import ru.tatarcha.tatlearn.domain.repository.AuthRepository
 
 class AuthViewModel(
     initialMode: AuthMode,
     private val auth: AuthRepository,
 ) : MviViewModel<AuthUiState, AuthUiEvent, AuthUiEffect>(AuthUiState(mode = initialMode)) {
+
+    private var toastJob: Job? = null
 
     override fun onEvent(event: AuthUiEvent) {
         when (event) {
@@ -18,8 +23,9 @@ class AuthViewModel(
             is AuthUiEvent.PasswordChanged -> setState { copy(password = event.value, passwordError = null, requestErrorCode = null) }
             AuthUiEvent.TogglePasswordVisibility -> setState { copy(passwordVisible = !passwordVisible) }
             AuthUiEvent.SubmitClicked -> submit()
-            // TODO(backend): настоящий OAuth. Пока кнопки соцсетей входят под фейковым аккаунтом.
-            is AuthUiEvent.SocialClicked -> signIn(SOCIAL_EMAIL[event.provider].orEmpty(), SOCIAL_PASSWORD)
+            // TODO(backend): настоящий OAuth. Пока кнопки соцсетей только сообщают, что вход недоступен.
+            is AuthUiEvent.SocialClicked -> showToast(AuthToast.SocialUnavailable)
+            AuthUiEvent.ToastDismissed -> hideToast()
             AuthUiEvent.BackClicked -> sendEffect(AuthUiEffect.NavigateBack)
         }
     }
@@ -33,10 +39,10 @@ class AuthViewModel(
             setState { copy(emailError = emailError, passwordError = passwordError) }
             return
         }
-        signIn(current.email.trim(), current.password, current.mode)
+        authenticate(current.email.trim(), current.password, current.mode)
     }
 
-    private fun signIn(email: String, password: String, mode: AuthMode = AuthMode.SignIn) {
+    private fun authenticate(email: String, password: String, mode: AuthMode) {
         viewModelScope.launch {
             setState { copy(isSubmitting = true, requestErrorCode = null) }
             val result = if (mode == AuthMode.SignIn) auth.signIn(email, password) else auth.signUp(email, password)
@@ -50,11 +56,17 @@ class AuthViewModel(
         }
     }
 
-    private companion object {
-        val SOCIAL_EMAIL = mapOf(
-            SocialProvider.Google to "aliya@gmail.example",
-            SocialProvider.Vk to "aliya@vk.example",
-        )
-        const val SOCIAL_PASSWORD = "social-login"
+    private fun showToast(toast: AuthToast) {
+        toastJob?.cancel()
+        setState { copy(toast = toast) }
+        toastJob = viewModelScope.launch {
+            delay(TamyrMotion.TOAST_VISIBLE_MS)
+            setState { copy(toast = null) }
+        }
+    }
+
+    private fun hideToast() {
+        toastJob?.cancel()
+        setState { copy(toast = null) }
     }
 }

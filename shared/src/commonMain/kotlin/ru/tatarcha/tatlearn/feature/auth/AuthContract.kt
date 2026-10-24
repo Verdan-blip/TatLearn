@@ -11,6 +11,7 @@ enum class AuthMode { SignIn, SignUp }
 enum class EmailError { Empty, Invalid }
 enum class PasswordError { TooShort }
 enum class SocialProvider { Google, Vk }
+enum class AuthToast { SocialUnavailable }
 
 data class AuthUiState(
     val mode: AuthMode = AuthMode.SignIn,
@@ -22,6 +23,7 @@ data class AuthUiState(
     val isSubmitting: Boolean = false,
     /** Короткий код последнего неудачного запроса, показывается под кнопкой. */
     val requestErrorCode: String? = null,
+    val toast: AuthToast? = null,
 ) : UiState
 
 sealed interface AuthUiEvent : UiEvent {
@@ -31,6 +33,7 @@ sealed interface AuthUiEvent : UiEvent {
     data object TogglePasswordVisibility : AuthUiEvent
     data object SubmitClicked : AuthUiEvent
     data class SocialClicked(val provider: SocialProvider) : AuthUiEvent
+    data object ToastDismissed : AuthUiEvent
     data object BackClicked : AuthUiEvent
 }
 

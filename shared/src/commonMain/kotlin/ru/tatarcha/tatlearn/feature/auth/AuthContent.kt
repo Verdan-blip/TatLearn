@@ -44,6 +44,9 @@ import ru.tatarcha.tatlearn.core.designsystem.component.TamyrButton
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrButtonStyle
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrSegmentedTabs
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrTextField
+import ru.tatarcha.tatlearn.core.designsystem.component.TamyrToastData
+import ru.tatarcha.tatlearn.core.designsystem.component.TamyrToastHost
+import ru.tatarcha.tatlearn.core.designsystem.component.TamyrToastKind
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrSizes
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import tatlearn.shared.generated.resources.Res
@@ -60,6 +63,7 @@ import tatlearn.shared.generated.resources.auth_legal
 import tatlearn.shared.generated.resources.auth_or
 import tatlearn.shared.generated.resources.auth_password_label
 import tatlearn.shared.generated.resources.auth_show_password
+import tatlearn.shared.generated.resources.auth_social_unavailable
 import tatlearn.shared.generated.resources.auth_submit_sign_in
 import tatlearn.shared.generated.resources.auth_submit_sign_up
 import tatlearn.shared.generated.resources.auth_tab_sign_in
@@ -75,122 +79,117 @@ private val ProviderMarkSize = 18.dp
 private const val PASSWORD_MASK = '•'
 
 @Composable
-fun AuthRoute(
-    mode: AuthMode,
-    onNavigateToHome: () -> Unit,
-    onNavigateBack: () -> Unit,
-    viewModel: AuthViewModel = koinViewModel(parameters = { parametersOf(mode) }),
-) {
-    LaunchedEffect(viewModel) {
-        viewModel.effects.collect { effect ->
-            when (effect) {
-                AuthUiEffect.NavigateToHome -> onNavigateToHome()
-                AuthUiEffect.NavigateBack -> onNavigateBack()
-            }
-        }
-    }
-    val state by viewModel.state.collectAsState()
-    AuthScreen(state, viewModel::onEvent)
-}
-
-@Composable
-fun AuthScreen(state: AuthUiState, onEvent: (AuthUiEvent) -> Unit) {
-    val colors = TamyrTheme.colors
-    val spacing = TamyrTheme.spacing
+fun AuthContent(state: AuthUiState, onEvent: (AuthUiEvent) -> Unit) {
     val signIn = state.mode == AuthMode.SignIn
 
-    Column(Modifier.fillMaxSize().background(colors.background).safeDrawingPadding().imePadding()) {
-        Row(
-            Modifier.padding(start = spacing.screen, end = spacing.screen, top = 18.dp),
-            horizontalArrangement = Arrangement.spacedBy(spacing.m),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(
-                Modifier
-                    .size(BackButtonSize)
-                    .clip(BackButtonShape)
-                    .background(colors.surface)
-                    .border(TamyrSizes.borderThin, colors.border, BackButtonShape)
-                    .clickable(role = Role.Button) { onEvent(AuthUiEvent.BackClicked) },
-                contentAlignment = Alignment.Center,
+    Box(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize().background(TamyrTheme.colors.background).safeDrawingPadding().imePadding()) {
+            Row(
+                Modifier.padding(start = TamyrTheme.spacing.screen, end = TamyrTheme.spacing.screen, top = 18.dp),
+                horizontalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.m),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(stringResource(Res.string.auth_back), style = TamyrTheme.typography.title18, color = colors.textSecondary)
-            }
-            Text(
-                stringResource(if (signIn) Res.string.auth_title_sign_in else Res.string.auth_title_sign_up),
-                style = TamyrTheme.typography.title22,
-                color = colors.textPrimary,
-            )
-        }
-
-        Column(
-            Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = spacing.screen, vertical = 22.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp),
-        ) {
-            TamyrSegmentedTabs(
-                options = listOf(stringResource(Res.string.auth_tab_sign_in), stringResource(Res.string.auth_tab_sign_up)),
-                selectedIndex = if (signIn) 0 else 1,
-                onSelect = { onEvent(AuthUiEvent.ModeChanged(if (it == 0) AuthMode.SignIn else AuthMode.SignUp)) },
-            )
-            TamyrTextField(
-                value = state.email,
-                onValueChange = { onEvent(AuthUiEvent.EmailChanged(it)) },
-                label = stringResource(Res.string.auth_email_label),
-                errorText = state.emailError?.let {
-                    stringResource(if (it == EmailError.Empty) Res.string.auth_error_email_empty else Res.string.auth_error_email_invalid)
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            )
-            TamyrTextField(
-                value = state.password,
-                onValueChange = { onEvent(AuthUiEvent.PasswordChanged(it)) },
-                label = stringResource(Res.string.auth_password_label),
-                errorText = state.passwordError?.let { stringResource(Res.string.auth_error_password_short) },
-                visualTransformation = if (state.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(PASSWORD_MASK),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailing = {
-                    Text(
-                        stringResource(if (state.passwordVisible) Res.string.auth_hide_password else Res.string.auth_show_password),
-                        style = TamyrTheme.typography.caption13Bold,
-                        color = colors.accent,
-                        modifier = Modifier.clickable(role = Role.Button) { onEvent(AuthUiEvent.TogglePasswordVisibility) },
-                    )
-                },
-            )
-            if (signIn) {
-                // TODO(design): у «Забыли пароль» пока нет целевого экрана.
+                Box(
+                    Modifier
+                        .size(BackButtonSize)
+                        .clip(BackButtonShape)
+                        .background(TamyrTheme.colors.surface)
+                        .border(TamyrSizes.borderThin, TamyrTheme.colors.border, BackButtonShape)
+                        .clickable(role = Role.Button) { onEvent(AuthUiEvent.BackClicked) },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(stringResource(Res.string.auth_back), style = TamyrTheme.typography.title18, color = TamyrTheme.colors.textSecondary)
+                }
                 Text(
-                    stringResource(Res.string.auth_forgot_password),
-                    style = TamyrTheme.typography.body14Bold,
-                    color = colors.accent,
-                    textAlign = TextAlign.End,
-                    modifier = Modifier.fillMaxWidth(),
+                    stringResource(if (signIn) Res.string.auth_title_sign_in else Res.string.auth_title_sign_up),
+                    style = TamyrTheme.typography.title22,
+                    color = TamyrTheme.colors.textPrimary,
                 )
             }
-            TamyrButton(
-                text = stringResource(if (signIn) Res.string.auth_submit_sign_in else Res.string.auth_submit_sign_up),
-                onClick = { onEvent(AuthUiEvent.SubmitClicked) },
-                enabled = !state.isSubmitting,
+
+            Column(
+                Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = TamyrTheme.spacing.screen, vertical = 22.dp),
+                verticalArrangement = Arrangement.spacedBy(18.dp),
+            ) {
+                TamyrSegmentedTabs(
+                    options = listOf(stringResource(Res.string.auth_tab_sign_in), stringResource(Res.string.auth_tab_sign_up)),
+                    selectedIndex = if (signIn) 0 else 1,
+                    onSelect = { onEvent(AuthUiEvent.ModeChanged(if (it == 0) AuthMode.SignIn else AuthMode.SignUp)) },
+                )
+                TamyrTextField(
+                    value = state.email,
+                    onValueChange = { onEvent(AuthUiEvent.EmailChanged(it)) },
+                    label = stringResource(Res.string.auth_email_label),
+                    errorText = state.emailError?.let {
+                        stringResource(if (it == EmailError.Empty) Res.string.auth_error_email_empty else Res.string.auth_error_email_invalid)
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                )
+                TamyrTextField(
+                    value = state.password,
+                    onValueChange = { onEvent(AuthUiEvent.PasswordChanged(it)) },
+                    label = stringResource(Res.string.auth_password_label),
+                    errorText = state.passwordError?.let { stringResource(Res.string.auth_error_password_short) },
+                    visualTransformation = if (state.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(PASSWORD_MASK),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailing = {
+                        Text(
+                            stringResource(if (state.passwordVisible) Res.string.auth_hide_password else Res.string.auth_show_password),
+                            style = TamyrTheme.typography.caption13Bold,
+                            color = TamyrTheme.colors.accent,
+                            modifier = Modifier.clickable(role = Role.Button) { onEvent(AuthUiEvent.TogglePasswordVisibility) },
+                        )
+                    },
+                )
+                if (signIn) {
+                    // TODO(design): у «Забыли пароль» пока нет целевого экрана.
+                    Text(
+                        stringResource(Res.string.auth_forgot_password),
+                        style = TamyrTheme.typography.body14Bold,
+                        color = TamyrTheme.colors.accent,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                TamyrButton(
+                    text = stringResource(if (signIn) Res.string.auth_submit_sign_in else Res.string.auth_submit_sign_up),
+                    onClick = { onEvent(AuthUiEvent.SubmitClicked) },
+                    enabled = !state.isSubmitting,
+                )
+                state.requestErrorCode?.let {
+                    Text(stringResource(Res.string.auth_error_request, it), style = TamyrTheme.typography.caption13, color = TamyrTheme.colors.accent)
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.m), verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.weight(1f).height(TamyrSizes.borderThin).background(TamyrTheme.colors.border))
+                    Text(stringResource(Res.string.auth_or), style = TamyrTheme.typography.caption13, color = TamyrTheme.colors.textSecondary)
+                    Box(Modifier.weight(1f).height(TamyrSizes.borderThin).background(TamyrTheme.colors.border))
+                }
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    SocialButton(stringResource(Res.string.auth_google), TamyrTheme.colors.gold, CircleShape) { onEvent(AuthUiEvent.SocialClicked(SocialProvider.Google)) }
+                    SocialButton(stringResource(Res.string.auth_vk), TamyrTheme.colors.primary, RoundedCornerShape(5.dp)) { onEvent(AuthUiEvent.SocialClicked(SocialProvider.Vk)) }
+                }
+            }
+            Text(
+                stringResource(Res.string.auth_legal),
+                style = TamyrTheme.typography.caption13.copy(lineHeight = TamyrTheme.typography.caption13.fontSize * 1.5f),
+                color = TamyrTheme.colors.textSecondary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(start = TamyrTheme.spacing.xxl, end = TamyrTheme.spacing.xxl, bottom = TamyrTheme.spacing.xxl),
             )
-            state.requestErrorCode?.let {
-                Text(stringResource(Res.string.auth_error_request, it), style = TamyrTheme.typography.caption13, color = colors.accent)
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(spacing.m), verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.weight(1f).height(TamyrSizes.borderThin).background(colors.border))
-                Text(stringResource(Res.string.auth_or), style = TamyrTheme.typography.caption13, color = colors.textSecondary)
-                Box(Modifier.weight(1f).height(TamyrSizes.borderThin).background(colors.border))
-            }
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                SocialButton(stringResource(Res.string.auth_google), colors.gold, CircleShape) { onEvent(AuthUiEvent.SocialClicked(SocialProvider.Google)) }
-                SocialButton(stringResource(Res.string.auth_vk), colors.primary, RoundedCornerShape(5.dp)) { onEvent(AuthUiEvent.SocialClicked(SocialProvider.Vk)) }
-            }
         }
-        Text(
-            stringResource(Res.string.auth_legal),
-            style = TamyrTheme.typography.caption13.copy(lineHeight = TamyrTheme.typography.caption13.fontSize * 1.5f),
-            color = colors.textSecondary,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth().padding(start = spacing.xxl, end = spacing.xxl, bottom = spacing.xxl),
+        TamyrToastHost(
+            toast = state.toast?.let { toast ->
+                TamyrToastData(
+                    text = stringResource(
+                        when (toast) {
+                            AuthToast.SocialUnavailable -> Res.string.auth_social_unavailable
+                        },
+                    ),
+                    kind = TamyrToastKind.Info,
+                )
+            },
+            onDismiss = { onEvent(AuthUiEvent.ToastDismissed) },
+            modifier = Modifier.align(Alignment.TopCenter),
         )
     }
 }
@@ -198,20 +197,19 @@ fun AuthScreen(state: AuthUiState, onEvent: (AuthUiEvent) -> Unit) {
 /** TODO(design): логотипы провайдеров в макете тоже просто цветные метки. */
 @Composable
 private fun SocialButton(text: String, markColor: Color, markShape: Shape, onClick: () -> Unit) {
-    val colors = TamyrTheme.colors
     Row(
         Modifier
             .fillMaxWidth()
             .height(SocialHeight)
             .clip(TamyrTheme.shapes.answer)
-            .background(colors.surface)
-            .border(TamyrSizes.borderThin, colors.border, TamyrTheme.shapes.answer)
+            .background(TamyrTheme.colors.surface)
+            .border(TamyrSizes.borderThin, TamyrTheme.colors.border, TamyrTheme.shapes.answer)
             .clickable(role = Role.Button, onClick = onClick),
         horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(Modifier.size(ProviderMarkSize).clip(markShape).background(markColor))
-        Text(text, style = TamyrTheme.typography.body15Bold, color = colors.textPrimary)
+        Text(text, style = TamyrTheme.typography.body15Bold, color = TamyrTheme.colors.textPrimary)
     }
 }
 
@@ -220,7 +218,7 @@ private fun SocialButton(text: String, markColor: Color, markShape: Shape, onCli
 private const val Group = "Auth"
 
 @Composable
-private fun AuthPreview(state: AuthUiState) = PreviewFrame { AuthScreen(state) {} }
+private fun AuthPreview(state: AuthUiState) = PreviewFrame { AuthContent(state) {} }
 
 @Preview(name = "Sign in · empty", group = Group, widthDp = 390, heightDp = 844)
 @Composable
@@ -249,6 +247,10 @@ private fun AuthSubmittingPreview() = AuthPreview(AuthUiState(email = "aliya@exa
 private fun AuthRequestErrorPreview() = AuthPreview(
     AuthUiState(email = "aliya@example.com", password = "secret123", requestErrorCode = "NET_TIMEOUT"),
 )
+
+@Preview(name = "Sign in · social unavailable toast", group = Group, widthDp = 390, heightDp = 844)
+@Composable
+private fun AuthSocialToastPreview() = AuthPreview(AuthUiState(toast = AuthToast.SocialUnavailable))
 
 @Preview(name = "Sign up · empty", group = Group, widthDp = 390, heightDp = 844)
 @Composable

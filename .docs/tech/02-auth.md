@@ -1,6 +1,6 @@
 # 02. Вход / Регистрация
 
-Макет: `design/screens/02.png`. Код: `…/feature/auth/` (`AuthContract.kt`, `AuthViewModel.kt`, `AuthValidator.kt`, `AuthScreen.kt`), `…/data/fake/FakeRepositories.kt` (`FakeAuthRepository`), `…/data/local/SessionStorage.kt`.
+Макет: `design/screens/02.png`. Код: `…/feature/auth/` (`AuthContract.kt`, `AuthViewModel.kt`, `AuthValidator.kt`, `AuthScene.kt`, `AuthContent.kt`), `…/data/fake/FakeRepositories.kt` (`FakeAuthRepository`), `…/data/local/SessionStorage.kt`.
 
 <img src="../screens/02.png" alt="Макет 02" width="220">
 
@@ -35,7 +35,8 @@
 | Отправка | Если уже идёт запрос — игнор. При ошибках валидации они показываются, запрос не уходит. Иначе вход (`signIn`) или регистрация (`signUp`) с `email.trim()`. Во время запроса кнопка отключена. |
 | Успех | `isSubmitting=false`, effect `NavigateToHome`. |
 | Ошибка запроса | Текст «Не получилось войти. Код ошибки: …» (код из `AppException`). Текст одинаков для входа и регистрации. |
-| Соцвход (Google/VK) | **Заглушка:** входит фейковым аккаунтом `aliya@gmail.example` / `aliya@vk.example` с паролем `social-login` (всегда как «Вход»). `TODO(backend)`: настоящий OAuth. |
+| Соцвход (Google/VK) | **Заглушка:** репозиторий не вызывается, в `uiState.toast` ставится `AuthToast.SocialUnavailable`. `TODO(backend)`: настоящий OAuth. |
+| Уведомление (`TamyrToast`) | `AuthViewModel` держит `toastJob`: показ → `delay(TamyrMotion.TOAST_VISIBLE_MS)` (5 с) → `toast = null`. Новое уведомление отменяет предыдущий таймер и заменяет текст. `ToastDismissed` (крестик/свайп вверх) сразу скрывает. |
 | «←» | effect `NavigateBack` (если Auth — корень стека, действие ничего не делает). |
 | «Забыли пароль?» | Просто текст, не кликабелен (`TODO(design)`). |
 

@@ -77,6 +77,7 @@
     <string name="auth_error_email_empty">Введите электронную почту</string>
     <string name="auth_error_email_invalid">Проверьте адрес электронной почты</string>
     <string name="auth_error_password_short">Пароль — не меньше 6 символов</string>
+    <string name="auth_social_unavailable">Вход через Google и VK ID пока недоступен</string>
     <string name="auth_error_request">Не получилось войти. Код ошибки: %1$s</string>
 
     <!-- 03 Главная -->
@@ -151,4 +152,8 @@
     <string name="translation_title">Напиши по-татарски</string>
     <string name="translation_caption">Специальные татарские буквы — под полем ввода</string>
     <string name="translation_letters">ә ө ү җ ң һ</string>
+    <string name="toast_close">Закрыть уведомление</string>
+    <string name="toast_icon_info">i</string>
+    <string name="toast_icon_error">!</string>
+    <string name="toast_icon_success">✓</string>
 </resources>
