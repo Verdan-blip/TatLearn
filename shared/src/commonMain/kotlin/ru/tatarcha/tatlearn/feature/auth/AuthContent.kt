@@ -55,7 +55,6 @@ import ru.tatarcha.tatlearn.core.designsystem.component.TamyrToastKind
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrSizes
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import tatlearn.shared.generated.resources.Res
-import tatlearn.shared.generated.resources.auth_back
 import tatlearn.shared.generated.resources.auth_email_label
 import tatlearn.shared.generated.resources.auth_error_email_empty
 import tatlearn.shared.generated.resources.auth_error_email_invalid
@@ -81,8 +80,6 @@ import tatlearn.shared.generated.resources.auth_title_sign_in
 import tatlearn.shared.generated.resources.auth_title_sign_up
 import tatlearn.shared.generated.resources.auth_vk
 
-private val BackButtonSize = 40.dp
-private val BackButtonShape = RoundedCornerShape(12.dp)
 private val SocialHeight = 50.dp
 private val ProviderMarkSize = 18.dp
 private const val PASSWORD_MASK = '•'
@@ -94,28 +91,12 @@ fun AuthContent(state: AuthUiState, onEvent: (AuthUiEvent) -> Unit) {
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize().background(TamyrTheme.colors.background).safeDrawingPadding().imePadding()) {
-            Row(
-                Modifier.padding(start = TamyrTheme.spacing.screen, end = TamyrTheme.spacing.screen, top = 18.dp),
-                horizontalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.m),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Box(
-                    Modifier
-                        .size(BackButtonSize)
-                        .clip(BackButtonShape)
-                        .background(TamyrTheme.colors.surface)
-                        .border(TamyrSizes.borderThin, TamyrTheme.colors.border, BackButtonShape)
-                        .clickable(role = Role.Button) { onEvent(AuthUiEvent.BackClicked) },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(stringResource(Res.string.auth_back), style = TamyrTheme.typography.title18, color = TamyrTheme.colors.textSecondary)
-                }
-                Text(
-                    stringResource(if (signIn) Res.string.auth_title_sign_in else Res.string.auth_title_sign_up),
-                    style = TamyrTheme.typography.title22,
-                    color = TamyrTheme.colors.textPrimary,
-                )
-            }
+            Text(
+                text = stringResource(if (signIn) Res.string.auth_title_sign_in else Res.string.auth_title_sign_up),
+                style = TamyrTheme.typography.title22,
+                color = TamyrTheme.colors.textPrimary,
+                modifier = Modifier.padding(start = TamyrTheme.spacing.screen, end = TamyrTheme.spacing.screen, top = 18.dp),
+            )
 
             Column(
                 Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = TamyrTheme.spacing.screen, vertical = 22.dp),

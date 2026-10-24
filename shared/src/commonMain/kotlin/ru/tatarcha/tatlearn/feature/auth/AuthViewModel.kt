@@ -26,7 +26,6 @@ class AuthViewModel(
             // TODO(backend): настоящий OAuth. Пока кнопки соцсетей только сообщают, что вход недоступен.
             is AuthUiEvent.SocialClicked -> showToast(AuthToast.SocialUnavailable)
             AuthUiEvent.ToastDismissed -> hideToast()
-            AuthUiEvent.BackClicked -> sendEffect(AuthUiEffect.NavigateBack)
         }
     }
 

@@ -73,7 +73,6 @@
     <string name="auth_google">Продолжить с Google</string>
     <string name="auth_vk">Продолжить с VK ID</string>
     <string name="auth_legal">Продолжая, вы соглашаетесь с условиями использования и политикой конфиденциальности</string>
-    <string name="auth_back">←</string>
     <string name="auth_error_email_empty">Введите электронную почту</string>
     <string name="auth_error_email_invalid">Проверьте адрес электронной почты</string>
     <string name="auth_error_password_empty">Введите пароль</string>

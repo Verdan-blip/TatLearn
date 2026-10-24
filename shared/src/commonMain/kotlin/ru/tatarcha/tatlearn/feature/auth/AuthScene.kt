@@ -11,14 +11,12 @@ import org.koin.core.parameter.parametersOf
 fun AuthScene(
     mode: AuthMode,
     onNavigateToHome: () -> Unit,
-    onNavigateBack: () -> Unit,
     viewModel: AuthViewModel = koinViewModel(parameters = { parametersOf(mode) }),
 ) {
     LaunchedEffect(viewModel) {
         viewModel.effects.collect { effect ->
             when (effect) {
                 AuthUiEffect.NavigateToHome -> onNavigateToHome()
-                AuthUiEffect.NavigateBack -> onNavigateBack()
             }
         }
     }

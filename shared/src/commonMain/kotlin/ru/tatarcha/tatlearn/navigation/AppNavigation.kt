@@ -75,7 +75,6 @@ fun AppNavigation(showDebugTools: Boolean = false) {
                     AuthScene(
                         mode = key.mode,
                         onNavigateToHome = { resetTo(HomeKey) },
-                        onNavigateBack = ::pop,
                     )
                 }
                 entry<HomeKey> {

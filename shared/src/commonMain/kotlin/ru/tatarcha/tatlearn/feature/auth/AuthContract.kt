@@ -35,10 +35,8 @@ sealed interface AuthUiEvent : UiEvent {
     data object SubmitClicked : AuthUiEvent
     data class SocialClicked(val provider: SocialProvider) : AuthUiEvent
     data object ToastDismissed : AuthUiEvent
-    data object BackClicked : AuthUiEvent
 }
 
 sealed interface AuthUiEffect : UiEffect {
     data object NavigateToHome : AuthUiEffect
-    data object NavigateBack : AuthUiEffect
 }
