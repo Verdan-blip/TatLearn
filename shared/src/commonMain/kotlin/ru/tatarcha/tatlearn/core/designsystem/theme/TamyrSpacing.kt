@@ -38,6 +38,9 @@ object TamyrSizes {
     val providerMark = 18.dp
     val toastIcon = 26.dp
     val spinner = 22.dp
+    val sheetHandleWidth = 40.dp
+    val sheetHandleHeight = 4.dp
+    val closeTargetPadding = 12.dp
     val resultMascot = 140.dp
     val resultMascotCompact = 110.dp
     val thresholdBar = 14.dp

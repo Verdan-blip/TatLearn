@@ -37,7 +37,7 @@ import ru.tatarcha.tatlearn.core.designsystem.component.PreviewFrame
 import ru.tatarcha.tatlearn.core.designsystem.component.exercise.AnswerFeedback
 import ru.tatarcha.tatlearn.core.designsystem.component.exercise.ExerciseFooter
 import ru.tatarcha.tatlearn.core.designsystem.component.exercise.ExerciseHeader
-import ru.tatarcha.tatlearn.core.designsystem.component.exercise.TamyrConfirmDialog
+import ru.tatarcha.tatlearn.core.designsystem.component.TamyrConfirmSheet
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import ru.tatarcha.tatlearn.domain.exercise.ExerciseStep
@@ -79,13 +79,14 @@ fun LessonRoute(
 
 @Composable
 fun LessonScreen(state: LessonUiState, onEvent: (LessonUiEvent) -> Unit) {
-    when (val load = state.load) {
-        LoadState.Loading -> LoadingState()
-        is LoadState.Error -> ErrorState(code = load.code, onRetry = { onEvent(LessonUiEvent.RetryClicked) })
-        is LoadState.Content -> ExerciseFrame(state, onEvent)
-    }
-    if (state.showExitDialog) {
-        TamyrConfirmDialog(
+    Box(Modifier.fillMaxSize()) {
+        when (val load = state.load) {
+            LoadState.Loading -> LoadingState()
+            is LoadState.Error -> ErrorState(code = load.code, onRetry = { onEvent(LessonUiEvent.RetryClicked) })
+            is LoadState.Content -> ExerciseFrame(state, onEvent)
+        }
+        TamyrConfirmSheet(
+            visible = state.showExitDialog,
             title = stringResource(Res.string.exercise_exit_title),
             message = stringResource(Res.string.exercise_exit_message),
             confirmText = stringResource(Res.string.exercise_exit_confirm),

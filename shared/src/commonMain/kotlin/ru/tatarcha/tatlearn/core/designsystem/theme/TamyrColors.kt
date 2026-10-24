@@ -42,6 +42,9 @@ data class TamyrColors(
     val errorBorder: Color,
 
     val cardShadow: Color,
+
+    /** Затемнение экрана под листом подтверждения. */
+    val scrim: Color,
 )
 
 val LightTamyrColors = TamyrColors(
@@ -76,4 +79,5 @@ val LightTamyrColors = TamyrColors(
     errorBorder = Color(0xFFDFB9A5),
 
     cardShadow = Color(0x243D3A2D), // rgba(61,58,45,.14)
+    scrim = Color(0x733D3A2D), // rgba(61,58,45,.45)
 )
