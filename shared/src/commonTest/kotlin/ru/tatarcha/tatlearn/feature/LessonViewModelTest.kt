@@ -125,20 +125,18 @@ class LessonViewModelTest {
         assertTrue(feedback.isCorrect)
         assertEquals("китап — книга", feedback.detail)
         assertEquals(XpRules.PER_CORRECT_STEP, feedback.xpGained)
-        assertEquals(XpRules.MAX_LIVES, vm.state.value.lives)
         vm.onEvent(LessonUiEvent.ContinueClicked)
         assertEquals(1, vm.state.value.stepIndex)
         assertNull(vm.state.value.feedback)
     }
 
-    @Test fun wrongAnswerCostsALifeAndRevealsAnswer() = runTest {
+    @Test fun wrongAnswerRevealsAnswer() = runTest {
         val vm = viewModel(listOf("quiz-0"))
         vm.onEvent(LessonUiEvent.OptionSelected(1))
         vm.onEvent(LessonUiEvent.CheckClicked)
         val feedback = vm.state.value.feedback!!
         assertEquals(false, feedback.isCorrect)
         assertEquals("книга", feedback.correctAnswer)
-        assertEquals(XpRules.MAX_LIVES - 1, vm.state.value.lives)
         assertEquals(0, progress.recorded.single().correct)
     }
 
@@ -161,14 +159,13 @@ class LessonViewModelTest {
         assertEquals(50, result.accuracyPercent)
         assertEquals(65, result.durationSeconds)
         assertEquals(listOf("quiz-1"), result.mistakeStepIds)
-        assertEquals("lesson_t" to 50, progress.completed)
+        assertNull(progress.completed) // 50% ниже порога
     }
 
     @Test fun matchingFlowWithMistake() = runTest {
         val vm = viewModel(listOf("matching"))
         vm.onEvent(LessonUiEvent.MatchLeftClicked(0))
         vm.onEvent(LessonUiEvent.MatchRightClicked(1)) // неверная пара
-        assertEquals(XpRules.MAX_LIVES - 1, vm.state.value.lives)
         assertEquals(0 to 1, (vm.state.value.input as StepInput.Matching).wrongPair)
         advanceUntilIdle()
         assertNull((vm.state.value.input as StepInput.Matching).wrongPair)
@@ -218,19 +215,23 @@ class LessonViewModelTest {
         assertEquals(TextRange(2), value.selection)
     }
 
-    @Test fun runningOutOfLivesEndsTheLessonWithoutCompleting() = runTest {
+    @Test fun mistakesNeverEndTheLessonEarly() = runTest {
         val vm = viewModel(listOf("quiz-0", "quiz-1", "listening-0", "sentence-0"))
-        // Неверные ответы на трёх шагах с выбором тратят все жизни; до четвёртого шага дело не доходит.
-        val wrongPicks = listOf(1, 0, 1)
-        wrongPicks.forEachIndexed { i, pick ->
+        listOf(1, 0, 1).forEach { pick ->
             vm.onEvent(LessonUiEvent.OptionSelected(pick))
             vm.onEvent(LessonUiEvent.CheckClicked)
-            if (i < wrongPicks.lastIndex) vm.onEvent(LessonUiEvent.ContinueClicked)
+            vm.onEvent(LessonUiEvent.ContinueClicked)
         }
-        assertEquals(0, vm.state.value.lives)
-        vm.onEvent(LessonUiEvent.ContinueClicked)
-        assertIs<LessonUiEffect.NavigateToResult>(vm.effects.first())
-        assertNull(progress.completed)
+        assertEquals(3, vm.state.value.stepIndex)
+        assertIs<ExerciseStep.SentenceBuilder>(vm.step())
+    }
+
+    @Test fun lessonIsCompletedAtPassThreshold() = runTest {
+        val vm = viewModel(listOf("quiz-0", "quiz-1"))
+        vm.onEvent(LessonUiEvent.OptionSelected(0)); vm.onEvent(LessonUiEvent.CheckClicked); vm.onEvent(LessonUiEvent.ContinueClicked)
+        vm.onEvent(LessonUiEvent.OptionSelected(1)); vm.onEvent(LessonUiEvent.CheckClicked); vm.onEvent(LessonUiEvent.ContinueClicked)
+        assertEquals(100, (vm.effects.first() as LessonUiEffect.NavigateToResult).key.accuracyPercent)
+        assertEquals("lesson_t" to 100, progress.completed)
     }
 
     @Test fun exitNeedsConfirmation() = runTest {

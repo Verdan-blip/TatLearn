@@ -171,10 +171,10 @@ private fun ResultNoStreakPreview() = ResultPreview(
     ResultUiState("", xpEarned = 12, accuracyPercent = 60, durationSeconds = 65, mistakes = 3, mistakeStepIds = listOf("quiz-0", "quiz-2", "sentence-0")),
 )
 
-@Preview(name = "Ran out of lives", group = Group, widthDp = 390, heightDp = 844)
+@Preview(name = "Below pass threshold", group = Group, widthDp = 390, heightDp = 844)
 @Composable
-private fun ResultOutOfLivesPreview() = ResultPreview(
-    // TODO(design): в заголовке по-прежнему сказано, что урок пройден; отдельного варианта «кончились жизни» нет.
+private fun ResultBelowThresholdPreview() = ResultPreview(
+    // TODO(design): в заголовке по-прежнему сказано, что урок пройден; отдельного варианта «порог 80% не достигнут» нет.
     ResultUiState("Алия", xpEarned = 6, accuracyPercent = 40, durationSeconds = 130, mistakes = 3, mistakeStepIds = listOf("quiz-0", "quiz-1", "listening-0"), streak = 2),
 )
 

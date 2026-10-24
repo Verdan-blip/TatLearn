@@ -30,10 +30,8 @@ object TamyrSizes {
     val buttonShadow = 3.dp
     val progressHeight = 10.dp
     val diamondBrand = 9.dp
-    val diamondLife = 10.dp
     val diamondLoader = 11.dp
     val diamondGap = 5.dp
-    val livesGap = 4.dp
     val loaderGap = 8.dp
     val borderThin = 1.dp
     val borderAccent = 2.dp

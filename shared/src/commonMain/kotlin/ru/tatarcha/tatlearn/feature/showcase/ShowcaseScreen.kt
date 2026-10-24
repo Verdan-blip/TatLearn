@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import ru.tatarcha.tatlearn.core.designsystem.component.BrandDiamonds
 import ru.tatarcha.tatlearn.core.designsystem.component.ErrorState
-import ru.tatarcha.tatlearn.core.designsystem.component.LivesIndicator
 import ru.tatarcha.tatlearn.core.designsystem.component.LoadingState
 import ru.tatarcha.tatlearn.core.designsystem.component.PulsingDiamonds
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrButton
@@ -133,11 +132,6 @@ fun ShowcaseScreen(viewModel: ShowcaseViewModel, onClose: () -> Unit) {
             }
             Section(Res.string.showcase_section_progress) {
                 TamyrProgressBar(progress, Modifier.fillMaxWidth())
-                Row(horizontalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.l)) {
-                    LivesIndicator(total = 3, remaining = 3)
-                    LivesIndicator(total = 3, remaining = 2)
-                    LivesIndicator(total = 3, remaining = 0)
-                }
             }
             Section(Res.string.showcase_section_diamonds) {
                 BrandDiamonds()

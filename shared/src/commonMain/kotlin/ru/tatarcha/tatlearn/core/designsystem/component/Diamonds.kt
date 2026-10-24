@@ -55,17 +55,6 @@ fun BrandDiamonds(modifier: Modifier = Modifier, size: Dp = TamyrSizes.diamondBr
     }
 }
 
-/** Оставшиеся/потерянные попытки в шапке упражнения: терракотовый, пока есть, цвет рамки, когда потрачена. */
-@Composable
-fun LivesIndicator(total: Int, remaining: Int, modifier: Modifier = Modifier) {
-    val colors = TamyrTheme.colors
-    Row(modifier, horizontalArrangement = Arrangement.spacedBy(TamyrSizes.livesGap), verticalAlignment = Alignment.CenterVertically) {
-        repeat(total) { index ->
-            Diamond(if (index < remaining) colors.accent else colors.border, TamyrSizes.diamondLife)
-        }
-    }
-}
-
 /**
  * Загрузчик: зелёный, золотой и терракотовый ромбы пульсируют по прозрачности .35→1 и масштабу .85→1.1,
  * период 1 с, каждый сдвинут на 0,2 с.

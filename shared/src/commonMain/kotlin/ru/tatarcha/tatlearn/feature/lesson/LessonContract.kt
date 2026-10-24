@@ -48,7 +48,6 @@ data class LessonUiState(
     val load: LoadState<Unit> = LoadState.Loading,
     val steps: List<ExerciseStep> = emptyList(),
     val stepIndex: Int = 0,
-    val lives: Int = XpRules.MAX_LIVES,
     val input: StepInput = StepInput.Choice(),
     val feedback: StepFeedback? = null,
     val audio: AudioPlayerState = AudioPlayerState.Idle,

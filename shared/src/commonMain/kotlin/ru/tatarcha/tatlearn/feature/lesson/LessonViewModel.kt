@@ -15,6 +15,7 @@ import ru.tatarcha.tatlearn.core.common.errorCode
 import ru.tatarcha.tatlearn.domain.exercise.AnswerNormalizer
 import ru.tatarcha.tatlearn.domain.exercise.ExerciseStep
 import ru.tatarcha.tatlearn.domain.exercise.LessonPlanner
+import ru.tatarcha.tatlearn.domain.exercise.XpRules
 import ru.tatarcha.tatlearn.domain.model.ExerciseResult
 import ru.tatarcha.tatlearn.domain.repository.LessonsRepository
 import ru.tatarcha.tatlearn.domain.repository.ProgressRepository
@@ -120,14 +121,10 @@ class LessonViewModel(
             if (matched.size == step.pairs.size) finishStep(correct = input.mistakes == 0, feedback = StepFeedback(isCorrect = true))
         } else {
             val mistakes = input.mistakes + 1
-            val lives = current.lives - 1
-            setState { copy(lives = lives, input = input.copy(leftSelected = null, wrongPair = left to pairIndex, mistakes = mistakes)) }
+            setState { copy(input = input.copy(leftSelected = null, wrongPair = left to pairIndex, mistakes = mistakes)) }
             viewModelScope.launch {
                 delay(WRONG_FLASH_MS)
                 setState { copy(input = (this.input as? StepInput.Matching)?.copy(wrongPair = null) ?: this.input) }
-                if (lives <= 0) {
-                    finishStep(correct = false, feedback = StepFeedback(isCorrect = false, correctAnswer = step.pairs.joinToString { "${it.tatar} — ${it.russian}" }), loseLife = false)
-                }
             }
         }
     }
@@ -205,7 +202,7 @@ class LessonViewModel(
         }
     }
 
-    private fun finishStep(correct: Boolean, feedback: StepFeedback, loseLife: Boolean = true) {
+    private fun finishStep(correct: Boolean, feedback: StepFeedback) {
         val step = state.value.step ?: return
         checkedSteps++
         if (correct) correctSteps++ else mistakeIds += step.id
@@ -213,12 +210,7 @@ class LessonViewModel(
         viewModelScope.launch {
             val outcome = progress.recordExerciseResult(ExerciseResult(key.lessonId, step.type, if (correct) 1 else 0, 1))
             xpEarned += outcome.xpEarned
-            setState {
-                copy(
-                    feedback = feedback.copy(xpGained = outcome.xpEarned),
-                    lives = if (!correct && loseLife && step !is ExerciseStep.Matching) lives - 1 else lives,
-                )
-            }
+            setState { copy(feedback = feedback.copy(xpGained = outcome.xpEarned)) }
         }
     }
 
@@ -226,19 +218,18 @@ class LessonViewModel(
         val current = state.value
         if (current.feedback == null) return
         val lastStep = current.stepIndex >= current.steps.lastIndex
-        if (lastStep || current.lives <= 0) {
-            finishLesson(current.lives)
+        if (lastStep) {
+            finishLesson()
         } else {
             val nextStep = current.steps[current.stepIndex + 1]
             setState { copy(stepIndex = stepIndex + 1, input = initialInput(nextStep), feedback = null) }
         }
     }
 
-    private fun finishLesson(livesLeft: Int) {
+    private fun finishLesson() {
         viewModelScope.launch {
             val accuracy = if (checkedSteps == 0) 0 else correctSteps * 100 / checkedSteps
-            // Урок «пройден» только если у пользователя не кончились жизни.
-            if (livesLeft > 0) progress.completeLesson(key.lessonId, accuracy)
+            if (accuracy >= XpRules.PASS_THRESHOLD_PERCENT) progress.completeLesson(key.lessonId, accuracy)
             val seconds = ((time.nowMillis() - startedAtMillis) / MILLIS_PER_SECOND).toInt().coerceAtLeast(0)
             sendEffect(LessonUiEffect.NavigateToResult(ResultKey(key.lessonId, xpEarned, accuracy, seconds, mistakeIds.toList())))
         }

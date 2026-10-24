@@ -13,18 +13,15 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import ru.tatarcha.tatlearn.core.designsystem.component.LivesIndicator
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrProgressBar
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import tatlearn.shared.generated.resources.Res
 import tatlearn.shared.generated.resources.exercise_close
 
-/** Верхняя панель каждого упражнения: закрыть, прогресс урока, оставшиеся жизни. */
+/** Верхняя панель каждого упражнения: закрыть и прогресс урока. */
 @Composable
 fun ExerciseHeader(
     progress: Float,
-    lives: Int,
-    maxLives: Int,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -40,6 +37,5 @@ fun ExerciseHeader(
             modifier = Modifier.clickable(role = Role.Button, onClick = onClose),
         )
         TamyrProgressBar(progress, Modifier.weight(1f))
-        LivesIndicator(total = maxLives, remaining = lives)
     }
 }

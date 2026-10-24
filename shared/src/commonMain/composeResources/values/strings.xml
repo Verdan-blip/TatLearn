@@ -15,7 +15,7 @@
     <string name="showcase_close">Назад</string>
     <string name="showcase_section_buttons">Кнопки</string>
     <string name="showcase_section_tags">Теги</string>
-    <string name="showcase_section_progress">Прогресс и жизни</string>
+    <string name="showcase_section_progress">Прогресс</string>
     <string name="showcase_section_diamonds">Ромбики и лоадер</string>
     <string name="showcase_section_card">Карточка</string>
     <string name="showcase_section_states">Состояния</string>

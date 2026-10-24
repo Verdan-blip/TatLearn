@@ -41,7 +41,6 @@ import ru.tatarcha.tatlearn.core.designsystem.component.exercise.TamyrConfirmDia
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import ru.tatarcha.tatlearn.domain.exercise.ExerciseStep
-import ru.tatarcha.tatlearn.domain.exercise.XpRules
 import ru.tatarcha.tatlearn.navigation.LessonKey
 import ru.tatarcha.tatlearn.navigation.ResultKey
 import tatlearn.shared.generated.resources.Res
@@ -104,8 +103,6 @@ private fun ExerciseFrame(state: LessonUiState, onEvent: (LessonUiEvent) -> Unit
     Column(Modifier.fillMaxSize().background(TamyrTheme.colors.background).statusBarsPadding()) {
         ExerciseHeader(
             progress = state.progress,
-            lives = state.lives,
-            maxLives = XpRules.MAX_LIVES,
             onClose = { onEvent(LessonUiEvent.CloseClicked) },
         )
         // Каждый шаг въезжает справа; обратная связь того же шага не должна запускать анимацию заново.
@@ -214,7 +211,6 @@ private fun MatchingWrongPreview() = LessonPreview(
     LessonPreviewData.state(
         LessonPreviewData.matching,
         StepInput.Matching(leftSelected = 1, matched = setOf(0), wrongPair = 1 to 3, mistakes = 1),
-        lives = 2,
         stepIndex = 0,
     ),
 )
@@ -226,18 +222,6 @@ private fun MatchingDonePreview() = LessonPreview(
         LessonPreviewData.matching,
         StepInput.Matching(matched = setOf(0, 1, 2, 3, 4)),
         feedback = StepFeedback(isCorrect = true, xpGained = 3),
-        stepIndex = 0,
-    ),
-)
-
-@Preview(name = "Matching · out of lives", group = Group, widthDp = 390, heightDp = 844)
-@Composable
-private fun MatchingOutOfLivesPreview() = LessonPreview(
-    LessonPreviewData.state(
-        LessonPreviewData.matching,
-        StepInput.Matching(matched = setOf(0, 1), mistakes = 3),
-        feedback = wrong("әни — мама · ипи — хлеб · су — вода · мәктәп — школа · дус — друг"),
-        lives = 0,
         stepIndex = 0,
     ),
 )
@@ -261,13 +245,13 @@ private fun QuizCorrectPreview() = LessonPreview(
 @Preview(name = "Quiz · wrong", group = Group, widthDp = 390, heightDp = 844)
 @Composable
 private fun QuizWrongPreview() = LessonPreview(
-    LessonPreviewData.state(LessonPreviewData.quiz, StepInput.Choice(selected = 2), feedback = wrong("книга"), lives = 2),
+    LessonPreviewData.state(LessonPreviewData.quiz, StepInput.Choice(selected = 2), feedback = wrong("книга")),
 )
 
-@Preview(name = "Quiz · repeated word, 1 life", group = Group, widthDp = 390, heightDp = 844)
+@Preview(name = "Quiz · repeated word", group = Group, widthDp = 390, heightDp = 844)
 @Composable
 private fun QuizLastLifePreview() = LessonPreview(
-    LessonPreviewData.state(LessonPreviewData.quizRepeat, StepInput.Choice(), lives = 1, stepIndex = 8),
+    LessonPreviewData.state(LessonPreviewData.quizRepeat, StepInput.Choice(), stepIndex = 8),
 )
 
 // Аудирование
@@ -291,7 +275,7 @@ private fun ListeningCorrectPreview() = LessonPreview(
 @Preview(name = "Listening · wrong", group = Group, widthDp = 390, heightDp = 844)
 @Composable
 private fun ListeningWrongPreview() = LessonPreview(
-    LessonPreviewData.state(LessonPreviewData.listening, StepInput.Choice(selected = 2), feedback = wrong("Рәхмәт"), lives = 2),
+    LessonPreviewData.state(LessonPreviewData.listening, StepInput.Choice(selected = 2), feedback = wrong("Рәхмәт")),
 )
 
 @Preview(name = "Listening · audio error", group = Group, widthDp = 390, heightDp = 844)
@@ -335,7 +319,6 @@ private fun SentenceWrongPreview() = LessonPreview(
         LessonPreviewData.sentence,
         StepInput.Sentence(placed = listOf(0, 1, 2)),
         feedback = wrong("Мин мәктәпкә барам"),
-        lives = 2,
     ),
 )
 
@@ -378,7 +361,6 @@ private fun TranslationWrongPreview() = LessonPreview(
         LessonPreviewData.translation,
         StepInput.Translation(LessonPreviewData.text("Исәнмесез")),
         feedback = wrong("Хәерле иртә"),
-        lives = 1,
     ),
 )
 
