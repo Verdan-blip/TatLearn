@@ -43,18 +43,18 @@
           <div style="width:46px;height:46px;border-radius:50%;background:#E5DEC6"></div>
         </div>
         <div style="padding:18px 24px 0;display:flex;flex-direction:column;gap:14px">
-          <div style="background:#FFFCF3;border:1px solid #E5DEC6;border-radius:16px;padding:16px;display:flex;align-items:center;gap:16px">
-            <div style="width:52px;height:52px;border-radius:14px;background:#EAE3CB"></div>
-            <div style="flex:1;display:flex;flex-direction:column;gap:8px">
-              <div style="width:60%;height:12px;border-radius:6px;background:#EAE3CB"></div>
-              <div style="height:8px;border-radius:4px;background:#EAE3CB"></div>
-            </div>
-          </div>
           <div style="background:#FFFCF3;border:1px solid #E5DEC6;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px">
             <div style="width:40%;height:12px;border-radius:6px;background:#EAE3CB"></div>
             <div style="width:65%;height:18px;border-radius:8px;background:#EAE3CB"></div>
             <div style="height:8px;border-radius:4px;background:#EAE3CB"></div>
             <div style="height:46px;border-radius:12px;background:#EAE3CB"></div>
+          </div>
+          <div style="background:#FFFCF3;border:1px solid #E5DEC6;border-radius:16px;padding:12px 16px;display:flex;align-items:center;gap:14px">
+            <div style="width:40px;height:40px;border-radius:12px;background:#EAE3CB"></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+              <div style="width:60%;height:12px;border-radius:6px;background:#EAE3CB"></div>
+              <div style="height:6px;border-radius:3px;background:#EAE3CB"></div>
+            </div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div style="height:110px;background:#FFFCF3;border:1px solid #E5DEC6;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box"><div style="width:34px;height:34px;border-radius:10px;background:#EAE3CB"></div><div style="width:70%;height:12px;border-radius:6px;background:#EAE3CB"></div></div>
@@ -410,14 +410,6 @@
           <div style="width:46px;height:46px;border-radius:50%;background:#D9EFD8;border:1px solid #E5DEC6;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#3B6B45">А</div>
         </div>
         <div style="padding:18px 24px 0;display:flex;flex-direction:column;gap:14px;overflow:hidden">
-          <div style="background:#FFFCF3;border:1px solid #E5DEC6;border-radius:16px;padding:16px;display:flex;align-items:center;gap:16px">
-            <div style="width:52px;height:52px;border-radius:14px;background:#C99A34;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#3D3A2D"><div style="font-size:20px;font-weight:700">{{ streak }}</div></div>
-            <div style="flex:1;display:flex;flex-direction:column;gap:6px">
-              <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:15px;font-weight:700">{{ streak }} көн рәттән</div><div style="font-size:13px;font-weight:700;color:#7A6119">340 XP</div></div>
-              <div style="height:8px;border-radius:4px;background:#EAE3CB;overflow:hidden"><div style="width:68%;height:100%;background:#C99A34;border-radius:4px"></div></div>
-              <div style="font-size:12px;color:#5A5642">До уровня 7 — ещё 60 XP</div>
-            </div>
-          </div>
           <div style="background:#D9EFD8;border:1px solid #E5DEC6;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px">
             <div style="display:flex;justify-content:space-between;align-items:center">
               <div style="font-size:13px;font-weight:700;color:#3B6B45;text-transform:uppercase;letter-spacing:.06em">Дәвам ит · Продолжить</div>
@@ -426,6 +418,13 @@
             <div style="font-size:19px;font-weight:700">Гаилә · Семья</div>
             <div style="height:8px;border-radius:4px;background:#FFFCF3;overflow:hidden"><div style="width:60%;height:100%;background:#3B6B45;border-radius:4px"></div></div>
             <div style="height:46px;border-radius:12px;background:#3B6B45;color:#F3EEDF;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700">Урок 4 · Туганнар</div>
+          </div>
+          <div style="background:#FFFCF3;border:1px solid #E5DEC6;border-radius:16px;padding:12px 16px;display:flex;align-items:center;gap:14px">
+            <div style="width:40px;height:40px;border-radius:12px;background:#C99A34;display:flex;align-items:center;justify-content:center;color:#3D3A2D"><div style="font-size:17px;font-weight:700">{{ streak }}</div></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:15px;font-weight:700">Серия: {{ streak }} көн</div><div style="font-size:13px;font-weight:700;color:#7A6119">Ур. 6 · 340 XP</div></div>
+              <div style="height:6px;border-radius:3px;background:#EAE3CB;overflow:hidden"><div style="width:68%;height:100%;background:#C99A34;border-radius:3px"></div></div>
+            </div>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:2px">
             <div style="font-size:17px;font-weight:700">Модули</div>
@@ -476,9 +475,7 @@
           </div>
           <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px">
             <div style="width:20px;height:20px;display:flex;align-items:center;justify-content:center">
-              <div style="width:17px;height:19px;border:2px solid #5A5642;border-radius:3px 6px 6px 3px;box-sizing:border-box;position:relative">
-                <div style="position:absolute;left:2px;top:0;bottom:0;width:2px;background:#5A5642"></div>
-              </div>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#5A5642" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M10 5.2C8 3.7 5.2 3.4 2.6 4.2V15.2C5.2 14.4 8 14.7 10 16.2C12 14.7 14.8 14.4 17.4 15.2V4.2C14.8 3.4 12 3.7 10 5.2Z"/><path d="M10 5.2V16.2"/></svg>
             </div>
             <div style="font-size:11px;color:#5A5642">Сүзлек</div>
           </div>
