@@ -119,6 +119,8 @@
 
     <!-- Упражнения: общее -->
     <string name="exercise_close">✕</string>
+    <string name="answer_mark_matched">✓</string>
+    <string name="answer_mark_wrong">✕</string>
     <string name="exercise_check">Тикшерергә · Проверить</string>
     <string name="exercise_continue">Дәвам итәргә</string>
     <string name="exercise_understood">Аңладым · Понятно</string>
