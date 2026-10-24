@@ -33,6 +33,8 @@ object TamyrSizes {
     val borderThin = 1.dp
     val borderAccent = 2.dp
     val toastIcon = 26.dp
+    val spinner = 22.dp
+    val spinnerStroke = 3.dp
     val toastClose = 32.dp
     val toastCloseIcon = 24.dp
     val toastSwipeThreshold = 24.dp
@@ -44,4 +46,5 @@ object TamyrMotion {
     const val STEP_MS = 280
     const val PROGRESS_MS = 400
     const val TOAST_VISIBLE_MS = 5_000L
+    const val SPINNER_MS = 900
 }

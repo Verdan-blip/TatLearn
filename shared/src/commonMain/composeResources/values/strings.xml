@@ -156,6 +156,7 @@
     <string name="translation_title">Напиши по-татарски</string>
     <string name="translation_caption">Специальные татарские буквы — под полем ввода</string>
     <string name="translation_letters">ә ө ү җ ң һ</string>
+    <string name="button_loading">Выполняется</string>
     <string name="toast_close">Закрыть уведомление</string>
     <string name="toast_icon_info">i</string>
     <string name="toast_icon_error">!</string>

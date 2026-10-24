@@ -28,7 +28,7 @@ Koin (DI), Navigation 3 (JetBrains, `navigation3-ui`; runtime comes transitively
 
 ## Design system (`core/designsystem`)
 - Access tokens via `TamyrTheme.colors/typography/shapes/spacing`; sizes of fixed components in `TamyrSizes`. Wrap UI in `TamyrTheme`.
-- Components: `TamyrButton`, `TamyrCard`, `TamyrProgressBar`, `TamyrTag`, `Diamond/BrandDiamonds/LivesIndicator/PulsingDiamonds`, `TamyrToast/TamyrToastHost` (Info/Error/Success, 5 s, close button, swipe up; design screen 12), `LoadingState`, `ErrorState`, `LoadStateContent` over `core/common/LoadState`.
+- Components: `TamyrButton` (`loading` -> `TamyrSpinner`; design screen 13), `TamyrCard`, `TamyrProgressBar`, `TamyrTag`, `Diamond/BrandDiamonds/LivesIndicator/PulsingDiamonds`, `TamyrToast/TamyrToastHost` (Info/Error/Success, 5 s, close button, swipe up; design screen 12), `LoadingState`, `ErrorState`, `LoadStateContent` over `core/common/LoadState`.
 - Font: PT Sans in `composeResources/font` (OFL license: `design/OFL-PTSans.txt`). Design PNGs: `design/screens/NN.png` (rendered with Playwright + system Chrome).
 - Debug UI kit: `ShowcaseScreen`, reached via the "UI kit" button (shown only for debug builds).
 - Mascot Myrauzhan: `TamyrMascot(MascotPose, size)` over vector drawables `mascot_*.xml` (sources: `design/mascot/*.svg`, brief: `design/mascot-prompt.md`). Used in onboarding, error state, answer panel, result, matching hint. Not wired yet: Loading (Searching), Tired on 0-lives result, Sleeping, HeadIcon; the cap/diamond ornament needs native/cultural review.

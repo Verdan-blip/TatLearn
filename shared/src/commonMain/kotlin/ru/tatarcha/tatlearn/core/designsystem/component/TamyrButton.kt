@@ -6,7 +6,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,13 +18,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.style.TextAlign
+import org.jetbrains.compose.resources.stringResource
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrSizes
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
+import tatlearn.shared.generated.resources.Res
+import tatlearn.shared.generated.resources.button_loading
 
 enum class TamyrButtonStyle {
     /** Зелёная заливка, главный призыв к действию. */
@@ -45,11 +54,13 @@ fun TamyrButton(
     modifier: Modifier = Modifier,
     style: TamyrButtonStyle = TamyrButtonStyle.Primary,
     enabled: Boolean = true,
+    loading: Boolean = false,
 ) {
     val colors = TamyrTheme.colors
     val shape = TamyrTheme.shapes.button
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
+    val loadingDescription = stringResource(Res.string.button_loading)
 
     val container: Color
     val content: Color
@@ -75,16 +86,20 @@ fun TamyrButton(
             .clip(shape)
             .background(container)
             .then(if (border != null) Modifier.border(BorderStroke(TamyrSizes.borderThin, border), shape) else Modifier)
-            .clickable(interactionSource = interaction, indication = null, enabled = enabled, role = Role.Button, onClick = onClick)
+            .clickable(interactionSource = interaction, indication = null, enabled = enabled && !loading, role = Role.Button, onClick = onClick)
+            .semantics { if (loading) stateDescription = loadingDescription }
             .padding(horizontal = TamyrTheme.spacing.l),
         contentAlignment = Alignment.Center,
     ) {
+        // Подпись остаётся в дереве под прозрачностью: так кнопка не меняет ширину, а TalkBack/VoiceOver читает действие.
         Text(
             text = text,
             color = content,
             style = if (secondary) TamyrTheme.typography.body16Bold else TamyrTheme.typography.body17Bold,
             textAlign = TextAlign.Center,
+            modifier = Modifier.alpha(if (loading) 0f else 1f),
         )
+        if (loading) TamyrSpinner(color = content)
     }
 }
 
@@ -98,4 +113,25 @@ fun TamyrTextButton(text: String, onClick: () -> Unit, modifier: Modifier = Modi
         textAlign = TextAlign.Center,
         modifier = modifier.clickable(role = Role.Button, onClick = onClick).padding(TamyrTheme.spacing.s),
     )
+}
+
+@Preview(name = "Loading")
+@Composable
+private fun TamyrButtonLoadingPreview() = PreviewFrame {
+    Column(
+        modifier = Modifier.padding(TamyrTheme.spacing.screen),
+        verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.l),
+    ) {
+        TamyrButton(
+            text = "Керергә · Войти",
+            onClick = {},
+            loading = true,
+        )
+        TamyrButton(
+            text = "Аңладым · Понятно",
+            onClick = {},
+            style = TamyrButtonStyle.Accent,
+            loading = true,
+        )
+    }
 }

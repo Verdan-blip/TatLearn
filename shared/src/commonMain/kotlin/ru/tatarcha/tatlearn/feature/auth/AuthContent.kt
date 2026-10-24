@@ -180,7 +180,7 @@ fun AuthContent(state: AuthUiState, onEvent: (AuthUiEvent) -> Unit) {
                 TamyrButton(
                     text = stringResource(if (signIn) Res.string.auth_submit_sign_in else Res.string.auth_submit_sign_up),
                     onClick = { onEvent(AuthUiEvent.SubmitClicked) },
-                    enabled = !state.isSubmitting,
+                    loading = state.isSubmitting,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.m), verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.weight(1f).height(TamyrSizes.borderThin).background(TamyrTheme.colors.border))
