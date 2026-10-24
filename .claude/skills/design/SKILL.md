@@ -14,6 +14,7 @@ description: Что в проекте Тамыр (TatLearn) называется
 | `design/Tatar App Screens.dc.html` | Источник истины для UI: 11 экранов 390×844 на одном холсте (HTML, сгенерирован Claude Design) |
 | `design/support.js` | Скрипт поддержки холста `.dc.html`, подключается самим макетом. Не менять без необходимости |
 | `design/screens/NN.png` | Эталонные рендеры экранов (Playwright + системный Chrome) |
+| `design/icons/*` | Логотипы сторонних сервисов (Google, VK) для кнопок входа; те же файлы лежат в `composeResources/drawable` |
 | `design/mascot/*.svg`, `design/mascot-prompt.md` | Исходники и бриф маскота Мырауҗан |
 | `design/OFL-PTSans.txt` | Лицензия шрифта PT Sans |
 

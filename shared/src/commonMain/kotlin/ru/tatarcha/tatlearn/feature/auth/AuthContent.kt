@@ -1,5 +1,6 @@
 package ru.tatarcha.tatlearn.feature.auth
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,8 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
@@ -34,6 +33,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ru.tatarcha.tatlearn.core.common.ErrorCodes
 import ru.tatarcha.tatlearn.core.designsystem.component.PreviewFrame
@@ -46,6 +47,8 @@ import ru.tatarcha.tatlearn.core.designsystem.component.TamyrToastKind
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrSizes
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import tatlearn.shared.generated.resources.Res
+import tatlearn.shared.generated.resources.ic_google
+import tatlearn.shared.generated.resources.ic_vk
 import tatlearn.shared.generated.resources.auth_email_label
 import tatlearn.shared.generated.resources.auth_error_email_empty
 import tatlearn.shared.generated.resources.auth_error_email_invalid
@@ -252,25 +255,21 @@ private fun SocialButtons(onEvent: (AuthUiEvent) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.tight)) {
         SocialButton(
             text = stringResource(Res.string.auth_google),
-            markColor = TamyrTheme.colors.gold,
-            markShape = TamyrTheme.shapes.circle,
+            icon = Res.drawable.ic_google,
             onClick = { onEvent(AuthUiEvent.SocialClicked(SocialProvider.Google)) },
         )
         SocialButton(
             text = stringResource(Res.string.auth_vk),
-            markColor = TamyrTheme.colors.primary,
-            markShape = TamyrTheme.shapes.mark,
+            icon = Res.drawable.ic_vk,
             onClick = { onEvent(AuthUiEvent.SocialClicked(SocialProvider.Vk)) },
         )
     }
 }
 
-/** TODO(design): логотипы провайдеров в макете тоже просто цветные метки. */
 @Composable
 private fun SocialButton(
     text: String,
-    markColor: Color,
-    markShape: Shape,
+    icon: DrawableResource,
     onClick: () -> Unit,
 ) {
     Row(
@@ -284,11 +283,10 @@ private fun SocialButton(
         horizontalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.tight, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            modifier = Modifier
-                .size(TamyrSizes.providerMark)
-                .clip(markShape)
-                .background(markColor),
+        Image(
+            painter = painterResource(icon),
+            contentDescription = null,
+            modifier = Modifier.size(TamyrSizes.providerMark),
         )
         Text(
             text = text,
