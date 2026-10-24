@@ -57,5 +57,8 @@ Koin (DI), Navigation 3 (JetBrains, `navigation3-ui`; runtime comes transitively
 - Tests (49, same set on both platforms): `./gradlew :shared:testAndroidHostTest :shared:iosSimulatorArm64Test`. Settings fake = `MapSettings` from `multiplatform-settings-test` (test-only).
 - Motion tokens: `TamyrMotion` (step slide, feedback panel slide-up, progress bar tween).
 
+## Methodology
+- Decisions that affect learning (module/lesson structure, exercise types and order, pass threshold, unlock rules, motivation: streak/XP/lives, repetition, audio, feedback on mistakes) are discussed together with the subagent `language-teacher` (`.claude/agents/language-teacher.md`, a language teacher/methodist). Ask it before settling; its report is advice, the decision stays with the user. Unverified Tatar content stays marked "needs native-speaker review".
+
 ## Status
 Stages 1-6 done. Open: XP/level formula, lives rule, native-speaker review of content.
