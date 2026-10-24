@@ -55,6 +55,7 @@ import tatlearn.shared.generated.resources.auth_back
 import tatlearn.shared.generated.resources.auth_email_label
 import tatlearn.shared.generated.resources.auth_error_email_empty
 import tatlearn.shared.generated.resources.auth_error_email_invalid
+import tatlearn.shared.generated.resources.auth_error_password_empty
 import tatlearn.shared.generated.resources.auth_error_password_short
 import tatlearn.shared.generated.resources.auth_error_sign_in_code
 import tatlearn.shared.generated.resources.auth_error_sign_in_network
@@ -133,7 +134,9 @@ fun AuthContent(state: AuthUiState, onEvent: (AuthUiEvent) -> Unit) {
                     value = state.password,
                     onValueChange = { onEvent(AuthUiEvent.PasswordChanged(it)) },
                     label = stringResource(Res.string.auth_password_label),
-                    errorText = state.passwordError?.let { stringResource(Res.string.auth_error_password_short) },
+                    errorText = state.passwordError?.let {
+                            stringResource(if (it == PasswordError.Empty) Res.string.auth_error_password_empty else Res.string.auth_error_password_short)
+                        },
                     visualTransformation = if (state.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(PASSWORD_MASK),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailing = {
@@ -244,8 +247,12 @@ private fun AuthSignInFilledPreview() = AuthPreview(AuthUiState(email = "aliya@e
 @Preview(name = "Sign in · field errors", group = Group, widthDp = 390, heightDp = 844)
 @Composable
 private fun AuthFieldErrorsPreview() = AuthPreview(
-    AuthUiState(email = "aliya@", password = "123", emailError = EmailError.Invalid, passwordError = PasswordError.TooShort),
+    AuthUiState(email = "aliya@", emailError = EmailError.Invalid, passwordError = PasswordError.Empty),
 )
+
+@Preview(name = "Sign in · empty password", group = Group, widthDp = 390, heightDp = 844)
+@Composable
+private fun AuthEmptyPasswordPreview() = AuthPreview(AuthUiState(email = "aliya@example.com", passwordError = PasswordError.Empty))
 
 @Preview(name = "Sign in · empty email", group = Group, widthDp = 390, heightDp = 844)
 @Composable

@@ -76,6 +76,7 @@
     <string name="auth_back">←</string>
     <string name="auth_error_email_empty">Введите электронную почту</string>
     <string name="auth_error_email_invalid">Проверьте адрес электронной почты</string>
+    <string name="auth_error_password_empty">Введите пароль</string>
     <string name="auth_error_password_short">Пароль — не меньше 6 символов</string>
     <string name="auth_social_unavailable">Вход через Google и VK ID пока недоступен</string>
     <string name="auth_error_sign_in_network">Не получилось войти. Проверьте интернет и попробуйте ещё раз</string>

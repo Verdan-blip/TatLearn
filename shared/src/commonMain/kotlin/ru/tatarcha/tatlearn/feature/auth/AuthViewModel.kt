@@ -34,7 +34,7 @@ class AuthViewModel(
         val current = state.value
         if (current.isSubmitting) return
         val emailError = AuthValidator.email(current.email)
-        val passwordError = AuthValidator.password(current.password)
+        val passwordError = AuthValidator.password(current.password, current.mode)
         if (emailError != null || passwordError != null) {
             setState { copy(emailError = emailError, passwordError = passwordError) }
             return

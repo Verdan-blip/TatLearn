@@ -9,7 +9,7 @@ import ru.tatarcha.tatlearn.core.common.UiState
 enum class AuthMode { SignIn, SignUp }
 
 enum class EmailError { Empty, Invalid }
-enum class PasswordError { TooShort }
+enum class PasswordError { Empty, TooShort }
 enum class SocialProvider { Google, Vk }
 sealed interface AuthToast {
     data object SocialUnavailable : AuthToast

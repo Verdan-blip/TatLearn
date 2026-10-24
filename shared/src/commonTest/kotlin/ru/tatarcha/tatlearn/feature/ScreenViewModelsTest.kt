@@ -110,13 +110,25 @@ class ScreenViewModelsTest {
         assertEquals(EmailError.Empty, AuthValidator.email("  "))
         assertEquals(EmailError.Invalid, AuthValidator.email("aliya@"))
         assertNull(AuthValidator.email(" aliya@mail.ru "))
-        assertEquals(PasswordError.TooShort, AuthValidator.password("12345"))
-        assertNull(AuthValidator.password("123456"))
+        assertEquals(PasswordError.Empty, AuthValidator.password("", AuthMode.SignIn))
+        assertEquals(PasswordError.Empty, AuthValidator.password("", AuthMode.SignUp))
+        assertEquals(PasswordError.TooShort, AuthValidator.password("12345", AuthMode.SignUp))
+        assertNull(AuthValidator.password("123456", AuthMode.SignUp))
+    }
+
+    @Test fun signInAcceptsShortPassword() = runTest {
+        val auth = FakeAuth()
+        val vm = AuthViewModel(AuthMode.SignIn, auth)
+        vm.onEvent(AuthUiEvent.EmailChanged("a@b.ru"))
+        vm.onEvent(AuthUiEvent.PasswordChanged("1"))
+        vm.onEvent(AuthUiEvent.SubmitClicked)
+        assertNull(vm.state.value.passwordError)
+        assertEquals(listOf("in:a@b.ru"), auth.calls)
     }
 
     @Test fun invalidFormDoesNotCallRepository() = runTest {
         val auth = FakeAuth()
-        val vm = AuthViewModel(AuthMode.SignIn, auth)
+        val vm = AuthViewModel(AuthMode.SignUp, auth)
         vm.onEvent(AuthUiEvent.EmailChanged("bad"))
         vm.onEvent(AuthUiEvent.PasswordChanged("1"))
         vm.onEvent(AuthUiEvent.SubmitClicked)
@@ -131,7 +143,7 @@ class ScreenViewModelsTest {
         assertEquals(EmailError.Empty, vm.state.value.emailError)
         vm.onEvent(AuthUiEvent.EmailChanged("a"))
         assertNull(vm.state.value.emailError)
-        assertEquals(PasswordError.TooShort, vm.state.value.passwordError)
+        assertEquals(PasswordError.Empty, vm.state.value.passwordError)
     }
 
     @Test fun signInSuccessNavigatesHome() = runTest {

@@ -12,6 +12,11 @@ object AuthValidator {
         else -> null
     }
 
-    fun password(value: String): PasswordError? =
-        if (value.length < MIN_PASSWORD_LENGTH) PasswordError.TooShort else null
+    /** При входе длина не проверяется: у существующего аккаунта пароль мог быть создан по другому правилу. */
+    fun password(value: String, mode: AuthMode): PasswordError? = when {
+        value.isEmpty() -> PasswordError.Empty
+        // TODO(backend): правило длины при регистрации должно совпасть с серверным.
+        mode == AuthMode.SignUp && value.length < MIN_PASSWORD_LENGTH -> PasswordError.TooShort
+        else -> null
+    }
 }
