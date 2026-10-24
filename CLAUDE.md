@@ -59,6 +59,7 @@ Koin (DI), Navigation 3 (JetBrains, `navigation3-ui`; runtime comes transitively
 
 ## Methodology
 - Decisions that affect learning (module/lesson structure, exercise types and order, pass threshold, unlock rules, motivation: streak/XP/lives, repetition, audio, feedback on mistakes) are discussed together with the subagent `language-teacher` (`.claude/agents/language-teacher.md`, a language teacher/methodist). Ask it before settling; its report is advice, the decision stays with the user. Unverified Tatar content stays marked "needs native-speaker review".
+- Screens and UI elements drawn in `design/` (new or changed) are reviewed by the subagent `ux-designer` (`.claude/agents/ux-designer.md`, a mobile UI/UX expert): clarity, navigation, colors/contrast, comfort, accessibility; it may propose bold ideas that keep the brand. Its report is advice, the decision stays with the user.
 
 ## Status
 Stages 1-6 done. Open: XP/level formula, result screen for a below-threshold lesson, native-speaker review of content.
