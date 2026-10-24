@@ -86,9 +86,12 @@
 
     <!-- 03 Главная -->
     <string name="home_greeting">Хәерле көн!</string>
-    <string name="home_streak_days">%1$d көн рәттән</string>
-    <string name="home_xp">%1$d XP</string>
-    <string name="home_level_left">До уровня %1$d — ещё %2$d XP</string>
+    <string name="home_streak_days">Серия: %1$d көн</string>
+    <string name="home_level_xp">Ур. %1$d · %2$d XP</string>
+    <string name="home_toast_module_unavailable">Экран модуля пока недоступен</string>
+    <string name="home_toast_module_locked">Модуль пока закрыт</string>
+    <string name="home_toast_all_unavailable">Список модулей пока недоступен</string>
+    <string name="home_toast_section_unavailable">Этот раздел пока недоступен</string>
     <string name="home_continue_tag">Дәвам ит · Продолжить</string>
     <string name="home_lesson_progress">%1$d / %2$d</string>
     <string name="home_lesson_button">Урок %1$d · %2$s</string>

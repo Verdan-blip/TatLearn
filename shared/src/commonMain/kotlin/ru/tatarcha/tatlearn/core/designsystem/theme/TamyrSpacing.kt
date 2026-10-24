@@ -17,6 +17,8 @@ data class TamyrSpacing(
     /** Интервал между блоками формы и верхний отступ шапки на экране входа. */
     val section: Dp = 18.dp,
     val xl: Dp = 20.dp,
+    /** Интервал между крупными блоками главной. */
+    val blockGap: Dp = 14.dp,
     val sectionInset: Dp = 22.dp,
     val screen: Dp = 24.dp,
     val xxl: Dp = 32.dp,
@@ -38,6 +40,13 @@ object TamyrSizes {
     val providerMark = 18.dp
     val toastIcon = 26.dp
     val spinner = 22.dp
+    val homeAvatar = 46.dp
+    val moduleChip = 34.dp
+    val lessonProgress = 8.dp
+    val moduleProgress = 6.dp
+    val lessonButton = 46.dp
+    val streakBadgeCompact = 40.dp
+    val navIcon = 20.dp
     val sheetHandleWidth = 40.dp
     val sheetHandleHeight = 4.dp
     val closeTargetPadding = 12.dp

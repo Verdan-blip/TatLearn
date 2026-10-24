@@ -1,9 +1,8 @@
 package ru.tatarcha.tatlearn.feature.auth
 
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import ru.tatarcha.tatlearn.core.common.AutoDismiss
 import ru.tatarcha.tatlearn.core.common.MviViewModel
 import ru.tatarcha.tatlearn.core.common.errorCode
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
@@ -14,7 +13,7 @@ class AuthViewModel(
     private val auth: AuthRepository,
 ) : MviViewModel<AuthUiState, AuthUiEvent, AuthUiEffect>(AuthUiState(mode = initialMode)) {
 
-    private var toastJob: Job? = null
+    private val toastTimer = AutoDismiss(viewModelScope, TamyrMotion.TOAST_VISIBLE_MS)
 
     override fun onEvent(event: AuthUiEvent) {
         when (event) {
@@ -62,16 +61,12 @@ class AuthViewModel(
     }
 
     private fun showToast(toast: AuthToast) {
-        toastJob?.cancel()
         setState { copy(toast = toast) }
-        toastJob = viewModelScope.launch {
-            delay(TamyrMotion.TOAST_VISIBLE_MS)
-            setState { copy(toast = null) }
-        }
+        toastTimer.start { setState { copy(toast = null) } }
     }
 
     private fun hideToast() {
-        toastJob?.cancel()
+        toastTimer.cancel()
         setState { copy(toast = null) }
     }
 }

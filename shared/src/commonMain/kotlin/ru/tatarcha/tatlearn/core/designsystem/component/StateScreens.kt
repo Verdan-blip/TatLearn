@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import ru.tatarcha.tatlearn.core.common.LoadState
+import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrSizes
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import tatlearn.shared.generated.resources.Res
 import tatlearn.shared.generated.resources.error_code
@@ -136,20 +137,20 @@ fun HomeSkeleton(modifier: Modifier = Modifier) {
             SkeletonBlock(Modifier.size(46.dp), radius = 23.dp)
         }
         TamyrCard {
-            Row(horizontalArrangement = Arrangement.spacedBy(spacing.l), verticalAlignment = Alignment.CenterVertically) {
-                SkeletonBlock(Modifier.size(52.dp), radius = 14.dp)
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(spacing.s)) {
-                    SkeletonBlock(Modifier.fillMaxWidth(0.6f).height(12.dp))
-                    SkeletonBlock(Modifier.fillMaxWidth().height(8.dp), radius = 4.dp)
-                }
-            }
-        }
-        TamyrCard {
             Column(verticalArrangement = Arrangement.spacedBy(spacing.m)) {
                 SkeletonBlock(Modifier.fillMaxWidth(0.4f).height(12.dp))
                 SkeletonBlock(Modifier.fillMaxWidth(0.65f).height(18.dp), radius = 8.dp)
                 SkeletonBlock(Modifier.fillMaxWidth().height(8.dp), radius = 4.dp)
                 SkeletonBlock(Modifier.fillMaxWidth().height(46.dp), radius = 12.dp)
+            }
+        }
+        TamyrCard(contentPadding = spacing.m) {
+            Row(horizontalArrangement = Arrangement.spacedBy(spacing.blockGap), verticalAlignment = Alignment.CenterVertically) {
+                SkeletonBlock(Modifier.size(TamyrSizes.streakBadgeCompact), radius = 12.dp)
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(spacing.s)) {
+                    SkeletonBlock(Modifier.fillMaxWidth(0.6f).height(12.dp))
+                    SkeletonBlock(Modifier.fillMaxWidth().height(6.dp), radius = 3.dp)
+                }
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(spacing.m)) {

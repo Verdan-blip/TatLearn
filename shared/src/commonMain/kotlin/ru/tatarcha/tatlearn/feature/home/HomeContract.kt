@@ -12,12 +12,16 @@ data class HomeUiState(
     /** Серия и XP приходят из локальной базы, независимо от запроса главной. */
     val stats: UserStats = UserStats.Empty,
     val content: LoadState<HomeContent> = LoadState.Loading,
+    val toast: HomeToast? = null,
 ) : UiState
 
 sealed interface HomeUiEvent : UiEvent {
     data object RetryClicked : HomeUiEvent
     data object StartLessonClicked : HomeUiEvent
     data class ModuleClicked(val moduleId: String) : HomeUiEvent
+    data object AllModulesClicked : HomeUiEvent
+    data class NavItemClicked(val item: HomeNavItem) : HomeUiEvent
+    data object ToastDismissed : HomeUiEvent
 }
 
 sealed interface HomeUiEffect : UiEffect {

@@ -19,6 +19,7 @@ import ru.tatarcha.tatlearn.domain.model.CurrentLesson
 import ru.tatarcha.tatlearn.domain.model.ExerciseOutcome
 import ru.tatarcha.tatlearn.domain.model.ExerciseResult
 import ru.tatarcha.tatlearn.domain.model.HomeContent
+import ru.tatarcha.tatlearn.domain.model.LearningModule
 import ru.tatarcha.tatlearn.domain.model.Lesson
 import ru.tatarcha.tatlearn.domain.model.LessonContent
 import ru.tatarcha.tatlearn.domain.model.LessonProgress
@@ -37,6 +38,8 @@ import ru.tatarcha.tatlearn.feature.auth.AuthViewModel
 import ru.tatarcha.tatlearn.feature.auth.EmailError
 import ru.tatarcha.tatlearn.feature.auth.PasswordError
 import ru.tatarcha.tatlearn.feature.auth.SocialProvider
+import ru.tatarcha.tatlearn.feature.home.HomeNavItem
+import ru.tatarcha.tatlearn.feature.home.HomeToast
 import ru.tatarcha.tatlearn.feature.home.HomeUiEffect
 import ru.tatarcha.tatlearn.feature.home.HomeUiEvent
 import ru.tatarcha.tatlearn.feature.home.HomeViewModel
@@ -93,8 +96,11 @@ private class StatsProgress(initial: UserStats = UserStats.Empty) : ProgressRepo
     override suspend fun completeLesson(lessonId: String, scorePercent: Int) = Unit
 }
 
+private val openModule = LearningModule("food", "Ашлар", "Еда", "food", progressPercent = 35, lockedBy = null, lockHint = null)
+private val lockedModule = LearningModule("nature", "Табигать", "Природа", "nature", progressPercent = 0, lockedBy = "food", lockHint = "Откроется после «Еды»")
+
 private fun homeContent() = HomeContent(
-    modules = emptyList(),
+    modules = listOf(openModule, lockedModule),
     currentLesson = CurrentLesson(Lesson("lesson_4", 4, "Туганнар", "Родные"), "Гаилә", "Семья", 2, 8),
 )
 
@@ -265,6 +271,36 @@ class ScreenViewModelsTest {
         vm.onEvent(HomeUiEvent.RetryClicked)
         vm.onEvent(HomeUiEvent.StartLessonClicked)
         assertEquals(HomeUiEffect.NavigateToLesson("lesson_4"), vm.effects.first())
+    }
+
+    @Test fun lockedModuleClickShowsItsHint() = runTest {
+        val vm = HomeViewModel(HomeLessons(Result.success(homeContent())), StatsProgress(), FakeAuth())
+        vm.onEvent(HomeUiEvent.ModuleClicked("nature"))
+        assertEquals(HomeToast.ModuleLocked("Откроется после «Еды»"), vm.state.value.toast)
+    }
+
+    @Test fun openModuleClickShowsUnavailable() = runTest {
+        val vm = HomeViewModel(HomeLessons(Result.success(homeContent())), StatsProgress(), FakeAuth())
+        vm.onEvent(HomeUiEvent.ModuleClicked("food"))
+        assertEquals(HomeToast.ModuleUnavailable, vm.state.value.toast)
+    }
+
+    @Test fun allModulesAndNavItemsShowStubToasts() = runTest {
+        val vm = HomeViewModel(HomeLessons(Result.success(homeContent())), StatsProgress(), FakeAuth())
+        vm.onEvent(HomeUiEvent.AllModulesClicked)
+        assertEquals(HomeToast.AllModulesUnavailable, vm.state.value.toast)
+        vm.onEvent(HomeUiEvent.ToastDismissed)
+        vm.onEvent(HomeUiEvent.NavItemClicked(HomeNavItem.Home))
+        assertNull(vm.state.value.toast)
+        vm.onEvent(HomeUiEvent.NavItemClicked(HomeNavItem.Profile))
+        assertEquals(HomeToast.SectionUnavailable, vm.state.value.toast)
+    }
+
+    @Test fun homeToastDisappearsAfterFiveSeconds() = runTest {
+        val vm = HomeViewModel(HomeLessons(Result.success(homeContent())), StatsProgress(), FakeAuth())
+        vm.onEvent(HomeUiEvent.AllModulesClicked)
+        testScheduler.advanceTimeBy(TamyrMotion.TOAST_VISIBLE_MS + 1)
+        assertNull(vm.state.value.toast)
     }
 
     // --- Результат ---

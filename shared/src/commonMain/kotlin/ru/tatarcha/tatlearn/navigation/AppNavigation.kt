@@ -21,7 +21,7 @@ import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrTextButton
 import ru.tatarcha.tatlearn.feature.auth.AuthScene
-import ru.tatarcha.tatlearn.feature.home.HomeRoute
+import ru.tatarcha.tatlearn.feature.home.HomeScene
 import ru.tatarcha.tatlearn.feature.lesson.LessonRoute
 import ru.tatarcha.tatlearn.feature.onboarding.OnboardingScene
 import ru.tatarcha.tatlearn.feature.result.ResultScene
@@ -78,7 +78,7 @@ fun AppNavigation(showDebugTools: Boolean = false) {
                     )
                 }
                 entry<HomeKey> {
-                    HomeRoute(onStartLesson = { lessonId -> backStack.add(LessonKey(lessonId)) })
+                    HomeScene(onStartLesson = { lessonId -> backStack.add(LessonKey(lessonId)) })
                 }
                 entry<LessonKey> { key ->
                     LessonRoute(
