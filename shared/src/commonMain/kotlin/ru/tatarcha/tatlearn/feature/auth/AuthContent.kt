@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -28,8 +29,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -86,6 +90,7 @@ private const val PASSWORD_MASK = '•'
 @Composable
 fun AuthContent(state: AuthUiState, onEvent: (AuthUiEvent) -> Unit) {
     val signIn = state.mode == AuthMode.SignIn
+    val focusManager = LocalFocusManager.current
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize().background(TamyrTheme.colors.background).safeDrawingPadding().imePadding()) {
@@ -128,7 +133,12 @@ fun AuthContent(state: AuthUiState, onEvent: (AuthUiEvent) -> Unit) {
                     errorText = state.emailError?.let {
                         stringResource(if (it == EmailError.Empty) Res.string.auth_error_email_empty else Res.string.auth_error_email_invalid)
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.None,
+                        autoCorrectEnabled = false,
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Next,
+                    ),
                 )
                 TamyrTextField(
                     value = state.password,
@@ -138,7 +148,16 @@ fun AuthContent(state: AuthUiState, onEvent: (AuthUiEvent) -> Unit) {
                             stringResource(if (it == PasswordError.Empty) Res.string.auth_error_password_empty else Res.string.auth_error_password_short)
                         },
                     visualTransformation = if (state.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(PASSWORD_MASK),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            focusManager.clearFocus()
+                            onEvent(AuthUiEvent.SubmitClicked)
+                        },
+                    ),
                     trailing = {
                         Text(
                             stringResource(if (state.passwordVisible) Res.string.auth_hide_password else Res.string.auth_show_password),
