@@ -108,7 +108,7 @@ fun TamyrButton(
 fun TamyrTextButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Text(
         text = text,
-        color = TamyrTheme.colors.accent,
+        color = TamyrTheme.colors.accentText,
         style = TamyrTheme.typography.body15Bold,
         textAlign = TextAlign.Center,
         modifier = modifier.clickable(role = Role.Button, onClick = onClick).padding(TamyrTheme.spacing.s),

@@ -96,7 +96,7 @@ fun ExerciseFooter(
             borderColor = colors.errorBorder,
             pose = MascotPose.Wrong,
             title = stringResource(Res.string.exercise_wrong),
-            titleColor = colors.accent,
+            titleColor = colors.accentText,
             detail = detail,
             detailColor = colors.accentShadow,
             buttonText = stringResource(Res.string.exercise_understood),

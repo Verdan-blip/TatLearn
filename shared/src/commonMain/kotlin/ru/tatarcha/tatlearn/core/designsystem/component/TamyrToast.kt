@@ -100,7 +100,7 @@ fun TamyrToast(
             Text(
                 text = stringResource(palette.glyph),
                 style = TamyrTheme.typography.body15Bold,
-                color = TamyrTheme.colors.surface,
+                color = palette.glyphColor,
             )
         }
         Text(
@@ -135,6 +135,7 @@ private class ToastPalette(
     val icon: Color,
     val content: Color,
     val glyph: StringResource,
+    val glyphColor: Color,
 )
 
 @Composable
@@ -146,6 +147,7 @@ private fun toastPalette(kind: TamyrToastKind): ToastPalette = when (kind) {
         icon = TamyrTheme.colors.gold,
         content = TamyrTheme.colors.goldText,
         glyph = Res.string.toast_icon_info,
+        glyphColor = TamyrTheme.colors.textPrimary,
     )
     TamyrToastKind.Error -> ToastPalette(
         container = TamyrTheme.colors.errorContainer,
@@ -154,6 +156,7 @@ private fun toastPalette(kind: TamyrToastKind): ToastPalette = when (kind) {
         icon = TamyrTheme.colors.accent,
         content = TamyrTheme.colors.accentShadow,
         glyph = Res.string.toast_icon_error,
+        glyphColor = TamyrTheme.colors.surface,
     )
     TamyrToastKind.Success -> ToastPalette(
         container = TamyrTheme.colors.successContainer,
@@ -162,6 +165,7 @@ private fun toastPalette(kind: TamyrToastKind): ToastPalette = when (kind) {
         icon = TamyrTheme.colors.primary,
         content = TamyrTheme.colors.primaryShadow,
         glyph = Res.string.toast_icon_success,
+        glyphColor = TamyrTheme.colors.surface,
     )
 }
 

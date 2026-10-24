@@ -25,7 +25,7 @@ fun StreakBadge(
         modifier.size(size).clip(TamyrTheme.shapes.tile).background(TamyrTheme.colors.gold),
         contentAlignment = Alignment.Center,
     ) {
-        Text(days.toString(), style = textStyle, color = TamyrTheme.colors.onAccent)
+        Text(days.toString(), style = textStyle, color = TamyrTheme.colors.textPrimary)
     }
 }
 

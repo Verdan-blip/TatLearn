@@ -20,7 +20,7 @@ fun TamyrTag(text: String, kind: TamyrTagKind, modifier: Modifier = Modifier) {
     val colors = TamyrTheme.colors
     val (container, content) = when (kind) {
         TamyrTagKind.Success -> colors.successContainer to colors.primary
-        TamyrTagKind.Error -> colors.errorContainer to colors.accent
+        TamyrTagKind.Error -> colors.errorContainer to colors.accentText
         TamyrTagKind.Gold -> colors.goldContainer to colors.goldText
     }
     Text(

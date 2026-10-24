@@ -28,6 +28,8 @@ data class TamyrColors(
     val accent: Color,
     val accentShadow: Color,
     val accentSoftShadow: Color,
+    /** Терракота для мелкого текста и ссылок на светлых фонах: контраст не ниже 4,5:1. */
+    val accentText: Color,
     val onAccent: Color,
 
     val gold: Color,
@@ -61,10 +63,11 @@ val LightTamyrColors = TamyrColors(
     accent = Color(0xFFB5522F),
     accentShadow = Color(0xFF8A4326),
     accentSoftShadow = Color(0xFFE0C9BC),
+    accentText = Color(0xFFA0472B),
     onAccent = Color(0xFFFFFCF3),
 
     gold = Color(0xFFC99A34),
-    goldText = Color(0xFF8A6F1F),
+    goldText = Color(0xFF7A6119),
     goldContainer = Color(0xFFEFE6C8),
 
     successContainer = Color(0xFFD9EFD8),

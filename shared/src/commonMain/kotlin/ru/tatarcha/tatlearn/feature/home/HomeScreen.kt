@@ -25,7 +25,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.intl.Locale
@@ -72,7 +71,6 @@ private val AvatarSize = 46.dp
 private val ChipSize = 34.dp
 private val LessonProgressHeight = 8.dp
 private val ModuleProgressHeight = 6.dp
-private val LockedAlpha = 0.55f
 private val LessonButtonHeight = 46.dp
 
 @Composable
@@ -113,7 +111,7 @@ private fun HomeContentLayout(userName: String, stats: UserStats, content: HomeC
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
                 Text(stringResource(Res.string.home_modules), style = TamyrTheme.typography.body17Bold, color = TamyrTheme.colors.textPrimary)
                 // TODO(design): у «Все модули» нет целевого экрана.
-                Text(stringResource(Res.string.home_modules_all), style = TamyrTheme.typography.body14Bold, color = TamyrTheme.colors.accent)
+                Text(stringResource(Res.string.home_modules_all), style = TamyrTheme.typography.body14Bold, color = TamyrTheme.colors.accentText)
             }
             ModulesGrid(content.modules) { onEvent(HomeUiEvent.ModuleClicked(it)) }
             Box(Modifier.height(spacing.s))
@@ -148,7 +146,7 @@ private fun StreakCard(stats: UserStats) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.xs)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
                     Text(stringResource(Res.string.home_streak_days, stats.streak), style = TamyrTheme.typography.body15Bold, color = colors.textPrimary)
-                    Text(stringResource(Res.string.home_xp, stats.xp), style = TamyrTheme.typography.caption13Bold, color = colors.gold)
+                    Text(stringResource(Res.string.home_xp, stats.xp), style = TamyrTheme.typography.caption13Bold, color = colors.goldText)
                 }
                 TamyrProgressBar(
                     progress = (UserStats.XP_PER_LEVEL - stats.xpToNextLevel) / UserStats.XP_PER_LEVEL.toFloat(),
@@ -226,16 +224,17 @@ private fun ModulesGrid(modules: List<LearningModule>, onClick: (String) -> Unit
 private fun ModuleTile(module: LearningModule, modifier: Modifier, onClick: () -> Unit) {
     val colors = TamyrTheme.colors
     TamyrCard(
-        modifier.then(if (module.isLocked) Modifier.alpha(LockedAlpha) else Modifier),
+        modifier,
         onClick = onClick,
         shape = TamyrTheme.shapes.tile,
+        containerColor = if (module.isLocked) colors.surfaceMuted else colors.surface,
         contentPadding = 14.dp,
     ) {
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.s)) {
             ModuleChip(module)
             // В макете на закрытых плитках показано только татарское название.
             val title = if (module.isLocked || module.titleTt == module.titleRu) module.titleTt else "${module.titleTt} · ${module.titleRu}"
-            Text(title, style = TamyrTheme.typography.body15Bold, color = colors.textPrimary)
+            Text(title, style = TamyrTheme.typography.body15Bold, color = if (module.isLocked) colors.textSecondary else colors.textPrimary)
             when {
                 module.isLocked -> module.lockHint?.let {
                     Text(it, style = TamyrTheme.typography.label12, color = colors.textSecondary)
@@ -264,7 +263,7 @@ private const val ICON_NUMBERS = "numbers"
 private fun ModuleChip(module: LearningModule) {
     val colors = TamyrTheme.colors
     val background: Color = when {
-        module.isLocked -> colors.surfaceMuted
+        module.isLocked -> colors.background
         module.icon == ICON_FOOD -> colors.errorContainer
         else -> colors.successContainer
     }

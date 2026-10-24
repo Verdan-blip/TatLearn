@@ -169,7 +169,7 @@ fun AuthContent(
                                 if (state.passwordVisible) Res.string.auth_hide_password else Res.string.auth_show_password,
                             ),
                             style = TamyrTheme.typography.caption13Bold,
-                            color = TamyrTheme.colors.accent,
+                            color = TamyrTheme.colors.accentText,
                             modifier = Modifier.clickable(role = Role.Button) {
                                 onEvent(AuthUiEvent.TogglePasswordVisibility)
                             },
@@ -181,7 +181,7 @@ fun AuthContent(
                     Text(
                         text = stringResource(Res.string.auth_forgot_password),
                         style = TamyrTheme.typography.body14Bold,
-                        color = TamyrTheme.colors.accent,
+                        color = TamyrTheme.colors.accentText,
                         textAlign = TextAlign.End,
                         modifier = Modifier
                             .fillMaxWidth()

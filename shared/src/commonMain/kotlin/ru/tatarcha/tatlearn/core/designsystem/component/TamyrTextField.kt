@@ -126,7 +126,7 @@ fun TamyrTextField(
         )
         if (errorText != null) {
             // TODO(design): стиля ошибки валидации нет в макете.
-            Text(errorText, style = TamyrTheme.typography.caption13, color = colors.accent)
+            Text(errorText, style = TamyrTheme.typography.caption13, color = colors.accentText)
         }
     }
 }

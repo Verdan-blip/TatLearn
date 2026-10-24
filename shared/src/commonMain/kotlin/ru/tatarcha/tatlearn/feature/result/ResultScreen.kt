@@ -89,12 +89,12 @@ fun ResultScreen(state: ResultUiState, onEvent: (ResultUiEvent) -> Unit) {
                 Text(stringResource(Res.string.result_subtitle, name), style = TamyrTheme.typography.body16, color = colors.textSecondary, textAlign = TextAlign.Center)
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(spacing.m)) {
-                StatTile(stringResource(Res.string.result_xp), stringResource(Res.string.result_xp_value, state.xpEarned), colors.gold, Modifier.weight(1f))
+                StatTile(stringResource(Res.string.result_xp), stringResource(Res.string.result_xp_value, state.xpEarned), colors.goldText, Modifier.weight(1f))
                 StatTile(stringResource(Res.string.result_accuracy), stringResource(Res.string.result_accuracy_value, state.accuracyPercent), colors.primary, Modifier.weight(1f))
                 StatTile(
                     stringResource(Res.string.result_time),
                     stringResource(Res.string.result_time_value, formatDuration(state.durationSeconds)),
-                    colors.accent,
+                    colors.textPrimary,
                     Modifier.weight(1f),
                 )
             }
