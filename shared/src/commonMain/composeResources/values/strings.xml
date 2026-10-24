@@ -78,7 +78,10 @@
     <string name="auth_error_email_invalid">Проверьте адрес электронной почты</string>
     <string name="auth_error_password_short">Пароль — не меньше 6 символов</string>
     <string name="auth_social_unavailable">Вход через Google и VK ID пока недоступен</string>
-    <string name="auth_error_request">Не получилось войти. Код ошибки: %1$s</string>
+    <string name="auth_error_sign_in_network">Не получилось войти. Проверьте интернет и попробуйте ещё раз</string>
+    <string name="auth_error_sign_up_network">Не получилось зарегистрироваться. Проверьте интернет и попробуйте ещё раз</string>
+    <string name="auth_error_sign_in_code">Не получилось войти. Код ошибки: %1$s</string>
+    <string name="auth_error_sign_up_code">Не получилось зарегистрироваться. Код ошибки: %1$s</string>
 
     <!-- 03 Главная -->
     <string name="home_greeting">Хәерле көн!</string>

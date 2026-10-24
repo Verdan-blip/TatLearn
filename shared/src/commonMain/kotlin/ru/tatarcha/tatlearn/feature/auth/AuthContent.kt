@@ -39,6 +39,7 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import ru.tatarcha.tatlearn.core.common.ErrorCodes
 import ru.tatarcha.tatlearn.core.designsystem.component.PreviewFrame
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrButton
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrButtonStyle
@@ -55,7 +56,10 @@ import tatlearn.shared.generated.resources.auth_email_label
 import tatlearn.shared.generated.resources.auth_error_email_empty
 import tatlearn.shared.generated.resources.auth_error_email_invalid
 import tatlearn.shared.generated.resources.auth_error_password_short
-import tatlearn.shared.generated.resources.auth_error_request
+import tatlearn.shared.generated.resources.auth_error_sign_in_code
+import tatlearn.shared.generated.resources.auth_error_sign_in_network
+import tatlearn.shared.generated.resources.auth_error_sign_up_code
+import tatlearn.shared.generated.resources.auth_error_sign_up_network
 import tatlearn.shared.generated.resources.auth_forgot_password
 import tatlearn.shared.generated.resources.auth_google
 import tatlearn.shared.generated.resources.auth_hide_password
@@ -156,9 +160,6 @@ fun AuthContent(state: AuthUiState, onEvent: (AuthUiEvent) -> Unit) {
                     onClick = { onEvent(AuthUiEvent.SubmitClicked) },
                     enabled = !state.isSubmitting,
                 )
-                state.requestErrorCode?.let {
-                    Text(stringResource(Res.string.auth_error_request, it), style = TamyrTheme.typography.caption13, color = TamyrTheme.colors.accent)
-                }
                 Row(horizontalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.m), verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.weight(1f).height(TamyrSizes.borderThin).background(TamyrTheme.colors.border))
                     Text(stringResource(Res.string.auth_or), style = TamyrTheme.typography.caption13, color = TamyrTheme.colors.textSecondary)
@@ -178,18 +179,30 @@ fun AuthContent(state: AuthUiState, onEvent: (AuthUiEvent) -> Unit) {
             )
         }
         TamyrToastHost(
-            toast = state.toast?.let { toast ->
-                TamyrToastData(
-                    text = stringResource(
-                        when (toast) {
-                            AuthToast.SocialUnavailable -> Res.string.auth_social_unavailable
-                        },
-                    ),
-                    kind = TamyrToastKind.Info,
-                )
-            },
+            toast = state.toast?.let { toast -> authToastData(toast) },
             onDismiss = { onEvent(AuthUiEvent.ToastDismissed) },
             modifier = Modifier.align(Alignment.TopCenter),
+        )
+    }
+}
+
+@Composable
+private fun authToastData(toast: AuthToast): TamyrToastData = when (toast) {
+    AuthToast.SocialUnavailable -> TamyrToastData(
+        text = stringResource(Res.string.auth_social_unavailable),
+        kind = TamyrToastKind.Info,
+    )
+    is AuthToast.RequestFailed -> {
+        val network = toast.code == ErrorCodes.NET_TIMEOUT || toast.code == ErrorCodes.NET_ERROR
+        val signIn = toast.mode == AuthMode.SignIn
+        TamyrToastData(
+            text = when {
+                network && signIn -> stringResource(Res.string.auth_error_sign_in_network)
+                network -> stringResource(Res.string.auth_error_sign_up_network)
+                signIn -> stringResource(Res.string.auth_error_sign_in_code, toast.code)
+                else -> stringResource(Res.string.auth_error_sign_up_code, toast.code)
+            },
+            kind = TamyrToastKind.Error,
         )
     }
 }
@@ -245,7 +258,22 @@ private fun AuthSubmittingPreview() = AuthPreview(AuthUiState(email = "aliya@exa
 @Preview(name = "Sign in · request error", group = Group, widthDp = 390, heightDp = 844)
 @Composable
 private fun AuthRequestErrorPreview() = AuthPreview(
-    AuthUiState(email = "aliya@example.com", password = "secret123", requestErrorCode = "NET_TIMEOUT"),
+    AuthUiState(
+        email = "aliya@example.com",
+        password = "secret123",
+        toast = AuthToast.RequestFailed(AuthMode.SignIn, ErrorCodes.NET_TIMEOUT),
+    ),
+)
+
+@Preview(name = "Sign up · request error with code", group = Group, widthDp = 390, heightDp = 844)
+@Composable
+private fun AuthSignUpRequestErrorPreview() = AuthPreview(
+    AuthUiState(
+        mode = AuthMode.SignUp,
+        email = "aliya@example.com",
+        password = "secret123",
+        toast = AuthToast.RequestFailed(AuthMode.SignUp, ErrorCodes.UNKNOWN),
+    ),
 )
 
 @Preview(name = "Sign in · social unavailable toast", group = Group, widthDp = 390, heightDp = 844)

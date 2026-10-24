@@ -154,15 +154,24 @@ class ScreenViewModelsTest {
         assertEquals(listOf("up:a@b.ru"), auth.calls)
     }
 
-    @Test fun requestFailureShowsErrorCodeAndStaysOnScreen() = runTest {
-        val vm = AuthViewModel(AuthMode.SignIn, FakeAuth(failure = AppException("NET_TIMEOUT")))
+    @Test fun requestFailureShowsErrorToastAndStaysOnScreen() = runTest {
+        val vm = AuthViewModel(AuthMode.SignUp, FakeAuth(failure = AppException("NET_TIMEOUT")))
         vm.onEvent(AuthUiEvent.EmailChanged("a@b.ru"))
         vm.onEvent(AuthUiEvent.PasswordChanged("secret1"))
         vm.onEvent(AuthUiEvent.SubmitClicked)
-        assertEquals("NET_TIMEOUT", vm.state.value.requestErrorCode)
+        assertEquals(AuthToast.RequestFailed(AuthMode.SignUp, "NET_TIMEOUT"), vm.state.value.toast)
         assertFalse(vm.state.value.isSubmitting)
-        vm.onEvent(AuthUiEvent.PasswordChanged("secret12"))
-        assertNull(vm.state.value.requestErrorCode)
+    }
+
+    @Test fun nextSubmitHidesPreviousErrorToast() = runTest {
+        val auth = FakeAuth(failure = AppException("NET_ERROR"))
+        val vm = AuthViewModel(AuthMode.SignIn, auth)
+        vm.onEvent(AuthUiEvent.EmailChanged("a@b.ru"))
+        vm.onEvent(AuthUiEvent.PasswordChanged("secret1"))
+        vm.onEvent(AuthUiEvent.SubmitClicked)
+        auth.failure = null
+        vm.onEvent(AuthUiEvent.SubmitClicked)
+        assertNull(vm.state.value.toast)
     }
 
     @Test fun socialClickShowsToastWithoutCallingRepository() = runTest {

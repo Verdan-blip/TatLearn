@@ -18,9 +18,9 @@ class AuthViewModel(
 
     override fun onEvent(event: AuthUiEvent) {
         when (event) {
-            is AuthUiEvent.ModeChanged -> setState { copy(mode = event.mode, emailError = null, passwordError = null, requestErrorCode = null) }
-            is AuthUiEvent.EmailChanged -> setState { copy(email = event.value, emailError = null, requestErrorCode = null) }
-            is AuthUiEvent.PasswordChanged -> setState { copy(password = event.value, passwordError = null, requestErrorCode = null) }
+            is AuthUiEvent.ModeChanged -> setState { copy(mode = event.mode, emailError = null, passwordError = null) }
+            is AuthUiEvent.EmailChanged -> setState { copy(email = event.value, emailError = null) }
+            is AuthUiEvent.PasswordChanged -> setState { copy(password = event.value, passwordError = null) }
             AuthUiEvent.TogglePasswordVisibility -> setState { copy(passwordVisible = !passwordVisible) }
             AuthUiEvent.SubmitClicked -> submit()
             // TODO(backend): настоящий OAuth. Пока кнопки соцсетей только сообщают, что вход недоступен.
@@ -44,14 +44,18 @@ class AuthViewModel(
 
     private fun authenticate(email: String, password: String, mode: AuthMode) {
         viewModelScope.launch {
-            setState { copy(isSubmitting = true, requestErrorCode = null) }
+            hideToast()
+            setState { copy(isSubmitting = true) }
             val result = if (mode == AuthMode.SignIn) auth.signIn(email, password) else auth.signUp(email, password)
             result.fold(
                 onSuccess = {
                     setState { copy(isSubmitting = false) }
                     sendEffect(AuthUiEffect.NavigateToHome)
                 },
-                onFailure = { error -> setState { copy(isSubmitting = false, requestErrorCode = error.errorCode()) } },
+                onFailure = { error ->
+                    setState { copy(isSubmitting = false) }
+                    showToast(AuthToast.RequestFailed(mode, error.errorCode()))
+                },
             )
         }
     }

@@ -11,7 +11,10 @@ enum class AuthMode { SignIn, SignUp }
 enum class EmailError { Empty, Invalid }
 enum class PasswordError { TooShort }
 enum class SocialProvider { Google, Vk }
-enum class AuthToast { SocialUnavailable }
+sealed interface AuthToast {
+    data object SocialUnavailable : AuthToast
+    data class RequestFailed(val mode: AuthMode, val code: String) : AuthToast
+}
 
 data class AuthUiState(
     val mode: AuthMode = AuthMode.SignIn,
@@ -21,8 +24,6 @@ data class AuthUiState(
     val emailError: EmailError? = null,
     val passwordError: PasswordError? = null,
     val isSubmitting: Boolean = false,
-    /** Короткий код последнего неудачного запроса, показывается под кнопкой. */
-    val requestErrorCode: String? = null,
     val toast: AuthToast? = null,
 ) : UiState
 
