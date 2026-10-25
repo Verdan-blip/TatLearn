@@ -3,6 +3,11 @@ package ru.tatarcha.tatlearn.feature.profile
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import ru.tatarcha.tatlearn.feature.lesson.dismissKeyboard
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -65,6 +70,8 @@ fun ProfileEditContent(
 ) {
     val spacing = TamyrTheme.spacing
     val backDescription = stringResource(Res.string.profile_edit_back_description)
+    val focusManager = LocalFocusManager.current
+    val keyboard = LocalSoftwareKeyboardController.current
     Box(Modifier.fillMaxSize()) {
         Column(
             Modifier
@@ -97,6 +104,7 @@ fun ProfileEditContent(
                 Modifier
                     .weight(1f)
                     .fillMaxWidth()
+                    .pointerInput(Unit) { detectTapGestures(onTap = { dismissKeyboard(focusManager, keyboard) }) }
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = spacing.screen, vertical = spacing.l),
                 verticalArrangement = Arrangement.spacedBy(spacing.xl),
@@ -115,7 +123,8 @@ fun ProfileEditContent(
                         null -> null
                     },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { onEvent(ProfileEditUiEvent.SaveClicked) }),
+                    // «Готово» только закрывает клавиатуру; сохранение отдельной кнопкой.
+                    keyboardActions = KeyboardActions(onDone = { dismissKeyboard(focusManager, keyboard) }),
                 )
                 AvatarPicker(
                     selected = state.avatar,

@@ -3,6 +3,11 @@ package ru.tatarcha.tatlearn.feature.intro
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import ru.tatarcha.tatlearn.feature.lesson.dismissKeyboard
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -62,6 +67,8 @@ fun IntroContent(
 ) {
     val spacing = TamyrTheme.spacing
     val keyboardOpen = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+    val focusManager = LocalFocusManager.current
+    val keyboard = LocalSoftwareKeyboardController.current
     Column(
         Modifier
             .fillMaxSize()
@@ -73,6 +80,8 @@ fun IntroContent(
             Modifier
                 .weight(1f)
                 .fillMaxWidth()
+                // Тап по свободному месту закрывает клавиатуру, не переходя дальше.
+                .pointerInput(Unit) { detectTapGestures(onTap = { dismissKeyboard(focusManager, keyboard) }) }
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = spacing.screen, vertical = spacing.s),
             verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -101,7 +110,8 @@ fun IntroContent(
                         null
                     },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { onEvent(IntroUiEvent.ContinueClicked) }),
+                    // «Готово» только закрывает клавиатуру: человек мог ещё не выбрать цвет, переход вперёд только кнопкой «Продолжить».
+                    keyboardActions = KeyboardActions(onDone = { dismissKeyboard(focusManager, keyboard) }),
                 )
                 if (state.nameError == null) {
                     Text(stringResource(Res.string.intro_name_hint), style = TamyrTheme.typography.caption13, color = TamyrTheme.colors.textSecondary)
