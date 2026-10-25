@@ -1,11 +1,17 @@
 package ru.tatarcha.tatlearn.navigation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -19,7 +25,8 @@ import kotlinx.serialization.modules.subclass
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
-import ru.tatarcha.tatlearn.core.designsystem.component.TamyrTextButton
+import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrSizes
+import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import ru.tatarcha.tatlearn.feature.auth.AuthScene
 import ru.tatarcha.tatlearn.feature.home.HomeScene
 import ru.tatarcha.tatlearn.feature.lesson.LessonRoute
@@ -28,6 +35,7 @@ import ru.tatarcha.tatlearn.feature.result.ResultScene
 import ru.tatarcha.tatlearn.feature.showcase.ShowcaseScreen
 import tatlearn.shared.generated.resources.Res
 import tatlearn.shared.generated.resources.showcase_open
+import tatlearn.shared.generated.resources.showcase_open_short
 
 // Не-JVM таргеты не умеют рефлексией находить подклассы NavKey, поэтому они регистрируются явно.
 private val navSavedStateConfig = SavedStateConfiguration {
@@ -104,11 +112,22 @@ fun AppNavigation(showDebugTools: Boolean = false) {
             },
         )
         if (showDebugTools && backStack.lastOrNull() != ShowcaseKey) {
-            TamyrTextButton(
-                text = stringResource(Res.string.showcase_open),
+            // Отладочная кнопка UI kit: плавающая снизу справа, над нижним меню (в релизной сборке не показывается).
+            val fabDescription = stringResource(Res.string.showcase_open)
+            SmallFloatingActionButton(
                 onClick = { backStack.add(ShowcaseKey) },
-                modifier = Modifier.align(Alignment.TopEnd).safeContentPadding(),
-            )
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .safeContentPadding()
+                    .padding(end = TamyrTheme.spacing.m, bottom = TamyrSizes.debugFabBottomInset)
+                    .size(TamyrSizes.debugFab)
+                    .semantics { contentDescription = fabDescription },
+                shape = TamyrTheme.shapes.circle,
+                containerColor = TamyrTheme.colors.primary,
+                contentColor = TamyrTheme.colors.onPrimary,
+            ) {
+                Text(text = stringResource(Res.string.showcase_open_short), style = TamyrTheme.typography.label12Bold)
+            }
         }
     }
 }

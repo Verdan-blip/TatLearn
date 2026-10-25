@@ -12,6 +12,7 @@
 
     <!-- Компоненты UI kit только для отладки -->
     <string name="showcase_open">UI kit</string>
+    <string name="showcase_open_short">UI</string>
     <string name="showcase_close">Назад</string>
     <string name="showcase_section_buttons">Кнопки</string>
     <string name="showcase_section_tags">Теги</string>
