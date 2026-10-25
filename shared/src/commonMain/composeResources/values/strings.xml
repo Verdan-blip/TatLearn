@@ -166,7 +166,8 @@
 
     <!-- Упражнения: общее -->
     <string name="exercise_close">✕</string>
-    <string name="answer_mark_matched">✓</string>
+    <string name="answer_state_matched">Пара найдена</string>
+    <string name="answer_state_wrong">Не подходит, попробуй ещё</string>
     <string name="answer_mark_wrong">✕</string>
     <string name="exercise_check">Тикшерергә · Проверить</string>
     <string name="exercise_continue">Дәвам итәргә</string>

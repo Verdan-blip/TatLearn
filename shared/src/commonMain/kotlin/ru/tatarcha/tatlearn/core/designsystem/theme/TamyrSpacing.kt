@@ -51,6 +51,8 @@ object TamyrSizes {
     val lessonStatus = 40.dp
     val lessonRowMinHeight = 64.dp
     val checkIcon = 22.dp
+    /** Тень плитки сопоставления, пока выбрано слово напротив (на 1dp глубже обычной). */
+    val tileLiftShadow = 4.dp
     val sheetHandleWidth = 40.dp
     val sheetHandleHeight = 4.dp
     val closeTargetPadding = 12.dp
@@ -72,4 +74,6 @@ object TamyrMotion {
     const val PROGRESS_MS = 400
     const val TOAST_VISIBLE_MS = 5_000L
     const val SPINNER_MS = 900
+    /** Покачивание неверной пары в сопоставлении (два цикла ±4dp). */
+    const val SHAKE_MS = 300
 }

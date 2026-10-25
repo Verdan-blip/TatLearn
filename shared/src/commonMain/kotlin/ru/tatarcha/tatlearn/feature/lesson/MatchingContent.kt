@@ -28,7 +28,9 @@ private val ColumnGap = 14.dp
 
 /**
  * Экран 04. Левая колонка: татарские слова в порядке урока, правая: переводы в фиксированном перемешивании.
- * Нажмите татарское слово, затем его перевод; верная пара тускнеет зелёным, неверная вспыхивает красным и стоит жизни.
+ * Нажмите татарское слово, затем его перевод; верная пара становится плоской зелёной плиткой без значка и больше не нажимается,
+ * неверная на мгновение подсвечивается терракотой с ✕ и покачивается, затем выбор снимается (жизней нет). Пока выбрано слово,
+ * не найденные переводы чуть «приподняты» тенью.
  */
 @Composable
 fun MatchingContent(step: ExerciseStep.Matching, input: StepInput.Matching, onEvent: (LessonUiEvent) -> Unit) {
@@ -50,14 +52,18 @@ fun MatchingContent(step: ExerciseStep.Matching, input: StepInput.Matching, onEv
                     bold = true,
                     centered = true,
                     height = TileHeight,
+                    shakeOnWrong = true,
                 )
+                val rightState = tileState(rightIndex, input, isLeft = false)
                 AnswerOption(
                     text = step.pairs[rightIndex].russian,
-                    state = tileState(rightIndex, input, isLeft = false),
+                    state = rightState,
                     onClick = { onEvent(LessonUiEvent.MatchRightClicked(rightIndex)) },
                     modifier = Modifier.weight(1f),
                     centered = true,
                     height = TileHeight,
+                    lifted = input.leftSelected != null && rightState == AnswerOptionState.Neutral,
+                    shakeOnWrong = true,
                 )
             }
         }
