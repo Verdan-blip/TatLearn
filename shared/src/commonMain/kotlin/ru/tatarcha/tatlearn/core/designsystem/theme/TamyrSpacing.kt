@@ -44,7 +44,7 @@ object TamyrSizes {
     val moduleChip = 34.dp
     val lessonProgress = 8.dp
     val moduleProgress = 6.dp
-    val lessonButton = 46.dp
+    val lessonButton = 48.dp
     val streakBadgeCompact = 40.dp
     val navIcon = 20.dp
     val topBarAction = 48.dp

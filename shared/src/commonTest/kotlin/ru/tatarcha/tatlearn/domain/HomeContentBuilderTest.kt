@@ -1,6 +1,7 @@
 package ru.tatarcha.tatlearn.domain
 
 import ru.tatarcha.tatlearn.domain.model.CourseModule
+import ru.tatarcha.tatlearn.domain.model.HomeCardKind
 import ru.tatarcha.tatlearn.domain.model.Lesson
 import ru.tatarcha.tatlearn.domain.model.LessonProgress
 import ru.tatarcha.tatlearn.domain.model.LessonStatus
@@ -63,6 +64,41 @@ class HomeContentBuilderTest {
         assertEquals(listOf(100, 100, 100, 100), home.modules.map { it.progressPercent })
         assertEquals("lesson_6", home.currentLesson.lesson.id)
         assertEquals(home.currentLesson.totalLessons, home.currentLesson.completedLessons)
+    }
+
+    @Test fun newcomerGetsStartCardNotContinue() {
+        val home = HomeContentBuilder.build(catalog, emptyList())!!
+        assertEquals(HomeCardKind.Start, home.currentLesson.kind)
+        assertEquals(false, home.currentLesson.restartsLesson)
+        assertEquals(HomeCardKind.Start, HomeContentBuilder.build(catalog, listOf(LessonProgress("lesson_1", LessonStatus.NotStarted, 0)))!!.currentLesson.kind)
+    }
+
+    @Test fun startedButNotPassedLessonIsContinueThatRestarts() {
+        val home = HomeContentBuilder.build(catalog, listOf(LessonProgress("lesson_1", LessonStatus.InProgress, 0)))!!
+        assertEquals(HomeCardKind.Continue, home.currentLesson.kind)
+        assertEquals(true, home.currentLesson.restartsLesson)
+        assertEquals("lesson_1", home.currentLesson.lesson.id)
+    }
+
+    @Test fun partlyPassedModuleIsContinueWithoutRestart() {
+        val home = HomeContentBuilder.build(catalog, done(1))!!
+        assertEquals(HomeCardKind.Continue, home.currentLesson.kind)
+        assertEquals(false, home.currentLesson.restartsLesson)
+    }
+
+    @Test fun firstLessonOfNextModuleIsNewModuleCard() {
+        val home = HomeContentBuilder.build(catalog, done(1, 2))!!
+        assertEquals(HomeCardKind.NewModule, home.currentLesson.kind)
+        assertEquals("lesson_3", home.currentLesson.lesson.id)
+        // Урок нового модуля уже начат: это снова «Продолжить» с перезапуском.
+        val started = HomeContentBuilder.build(catalog, done(1, 2) + LessonProgress("lesson_3", LessonStatus.InProgress, 0))!!
+        assertEquals(HomeCardKind.Continue, started.currentLesson.kind)
+        assertEquals(true, started.currentLesson.restartsLesson)
+    }
+
+    @Test fun finishedCourseIsAllDoneCard() {
+        val home = HomeContentBuilder.build(catalog, done(1, 2, 3, 4, 5, 6))!!
+        assertEquals(HomeCardKind.AllDone, home.currentLesson.kind)
     }
 
     @Test fun emptyCatalogGivesNothing() {

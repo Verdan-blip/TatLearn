@@ -17,7 +17,13 @@ data class CourseModule(
     val lockHint: String? = null,
 )
 
-/** Карточка «Продолжить»: урок, модуль-тема и прогресс по урокам этого модуля. */
+/** Что показывает главная карточка: старт (новичок), продолжение, начало нового модуля или «всё пройдено». */
+enum class HomeCardKind { Start, Continue, NewModule, AllDone }
+
+/**
+ * Главная карточка: урок, модуль-тема и прогресс по урокам этого модуля.
+ * [restartsLesson] — урок был начат, но не пройден; шаги внутри урока не сохраняются, он пойдёт с начала.
+ */
 data class CurrentLesson(
     val lesson: Lesson,
     /** Название модуля, показываемое на карточке главной, например «Ашлар» / «Еда». */
@@ -25,6 +31,8 @@ data class CurrentLesson(
     val topicRu: String,
     val completedLessons: Int,
     val totalLessons: Int,
+    val kind: HomeCardKind = HomeCardKind.Continue,
+    val restartsLesson: Boolean = false,
 ) {
     val progress: Float get() = if (totalLessons == 0) 0f else completedLessons.toFloat() / totalLessons
 }

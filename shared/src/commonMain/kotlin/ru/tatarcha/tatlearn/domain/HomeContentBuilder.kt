@@ -2,6 +2,7 @@ package ru.tatarcha.tatlearn.domain
 
 import ru.tatarcha.tatlearn.domain.model.CourseModule
 import ru.tatarcha.tatlearn.domain.model.CurrentLesson
+import ru.tatarcha.tatlearn.domain.model.HomeCardKind
 import ru.tatarcha.tatlearn.domain.model.HomeContent
 import ru.tatarcha.tatlearn.domain.model.LearningModule
 import ru.tatarcha.tatlearn.domain.model.LessonProgress
@@ -33,12 +34,24 @@ object HomeContentBuilder {
             )
         }
 
-        // Первый открытый модуль с непройденным уроком; если всё пройдено, показываем последний урок (TODO(design): состояние «всё пройдено»).
-        val target = modules.zip(learning).firstOrNull { (module, view) ->
+        // Первый открытый модуль с непройденным уроком; если всё пройдено, показываем последний урок («Повторить урок N»).
+        val open = modules.zip(learning).firstOrNull { (module, view) ->
             !view.isLocked && module.lessons.any { it.id !in completed }
-        } ?: modules.zip(learning).last { (module, _) -> module.lessons.isNotEmpty() }
-        val (module, _) = target
+        }
+        val allDone = open == null
+        val (module, _) = open ?: modules.zip(learning).last { (module, _) -> module.lessons.isNotEmpty() }
         val lesson = module.lessons.firstOrNull { it.id !in completed } ?: module.lessons.last()
+        val started = progress.any { it.status == LessonStatus.InProgress && it.lessonId == lesson.id }
+        // Новичок: ни одного пройденного и ни одного начатого урока. Тогда «Продолжить» нечего обещать.
+        val newcomer = progress.none { it.status != LessonStatus.NotStarted }
+        val moduleIndex = modules.indexOf(module)
+        val kind = when {
+            allDone -> HomeCardKind.AllDone
+            newcomer -> HomeCardKind.Start
+            // Первый урок следующего модуля, в котором ничего ещё не пройдено.
+            moduleIndex > 0 && !started && lesson == module.lessons.first() && module.lessons.none { it.id in completed } -> HomeCardKind.NewModule
+            else -> HomeCardKind.Continue
+        }
         return HomeContent(
             modules = learning,
             currentLesson = CurrentLesson(
@@ -47,6 +60,8 @@ object HomeContentBuilder {
                 topicRu = module.titleRu,
                 completedLessons = module.lessons.count { it.id in completed },
                 totalLessons = module.lessons.size,
+                kind = kind,
+                restartsLesson = started && kind == HomeCardKind.Continue,
             ),
         )
     }

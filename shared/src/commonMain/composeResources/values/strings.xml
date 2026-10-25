@@ -101,6 +101,20 @@
     <string name="home_streak_days">Серия: %1$d көн</string>
     <string name="home_level_xp">Ур. %1$d · %2$d XP</string>
     <string name="home_toast_all_unavailable">Список модулей пока недоступен</string>
+    <string name="home_start_tag">Башларга · Начать</string>
+    <string name="home_new_module_tag">Яңа модуль · Новый модуль</string>
+    <string name="home_done_tag">Тәмам · Готово</string>
+    <plurals name="home_lessons_count">
+        <item quantity="one">%1$d урок</item>
+        <item quantity="few">%1$d урока</item>
+        <item quantity="many">%1$d уроков</item>
+        <item quantity="other">%1$d урока</item>
+    </plurals>
+    <string name="home_all_done_title">Все модули пройдены</string>
+    <string name="home_repeat_lesson_button">Повторить урок %1$d</string>
+    <string name="home_lesson_restart_hint">Начнём урок с начала</string>
+    <string name="home_streak_invite">Пройди урок и начни серию</string>
+    <string name="home_level_short">Ур. %1$d</string>
     <string name="home_continue_tag">Дәвам ит · Продолжить</string>
     <string name="home_lesson_progress">%1$d / %2$d</string>
     <string name="home_lesson_button">Урок %1$d · %2$s</string>

@@ -1,6 +1,22 @@
 package ru.tatarcha.tatlearn.feature.home
 
 import androidx.compose.foundation.background
+import tatlearn.shared.generated.resources.home_streak_invite
+import tatlearn.shared.generated.resources.home_start_tag
+import tatlearn.shared.generated.resources.home_repeat_lesson_button
+import tatlearn.shared.generated.resources.home_new_module_tag
+import tatlearn.shared.generated.resources.home_level_short
+import tatlearn.shared.generated.resources.home_lesson_restart_hint
+import tatlearn.shared.generated.resources.home_done_tag
+import tatlearn.shared.generated.resources.home_all_done_title
+import ru.tatarcha.tatlearn.core.designsystem.component.BrandDiamonds
+import org.jetbrains.compose.resources.pluralStringResource
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.Path
+import androidx.compose.foundation.Canvas
+import ru.tatarcha.tatlearn.domain.model.HomeCardKind
+import ru.tatarcha.tatlearn.domain.model.AvatarPose
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -59,6 +75,7 @@ import tatlearn.shared.generated.resources.home_continue_tag
 import tatlearn.shared.generated.resources.home_dictionary_soon_message
 import tatlearn.shared.generated.resources.home_dictionary_soon_title
 import tatlearn.shared.generated.resources.home_greeting
+import tatlearn.shared.generated.resources.home_lessons_count
 import tatlearn.shared.generated.resources.home_lesson_button
 import tatlearn.shared.generated.resources.home_lesson_progress
 import tatlearn.shared.generated.resources.home_level_xp
@@ -169,7 +186,7 @@ private fun HomeLoaded(
                 current = content.currentLesson,
                 onStart = { onEvent(HomeUiEvent.StartLessonClicked) },
             )
-            StreakCard(stats = stats)
+            if (content.currentLesson.kind == HomeCardKind.Start) StreakInviteCard(stats = stats) else StreakCard(stats = stats)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -189,6 +206,7 @@ private fun HomeLoaded(
             }
             ModulesGrid(
                 modules = content.modules,
+                highlightedId = content.modules.firstOrNull { !it.isLocked }?.id.takeIf { content.currentLesson.kind == HomeCardKind.Start },
                 onClick = { moduleId -> onEvent(HomeUiEvent.ModuleClicked(moduleId)) },
             )
         }
@@ -237,6 +255,53 @@ private fun Header(
         )
     }
 }
+
+/** Новичку вместо «Серия: 0 көн» приглашение: нулевая серия выглядит упрёком (макет 34). */
+@Composable
+private fun StreakInviteCard(stats: UserStats) {
+    val colors = TamyrTheme.colors
+    TamyrCard(modifier = Modifier.fillMaxWidth(), contentPadding = TamyrTheme.spacing.m) {
+        Row(
+            modifier = Modifier.padding(horizontal = TamyrTheme.spacing.xxs),
+            horizontalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.blockGap),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                Modifier.size(TamyrSizes.streakBadgeCompact).clip(TamyrTheme.shapes.chip).background(colors.goldContainer),
+                contentAlignment = Alignment.Center,
+            ) { DiamondOutline(colors.goldText) }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.xs)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
+                    Text(stringResource(Res.string.home_streak_invite), style = TamyrTheme.typography.body15Bold, color = colors.textPrimary)
+                    Text(stringResource(Res.string.home_level_short, stats.level), style = TamyrTheme.typography.caption13Bold, color = colors.goldText)
+                }
+                TamyrProgressBar(
+                    progress = (UserStats.XP_PER_LEVEL - stats.xpToNextLevel) / UserStats.XP_PER_LEVEL.toFloat(),
+                    height = TamyrSizes.moduleProgress,
+                    color = colors.gold,
+                )
+            }
+        }
+    }
+}
+
+/** Контурный ромб: серия ещё не началась. */
+@Composable
+private fun DiamondOutline(color: Color) {
+    Canvas(Modifier.size(DiamondOutlineSize)) {
+        val w = size.width
+        val path = Path().apply {
+            moveTo(w / 2, w * 0.125f)
+            lineTo(w * 0.875f, w / 2)
+            lineTo(w / 2, w * 0.875f)
+            lineTo(w * 0.125f, w / 2)
+            close()
+        }
+        drawPath(path, color, style = Stroke(width = w * 0.1f, join = StrokeJoin.Round))
+    }
+}
+
+private val DiamondOutlineSize = 22.dp
 
 @Composable
 private fun StreakCard(stats: UserStats) {
@@ -289,9 +354,17 @@ private fun CurrentLessonCard(
     current: CurrentLesson,
     onStart: () -> Unit,
 ) {
+    val colors = TamyrTheme.colors
+    val allDone = current.kind == HomeCardKind.AllDone
+    val tag = when (current.kind) {
+        HomeCardKind.Start -> Res.string.home_start_tag
+        HomeCardKind.Continue -> Res.string.home_continue_tag
+        HomeCardKind.NewModule -> Res.string.home_new_module_tag
+        HomeCardKind.AllDone -> Res.string.home_done_tag
+    }
     TamyrCard(
         modifier = Modifier.fillMaxWidth(),
-        containerColor = TamyrTheme.colors.successContainer,
+        containerColor = colors.successContainer,
         contentPadding = TamyrTheme.spacing.l,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.m)) {
@@ -301,33 +374,67 @@ private fun CurrentLessonCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = stringResource(Res.string.home_continue_tag).toUpperCase(Locale.current),
+                    text = stringResource(tag).toUpperCase(Locale.current),
                     style = TamyrTheme.typography.tag.copy(fontSize = TamyrTheme.typography.caption13Bold.fontSize),
-                    color = TamyrTheme.colors.primary,
+                    color = colors.primary,
                 )
-                Text(
-                    text = stringResource(Res.string.home_lesson_progress, current.completedLessons, current.totalLessons),
-                    style = TamyrTheme.typography.caption13,
-                    color = TamyrTheme.colors.primary,
+                val counter = when (current.kind) {
+                    HomeCardKind.Continue -> stringResource(Res.string.home_lesson_progress, current.completedLessons, current.totalLessons)
+                    HomeCardKind.Start, HomeCardKind.NewModule -> pluralStringResource(Res.plurals.home_lessons_count, current.totalLessons, current.totalLessons)
+                    HomeCardKind.AllDone -> null
+                }
+                if (counter != null) Text(text = counter, style = TamyrTheme.typography.caption13, color = colors.primary)
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.m),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.xxs)) {
+                    Text(
+                        text = if (allDone) {
+                            stringResource(Res.string.home_all_done_title)
+                        } else if (current.topicTt == current.topicRu) {
+                            current.topicTt
+                        } else {
+                            "${current.topicTt} · ${current.topicRu}"
+                        },
+                        style = TamyrTheme.typography.title19,
+                        color = colors.textPrimary,
+                    )
+                    if (current.restartsLesson) {
+                        Text(stringResource(Res.string.home_lesson_restart_hint), style = TamyrTheme.typography.caption13, color = colors.textSecondary)
+                    }
+                }
+                // Новичку и тому, кто прошёл всё, Мыраужан; новому модулю три ромба; обычному «Продолжить» ничего (без «обоев»).
+                when (current.kind) {
+                    HomeCardKind.Start -> ProfileAvatar(Avatar.Pose(AvatarPose.Greeting), "", CardMascotSize)
+                    HomeCardKind.AllDone -> ProfileAvatar(Avatar.Pose(AvatarPose.Cheer), "", CardMascotSize)
+                    HomeCardKind.NewModule -> BrandDiamonds()
+                    HomeCardKind.Continue -> Unit
+                }
+            }
+            // Полосу показываем только при продолжении: пустая полоса у новичка выглядит упрёком.
+            if (current.kind == HomeCardKind.Continue) {
+                TamyrProgressBar(
+                    progress = current.progress,
+                    height = TamyrSizes.lessonProgress,
+                    trackColor = colors.surface,
                 )
             }
-            Text(
-                text = "${current.topicTt} · ${current.topicRu}",
-                style = TamyrTheme.typography.title19,
-                color = TamyrTheme.colors.textPrimary,
-            )
-            TamyrProgressBar(
-                progress = current.progress,
-                height = TamyrSizes.lessonProgress,
-                trackColor = TamyrTheme.colors.surface,
-            )
             LessonButton(
-                text = stringResource(Res.string.home_lesson_button, current.lesson.number, current.lesson.titleTt),
+                text = if (allDone) {
+                    stringResource(Res.string.home_repeat_lesson_button, current.lesson.number)
+                } else {
+                    stringResource(Res.string.home_lesson_button, current.lesson.number, current.lesson.titleTt)
+                },
                 onClick = onStart,
             )
         }
     }
 }
+
+private val CardMascotSize = 56.dp
 
 /** Кнопка в карточке урока: укороченный вариант главной кнопки (46dp, скругление 12dp, без «3D»-тени). */
 @Composable
@@ -355,6 +462,7 @@ private fun LessonButton(
 @Composable
 private fun ModulesGrid(
     modules: List<LearningModule>,
+    highlightedId: String?,
     onClick: (moduleId: String) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.m)) {
@@ -368,6 +476,7 @@ private fun ModulesGrid(
                 rowModules.forEach { module ->
                     ModuleTile(
                         module = module,
+                        highlighted = module.id == highlightedId,
                         onClick = { onClick(module.id) },
                         modifier = Modifier
                             .weight(1f)
@@ -383,6 +492,7 @@ private fun ModulesGrid(
 @Composable
 private fun ModuleTile(
     module: LearningModule,
+    highlighted: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -391,6 +501,9 @@ private fun ModuleTile(
         onClick = onClick,
         shape = TamyrTheme.shapes.tile,
         containerColor = if (module.isLocked) TamyrTheme.colors.surfaceMuted else TamyrTheme.colors.surface,
+        // Новичку первый модуль подсвечен рамкой: «начни отсюда».
+        borderColor = if (highlighted) TamyrTheme.colors.primary else TamyrTheme.colors.border,
+        borderWidth = if (highlighted) TamyrSizes.borderAccent else TamyrSizes.borderThin,
         contentPadding = ModuleCardPadding,
     ) {
         Column(
@@ -483,7 +596,12 @@ private fun previewContent(
     modules: List<LearningModule> = previewModules,
     completed: Int = 3,
     total: Int = 5,
-) = HomeContent(modules, CurrentLesson(Lesson("lesson_4", 4, "Туганнар", "Семья"), "Гаилә", "Семья", completed, total))
+    kind: HomeCardKind = HomeCardKind.Continue,
+    restartsLesson: Boolean = false,
+) = HomeContent(
+    modules,
+    CurrentLesson(Lesson("lesson_4", 4, "Туганнар", "Семья"), "Гаилә", "Семья", completed, total, kind, restartsLesson),
+)
 
 @Composable
 private fun HomePreview(state: HomeUiState) = PreviewFrame {
@@ -547,6 +665,34 @@ private fun HomeAllDonePreview() = HomePreview(
         UserStats(xp = 1990, streak = 100),
         LoadState.Content(previewContent(previewModules.map { it.copy(progressPercent = 100, lockedBy = null, lockHint = null) }, completed = 5)),
     ),
+)
+
+@Preview(name = "First launch (start card)", group = PREVIEW_GROUP)
+@Composable
+private fun HomeStartPreview() = HomePreview(
+    HomeUiState("Алия", UserStats.Empty, LoadState.Content(previewContent(previewModules.map { it.copy(progressPercent = 0) }, completed = 0, total = 3, kind = HomeCardKind.Start))),
+)
+
+@Preview(name = "New module card", group = PREVIEW_GROUP)
+@Composable
+private fun HomeNewModulePreview() = HomePreview(
+    HomeUiState("Алия", UserStats(xp = 200, streak = 3), LoadState.Content(previewContent(completed = 0, total = 2, kind = HomeCardKind.NewModule))),
+)
+
+@Preview(name = "All done card", group = PREVIEW_GROUP)
+@Composable
+private fun HomeAllDoneCardPreview() = HomePreview(
+    HomeUiState(
+        "Алия",
+        UserStats(xp = 1990, streak = 100),
+        LoadState.Content(previewContent(previewModules.map { it.copy(progressPercent = 100, lockedBy = null, lockHint = null) }, completed = 5, kind = HomeCardKind.AllDone)),
+    ),
+)
+
+@Preview(name = "Started lesson restarts", group = PREVIEW_GROUP)
+@Composable
+private fun HomeRestartPreview() = HomePreview(
+    HomeUiState("Алия", UserStats(xp = 340, streak = 12), LoadState.Content(previewContent(restartsLesson = true))),
 )
 
 @Preview(name = "Long name and titles", group = PREVIEW_GROUP)

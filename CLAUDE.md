@@ -1,7 +1,7 @@
 # Тамыр (TatLearn) — conventions
 
 App for learning Tatar (Russian-speaking audience). Kotlin Multiplatform + Compose Multiplatform, Android + iOS, all UI/logic in `commonMain`.
-Source of truth for UI: `design/Tatar App Screens.dc.html` (33 screens, 390×844). Skills: `design` (what "design" means here), `design-extend` (how to draw new screens/elements), `compose-style`.
+Source of truth for UI: `design/Tatar App Screens.dc.html` (37 screens, 390×844). Skills: `design` (what "design" means here), `design-extend` (how to draw new screens/elements), `compose-style`.
 
 ## Modules / build
 - `:shared` — all code (KMP library, iOS framework `Shared`); `:androidApp` — Android entry point; `iosApp/` — Xcode project (entry point only).
@@ -54,7 +54,7 @@ Koin (DI), Navigation 3 (JetBrains, `navigation3-ui`; runtime comes transitively
 - Typed answers go through `AnswerNormalizer`: lower-case + punctuation stripped, then Russian-keyboard folding (ә→а, ө→о, ү→у, җ→ж, ң→н, һ→х) gives `Approximate` = accepted with the proper spelling shown.
 - Back/close asks for confirmation (`NavigationBackHandler` from navigationevent-compose; `BackHandler` is deprecated).
 - Audio: `AudioPlayer` (expect fun `createPlatformAudioPlayer`: MediaPlayer / AVPlayer) wrapped by `StubbingAudioPlayer`, which fakes playback while a task has no `audioUrl` (TODO(audio)). `LessonPlanner` skips listening steps without `audioUrl` (MVP has no audio); the data stays in lesson JSON.
-- Tests (103, same set on both platforms): `./gradlew :shared:testAndroidHostTest :shared:iosSimulatorArm64Test`. Settings fake = `MapSettings` from `multiplatform-settings-test` (test-only).
+- Tests (108, same set on both platforms): `./gradlew :shared:testAndroidHostTest :shared:iosSimulatorArm64Test`. Settings fake = `MapSettings` from `multiplatform-settings-test` (test-only).
 - Motion tokens: `TamyrMotion` (step slide, feedback panel slide-up, progress bar tween).
 
 ## Methodology
