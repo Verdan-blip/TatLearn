@@ -35,7 +35,7 @@ Koin (DI), Navigation 3 (JetBrains, `navigation3-ui`; runtime comes transitively
 
 ## Data layer
 - `domain/{model,repository}`: interfaces return `Result<T>` with `AppException(code)`; UI maps to `LoadState.Error(code)`.
-- `data/fake`: `Fake*Repository` read API-shaped JSON from `composeResources/files` (DTOs are shared with the Ktorfit API, mappers in `data/mapper`), 300-800 ms delay, `FakeBackendConfig.setSimulateErrors` for screens 07/08.
+- `data/fake`: `Fake*Repository` read API-shaped JSON from `composeResources/files` (`modules.json` = catalog of modules with their lessons, `lessons/<id>.json` = lesson tasks; DTOs are shared with the Ktorfit API, mappers in `data/mapper`), 300-800 ms delay, `FakeBackendConfig.setSimulateErrors` for screens 07/08.
 - `data/remote`: Ktorfit `LessonsApi`/`AuthApi` + `Remote*Repository`; enabled by `tamyr.useRemote=true` in gradle.properties (`tamyr.baseUrl` too) -> generated `BuildConfig`.
 - `data/local`: `SqlDelightProgressRepository` (Progress.sq), `SessionStorage` (multiplatform-settings).
 - Koin starts in `TatLearnApplication` (Android) / `MainViewController` (iOS) via `initKoin`; `platformModule` is expect/actual (SqlDriver, Settings, HttpClientEngine).
@@ -54,7 +54,7 @@ Koin (DI), Navigation 3 (JetBrains, `navigation3-ui`; runtime comes transitively
 - Typed answers go through `AnswerNormalizer`: lower-case + punctuation stripped, then Russian-keyboard folding (ә→а, ө→о, ү→у, җ→ж, ң→н, һ→х) gives `Approximate` = accepted with the proper spelling shown.
 - Back/close asks for confirmation (`NavigationBackHandler` from navigationevent-compose; `BackHandler` is deprecated).
 - Audio: `AudioPlayer` (expect fun `createPlatformAudioPlayer`: MediaPlayer / AVPlayer) wrapped by `StubbingAudioPlayer`, which fakes playback while a task has no `audioUrl` (TODO(audio)).
-- Tests (61, same set on both platforms): `./gradlew :shared:testAndroidHostTest :shared:iosSimulatorArm64Test`. Settings fake = `MapSettings` from `multiplatform-settings-test` (test-only).
+- Tests (71, same set on both platforms): `./gradlew :shared:testAndroidHostTest :shared:iosSimulatorArm64Test`. Settings fake = `MapSettings` from `multiplatform-settings-test` (test-only).
 - Motion tokens: `TamyrMotion` (step slide, feedback panel slide-up, progress bar tween).
 
 ## Methodology

@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import ru.tatarcha.tatlearn.domain.model.ExerciseOutcome
 import ru.tatarcha.tatlearn.domain.model.ExerciseResult
-import ru.tatarcha.tatlearn.domain.model.HomeContent
+import ru.tatarcha.tatlearn.domain.model.CourseModule
 import ru.tatarcha.tatlearn.domain.model.LessonContent
 import ru.tatarcha.tatlearn.domain.model.LessonProgress
 import ru.tatarcha.tatlearn.domain.model.UserSession
@@ -12,7 +12,8 @@ import ru.tatarcha.tatlearn.domain.model.UserStats
 
 /** Сбои — это [ru.tatarcha.tatlearn.core.common.AppException] внутри [Result]. */
 interface LessonsRepository {
-    suspend fun getHome(): Result<HomeContent>
+    /** Каталог модулей по порядку; прогресс пользователя сюда не входит (он в [ProgressRepository]). */
+    suspend fun getModules(): Result<List<CourseModule>>
     suspend fun getLessonContent(lessonId: String): Result<LessonContent>
 }
 

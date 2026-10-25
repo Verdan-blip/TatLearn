@@ -5,10 +5,14 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.tatarcha.tatlearn.core.common.AutoDismiss
+import ru.tatarcha.tatlearn.core.common.ErrorCodes
 import ru.tatarcha.tatlearn.core.common.LoadState
 import ru.tatarcha.tatlearn.core.common.MviViewModel
 import ru.tatarcha.tatlearn.core.common.errorCode
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
+import ru.tatarcha.tatlearn.domain.HomeContentBuilder
+import ru.tatarcha.tatlearn.domain.model.CourseModule
+import ru.tatarcha.tatlearn.domain.model.LessonProgress
 import ru.tatarcha.tatlearn.domain.repository.AuthRepository
 import ru.tatarcha.tatlearn.domain.repository.LessonsRepository
 import ru.tatarcha.tatlearn.domain.repository.ProgressRepository
@@ -21,8 +25,16 @@ class HomeViewModel(
 
     private val toastTimer = AutoDismiss(viewModelScope, TamyrMotion.TOAST_VISIBLE_MS)
 
+    /** Каталог с сервера и локальный прогресс; главная пересобирается при изменении любого из них. */
+    private var catalog: List<CourseModule>? = null
+    private var lessonProgress: List<LessonProgress> = emptyList()
+
     init {
         progress.observeStats().onEach { stats -> setState { copy(stats = stats) } }.launchIn(viewModelScope)
+        progress.observeLessonProgress().onEach { items ->
+            lessonProgress = items
+            publish()
+        }.launchIn(viewModelScope)
         auth.session.onEach { session -> setState { copy(userName = session?.name.orEmpty()) } }.launchIn(viewModelScope)
         load()
     }
@@ -63,8 +75,20 @@ class HomeViewModel(
     private fun load() {
         viewModelScope.launch {
             setState { copy(content = LoadState.Loading) }
-            val result = lessons.getHome()
-            setState { copy(content = result.fold({ LoadState.Content(it) }, { LoadState.Error(it.errorCode()) })) }
+            catalog = null
+            lessons.getModules().fold(
+                onSuccess = { modules ->
+                    catalog = modules
+                    publish()
+                },
+                onFailure = { error -> setState { copy(content = LoadState.Error(error.errorCode())) } },
+            )
         }
+    }
+
+    private fun publish() {
+        val modules = catalog ?: return
+        val home = HomeContentBuilder.build(modules, lessonProgress)
+        setState { copy(content = if (home != null) LoadState.Content(home) else LoadState.Error(ErrorCodes.NOT_FOUND)) }
     }
 }

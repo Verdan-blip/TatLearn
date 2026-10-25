@@ -13,7 +13,7 @@ import ru.tatarcha.tatlearn.core.common.errorCode
 import ru.tatarcha.tatlearn.data.fake.FakeBackendConfig
 import ru.tatarcha.tatlearn.domain.model.ExerciseResult
 import ru.tatarcha.tatlearn.domain.model.ExerciseType
-import ru.tatarcha.tatlearn.domain.model.HomeContent
+import ru.tatarcha.tatlearn.domain.model.CourseModule
 import ru.tatarcha.tatlearn.domain.model.UserStats
 import ru.tatarcha.tatlearn.domain.repository.LessonsRepository
 import ru.tatarcha.tatlearn.domain.repository.ProgressRepository
@@ -21,7 +21,7 @@ import ru.tatarcha.tatlearn.domain.repository.ProgressRepository
 /** Только для отладки: прогоняет слой данных из UI kit (фейковый бэкенд, база прогресса). */
 data class ShowcaseUiState(
     val stats: UserStats = UserStats.Empty,
-    val home: LoadState<HomeContent> = LoadState.Loading,
+    val home: LoadState<List<CourseModule>> = LoadState.Loading,
     val simulateErrors: Boolean = false,
 ) : UiState
 
@@ -49,7 +49,7 @@ class ShowcaseViewModel(
         when (event) {
             ShowcaseUiEvent.LoadHome -> viewModelScope.launch {
                 setState { copy(home = LoadState.Loading) }
-                val result = lessons.getHome()
+                val result = lessons.getModules()
                 setState {
                     copy(home = result.fold({ LoadState.Content(it) }, { LoadState.Error(it.errorCode()) }))
                 }

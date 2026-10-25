@@ -15,7 +15,7 @@
 ## Где используются
 | Экран | Как |
 |---|---|
-| Home | `LoadStateContent` вокруг всей главной; Retry перезагружает `getHome()`. |
+| Home | `LoadStateContent` вокруг всей главной; Retry перезагружает `getModules()`. |
 | Lesson | `when(load)`: Loading / Error / рамка упражнения; Retry → `load()`. |
 | Auth, Onboarding, Result | не используют (нет начальной загрузки). |
 

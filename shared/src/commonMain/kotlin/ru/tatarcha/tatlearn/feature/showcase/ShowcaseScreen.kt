@@ -99,12 +99,10 @@ fun ShowcaseScreen(viewModel: ShowcaseViewModel, onClose: () -> Unit) {
                 val homeText = when (val home = data.home) {
                     LoadState.Loading -> stringResource(Res.string.showcase_home_loading)
                     is LoadState.Error -> stringResource(Res.string.error_code, home.code.orEmpty())
-                    is LoadState.Content -> stringResource(
-                        Res.string.showcase_home_loaded,
-                        home.data.currentLesson.lesson.number,
-                        home.data.currentLesson.lesson.titleTt,
-                        home.data.modules.size,
-                    )
+                    is LoadState.Content -> {
+                        val lesson = home.data.firstOrNull()?.lessons?.firstOrNull()
+                        stringResource(Res.string.showcase_home_loaded, lesson?.number ?: 0, lesson?.titleTt.orEmpty(), home.data.size)
+                    }
                 }
                 Text(homeText, style = TamyrTheme.typography.body15, color = TamyrTheme.colors.textSecondary)
                 TamyrButton(stringResource(Res.string.showcase_reload_home), { viewModel.onEvent(ShowcaseUiEvent.LoadHome) }, style = TamyrButtonStyle.Secondary)

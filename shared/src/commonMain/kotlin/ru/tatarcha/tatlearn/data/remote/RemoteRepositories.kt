@@ -4,15 +4,15 @@ import kotlinx.coroutines.flow.StateFlow
 import ru.tatarcha.tatlearn.data.local.SessionStorage
 import ru.tatarcha.tatlearn.data.mapper.toDomain
 import ru.tatarcha.tatlearn.data.remote.dto.CredentialsDto
-import ru.tatarcha.tatlearn.domain.model.HomeContent
+import ru.tatarcha.tatlearn.domain.model.CourseModule
 import ru.tatarcha.tatlearn.domain.model.LessonContent
 import ru.tatarcha.tatlearn.domain.model.UserSession
 import ru.tatarcha.tatlearn.domain.repository.AuthRepository
 import ru.tatarcha.tatlearn.domain.repository.LessonsRepository
 
 class RemoteLessonsRepository(private val api: LessonsApi) : LessonsRepository {
-    override suspend fun getHome(): Result<HomeContent> =
-        remoteCall { api.getHome().toDomain() }
+    override suspend fun getModules(): Result<List<CourseModule>> =
+        remoteCall { api.getModules().map { it.toDomain() } }
 
     override suspend fun getLessonContent(lessonId: String): Result<LessonContent> =
         remoteCall { api.getLesson(lessonId).toDomain() }

@@ -15,11 +15,11 @@ import kotlinx.coroutines.test.setMain
 import ru.tatarcha.tatlearn.core.common.AppException
 import ru.tatarcha.tatlearn.core.common.LoadState
 import ru.tatarcha.tatlearn.data.local.OnboardingStorage
-import ru.tatarcha.tatlearn.domain.model.CurrentLesson
+import ru.tatarcha.tatlearn.domain.model.CourseModule
 import ru.tatarcha.tatlearn.domain.model.ExerciseOutcome
 import ru.tatarcha.tatlearn.domain.model.ExerciseResult
 import ru.tatarcha.tatlearn.domain.model.HomeContent
-import ru.tatarcha.tatlearn.domain.model.LearningModule
+import ru.tatarcha.tatlearn.domain.model.LessonStatus
 import ru.tatarcha.tatlearn.domain.model.Lesson
 import ru.tatarcha.tatlearn.domain.model.LessonContent
 import ru.tatarcha.tatlearn.domain.model.LessonProgress
@@ -82,27 +82,32 @@ private class FakeAuth(
     }
 }
 
-private class HomeLessons(var result: Result<HomeContent>) : LessonsRepository {
+private class HomeLessons(var result: Result<List<CourseModule>>) : LessonsRepository {
     var calls = 0
-    override suspend fun getHome(): Result<HomeContent> { calls++; return result }
+    override suspend fun getModules(): Result<List<CourseModule>> { calls++; return result }
     override suspend fun getLessonContent(lessonId: String): Result<LessonContent> = error("unused")
 }
 
 private class StatsProgress(initial: UserStats = UserStats.Empty) : ProgressRepository {
     val stats = MutableStateFlow(initial)
+    val lessonProgress = MutableStateFlow<List<LessonProgress>>(emptyList())
     override fun observeStats(): Flow<UserStats> = stats
-    override fun observeLessonProgress(): Flow<List<LessonProgress>> = stats.map { emptyList() }
+    override fun observeLessonProgress(): Flow<List<LessonProgress>> = lessonProgress
     override suspend fun recordExerciseResult(result: ExerciseResult): ExerciseOutcome = error("unused")
     override suspend fun completeLesson(lessonId: String, scorePercent: Int) = Unit
 }
 
-private val openModule = LearningModule("food", "Ашлар", "Еда", "food", progressPercent = 35, lockedBy = null, lockHint = null)
-private val lockedModule = LearningModule("nature", "Табигать", "Природа", "nature", progressPercent = 0, lockedBy = "food", lockHint = "Откроется после «Еды»")
-
-private fun homeContent() = HomeContent(
-    modules = listOf(openModule, lockedModule),
-    currentLesson = CurrentLesson(Lesson("lesson_4", 4, "Туганнар", "Родные"), "Гаилә", "Семья", 2, 8),
+private val foodModule = CourseModule(
+    "food", "Ашлар", "Еда", "food",
+    lessons = listOf(Lesson("lesson_3", 3, "Ашлар", "Еда, часть 1"), Lesson("lesson_4", 4, "Туганнар", "Семья")),
 )
+private val natureModule = CourseModule(
+    "nature", "Табигать", "Природа", "nature",
+    lessons = listOf(Lesson("lesson_7", 7, "Табигать", "Природа, часть 1")),
+    lockHint = "Откроется после «Еды»",
+)
+
+private fun catalog() = listOf(foodModule, natureModule)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ScreenViewModelsTest {
@@ -245,7 +250,7 @@ class ScreenViewModelsTest {
 
     @Test fun homeLoadsContentAndStats() = runTest {
         val progress = StatsProgress(UserStats(xp = 120, streak = 3))
-        val vm = HomeViewModel(HomeLessons(Result.success(homeContent())), progress, FakeAuth(UserSession("Алия", "a@b.ru")))
+        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), progress, FakeAuth(UserSession("Алия", "a@b.ru")))
         assertEquals("Алия", vm.state.value.userName)
         assertIs<LoadState.Content<HomeContent>>(vm.state.value.content)
         assertEquals(3, vm.state.value.stats.streak)
@@ -257,7 +262,7 @@ class ScreenViewModelsTest {
         val lessons = HomeLessons(Result.failure(AppException("NET_TIMEOUT")))
         val vm = HomeViewModel(lessons, StatsProgress(), FakeAuth())
         assertEquals(LoadState.Error("NET_TIMEOUT"), vm.state.value.content)
-        lessons.result = Result.success(homeContent())
+        lessons.result = Result.success(catalog())
         vm.onEvent(HomeUiEvent.RetryClicked)
         assertIs<LoadState.Content<HomeContent>>(vm.state.value.content)
         assertEquals(2, lessons.calls)
@@ -267,37 +272,55 @@ class ScreenViewModelsTest {
         val lessons = HomeLessons(Result.failure(AppException("NET_ERROR")))
         val vm = HomeViewModel(lessons, StatsProgress(), FakeAuth())
         vm.onEvent(HomeUiEvent.StartLessonClicked)
-        lessons.result = Result.success(homeContent())
+        lessons.result = Result.success(catalog())
         vm.onEvent(HomeUiEvent.RetryClicked)
         vm.onEvent(HomeUiEvent.StartLessonClicked)
-        assertEquals(HomeUiEffect.NavigateToLesson("lesson_4"), vm.effects.first())
+        assertEquals(HomeUiEffect.NavigateToLesson("lesson_3"), vm.effects.first())
     }
 
     @Test fun lockedModuleClickShowsItsHint() = runTest {
-        val vm = HomeViewModel(HomeLessons(Result.success(homeContent())), StatsProgress(), FakeAuth())
+        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth())
         vm.onEvent(HomeUiEvent.ModuleClicked("nature"))
         assertEquals(HomeToast.ModuleLocked("Откроется после «Еды»"), vm.state.value.toast)
     }
 
     @Test fun openModuleClickShowsUnavailable() = runTest {
-        val vm = HomeViewModel(HomeLessons(Result.success(homeContent())), StatsProgress(), FakeAuth())
+        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth())
         vm.onEvent(HomeUiEvent.ModuleClicked("food"))
         assertEquals(HomeToast.ModuleUnavailable, vm.state.value.toast)
     }
 
+    @Test fun finishedLessonMovesCurrentLessonAndUpdatesProgress() = runTest {
+        val progress = StatsProgress()
+        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), progress, FakeAuth())
+        progress.lessonProgress.value = listOf(LessonProgress("lesson_3", LessonStatus.Completed, 90))
+        val home = (vm.state.value.content as LoadState.Content).data
+        assertEquals("lesson_4", home.currentLesson.lesson.id)
+        assertEquals(50, home.modules.first { it.id == "food" }.progressPercent)
+        vm.onEvent(HomeUiEvent.StartLessonClicked)
+        assertEquals(HomeUiEffect.NavigateToLesson("lesson_4"), vm.effects.first())
+    }
+
+    @Test fun emptyCatalogShowsNotFound() = runTest {
+        val vm = HomeViewModel(HomeLessons(Result.success(emptyList())), StatsProgress(), FakeAuth())
+        assertEquals(LoadState.Error("NOT_FOUND"), vm.state.value.content)
+    }
+
     @Test fun allModulesAndNavItemsShowStubToasts() = runTest {
-        val vm = HomeViewModel(HomeLessons(Result.success(homeContent())), StatsProgress(), FakeAuth())
+        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth())
         vm.onEvent(HomeUiEvent.AllModulesClicked)
         assertEquals(HomeToast.AllModulesUnavailable, vm.state.value.toast)
         vm.onEvent(HomeUiEvent.ToastDismissed)
         vm.onEvent(HomeUiEvent.NavItemClicked(HomeNavItem.Home))
         assertNull(vm.state.value.toast)
         vm.onEvent(HomeUiEvent.NavItemClicked(HomeNavItem.Profile))
-        assertEquals(HomeToast.SectionUnavailable, vm.state.value.toast)
+        assertEquals(HomeNavItem.Profile, vm.state.value.tab)
+        vm.onEvent(HomeUiEvent.NavItemClicked(HomeNavItem.Home))
+        assertEquals(HomeNavItem.Home, vm.state.value.tab)
     }
 
     @Test fun homeToastDisappearsAfterFiveSeconds() = runTest {
-        val vm = HomeViewModel(HomeLessons(Result.success(homeContent())), StatsProgress(), FakeAuth())
+        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth())
         vm.onEvent(HomeUiEvent.AllModulesClicked)
         testScheduler.advanceTimeBy(TamyrMotion.TOAST_VISIBLE_MS + 1)
         assertNull(vm.state.value.toast)

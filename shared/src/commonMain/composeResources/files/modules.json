@@ -1,0 +1,84 @@
+[
+  {
+    "id": "alphabet",
+    "titleTt": "Алфавит",
+    "titleRu": "Алфавит",
+    "icon": "alphabet",
+    "lessons": [
+      {
+        "id": "lesson_1",
+        "number": 1,
+        "titleTt": "Алфавит",
+        "titleRu": "Алфавит, часть 1"
+      },
+      {
+        "id": "lesson_2",
+        "number": 2,
+        "titleTt": "Алфавит",
+        "titleRu": "Алфавит, часть 2"
+      }
+    ]
+  },
+  {
+    "id": "food",
+    "titleTt": "Ашлар",
+    "titleRu": "Еда",
+    "icon": "food",
+    "lessons": [
+      {
+        "id": "lesson_3",
+        "number": 3,
+        "titleTt": "Ашлар",
+        "titleRu": "Еда, часть 1"
+      },
+      {
+        "id": "lesson_4",
+        "number": 4,
+        "titleTt": "Туганнар",
+        "titleRu": "Семья"
+      }
+    ]
+  },
+  {
+    "id": "numbers",
+    "titleTt": "Саннар",
+    "titleRu": "Числа",
+    "icon": "numbers",
+    "lessons": [
+      {
+        "id": "lesson_5",
+        "number": 5,
+        "titleTt": "Саннар",
+        "titleRu": "Числа, часть 1"
+      },
+      {
+        "id": "lesson_6",
+        "number": 6,
+        "titleTt": "Саннар",
+        "titleRu": "Числа, часть 2"
+      }
+    ]
+  },
+  {
+    "id": "nature",
+    "titleTt": "Табигать",
+    "titleRu": "Природа",
+    "icon": "nature",
+    "requires": "food",
+    "lockHint": "Откроется после «Еды»",
+    "lessons": [
+      {
+        "id": "lesson_7",
+        "number": 7,
+        "titleTt": "Табигать",
+        "titleRu": "Природа, часть 1"
+      },
+      {
+        "id": "lesson_8",
+        "number": 8,
+        "titleTt": "Табигать",
+        "titleRu": "Природа, часть 2"
+      }
+    ]
+  }
+]

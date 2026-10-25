@@ -14,23 +14,13 @@ data class ModuleDto(
     val titleTt: String,
     val titleRu: String,
     val icon: String,
-    val progress: Int,
-    val lockedBy: String? = null,
+    /** Уроки модуля по порядку (id, номер, названия); сами задания приходят отдельным запросом. */
+    val lessons: List<LessonDto>,
+    /** id модуля, который нужно пройти сначала; без него — предыдущий в списке. */
+    val requires: String? = null,
     /** Текст от сервера, например «Откроется после «Еды»» (грамматику на клиенте не вывести). */
     val lockHint: String? = null,
 )
-
-@Serializable
-data class CurrentLessonDto(
-    val lesson: LessonDto,
-    val topicTt: String,
-    val topicRu: String,
-    val completedExercises: Int,
-    val totalExercises: Int,
-)
-
-@Serializable
-data class HomeDto(val modules: List<ModuleDto>, val currentLesson: CurrentLessonDto)
 
 @Serializable
 data class WordPairDto(val tatar: String, val russian: String)

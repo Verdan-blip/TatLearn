@@ -305,7 +305,7 @@ private fun CurrentLessonCard(
                     color = TamyrTheme.colors.primary,
                 )
                 Text(
-                    text = stringResource(Res.string.home_lesson_progress, current.completedExercises, current.totalExercises),
+                    text = stringResource(Res.string.home_lesson_progress, current.completedLessons, current.totalLessons),
                     style = TamyrTheme.typography.caption13,
                     color = TamyrTheme.colors.primary,
                 )

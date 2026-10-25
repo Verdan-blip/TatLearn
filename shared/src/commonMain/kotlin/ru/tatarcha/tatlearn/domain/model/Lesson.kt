@@ -2,18 +2,34 @@ package ru.tatarcha.tatlearn.domain.model
 
 data class Lesson(val id: String, val number: Int, val titleTt: String, val titleRu: String)
 
+/**
+ * Модуль курса из каталога (то, что приходит с сервера): уроки по порядку, без прогресса пользователя.
+ * [requires] — id модуля, который нужно пройти сначала; null — предыдущий модуль в списке (у первого условий нет).
+ * [lockHint] — текст от сервера для закрытого модуля, например «Откроется после «Еды»» (грамматику на клиенте не вывести).
+ */
+data class CourseModule(
+    val id: String,
+    val titleTt: String,
+    val titleRu: String,
+    val icon: String,
+    val lessons: List<Lesson>,
+    val requires: String? = null,
+    val lockHint: String? = null,
+)
+
+/** Карточка «Продолжить»: урок, модуль-тема и прогресс по урокам этого модуля. */
 data class CurrentLesson(
     val lesson: Lesson,
-    /** Тема, показываемая на карточке главной, например «Гаилә» / «Семья». */
+    /** Название модуля, показываемое на карточке главной, например «Ашлар» / «Еда». */
     val topicTt: String,
     val topicRu: String,
-    val completedExercises: Int,
-    val totalExercises: Int,
+    val completedLessons: Int,
+    val totalLessons: Int,
 ) {
-    val progress: Float get() = if (totalExercises == 0) 0f else completedExercises.toFloat() / totalExercises
+    val progress: Float get() = if (totalLessons == 0) 0f else completedLessons.toFloat() / totalLessons
 }
 
-/** [lockedBy] — id модуля, который нужно пройти сначала; null, если модуль открыт. */
+/** Модуль на главной с прогрессом пользователя. [lockedBy] — id модуля, который нужно пройти сначала; null, если модуль открыт. */
 data class LearningModule(
     val id: String,
     val titleTt: String,

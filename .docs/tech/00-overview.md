@@ -33,7 +33,7 @@ Result ──«Повторить ошибки»──► Lesson(lessonId, stepI
 ## 4. Данные
 | Слой | Что | Где |
 |---|---|---|
-| Контент (fake) | `home.json`, `lessons/lesson_4.json` из `composeResources/files`, задержка 300–800 мс | `…/data/fake/FakeRepositories.kt` |
+| Контент (fake) | `modules.json`, `lessons/lesson_N.json` из `composeResources/files`, задержка 300–800 мс | `…/data/fake/FakeRepositories.kt` |
 | Сеть (опц.) | Ktorfit `LessonsApi`/`AuthApi`, включается `tamyr.useRemote=true` в `gradle.properties` | `…/data/remote/` |
 | Прогресс | SQLDelight: `LessonProgress`, `UserStats` (XP, серия), `CompletedExercise` | `…/data/local/SqlDelightProgressRepository.kt`, `Progress.sq` |
 | Сессия | имя+email в multiplatform-settings | `…/data/local/SessionStorage.kt` |

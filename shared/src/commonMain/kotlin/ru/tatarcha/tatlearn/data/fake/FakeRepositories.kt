@@ -7,9 +7,9 @@ import ru.tatarcha.tatlearn.core.common.ErrorCodes
 import ru.tatarcha.tatlearn.core.common.runCatchingApp
 import ru.tatarcha.tatlearn.data.local.SessionStorage
 import ru.tatarcha.tatlearn.data.mapper.toDomain
-import ru.tatarcha.tatlearn.data.remote.dto.HomeDto
 import ru.tatarcha.tatlearn.data.remote.dto.LessonContentDto
-import ru.tatarcha.tatlearn.domain.model.HomeContent
+import ru.tatarcha.tatlearn.data.remote.dto.ModuleDto
+import ru.tatarcha.tatlearn.domain.model.CourseModule
 import ru.tatarcha.tatlearn.domain.model.LessonContent
 import ru.tatarcha.tatlearn.domain.model.UserSession
 import ru.tatarcha.tatlearn.domain.repository.AuthRepository
@@ -21,9 +21,9 @@ private val json = Json { ignoreUnknownKeys = true }
 /** Читает JSON в формате API из composeResources/files. Весь контент нужно проверить носителем языка. */
 class FakeLessonsRepository(private val config: FakeBackendConfig) : LessonsRepository {
 
-    override suspend fun getHome(): Result<HomeContent> = runCatchingApp {
+    override suspend fun getModules(): Result<List<CourseModule>> = runCatchingApp {
         config.simulateNetwork()
-        json.decodeFromString<HomeDto>(readFile("files/home.json")).toDomain()
+        json.decodeFromString<List<ModuleDto>>(readFile("files/modules.json")).map { it.toDomain() }
     }
 
     override suspend fun getLessonContent(lessonId: String): Result<LessonContent> = runCatchingApp {

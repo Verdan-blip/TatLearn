@@ -24,7 +24,7 @@ import ru.tatarcha.tatlearn.domain.exercise.ExerciseStep
 import ru.tatarcha.tatlearn.domain.exercise.XpRules
 import ru.tatarcha.tatlearn.domain.model.ExerciseOutcome
 import ru.tatarcha.tatlearn.domain.model.ExerciseResult
-import ru.tatarcha.tatlearn.domain.model.HomeContent
+import ru.tatarcha.tatlearn.domain.model.CourseModule
 import ru.tatarcha.tatlearn.domain.model.LessonContent
 import ru.tatarcha.tatlearn.domain.model.LessonProgress
 import ru.tatarcha.tatlearn.domain.model.ListeningTask
@@ -59,7 +59,7 @@ internal fun testLessonContent() = LessonContent(
 )
 
 private class FakeLessons(private val result: Result<LessonContent> = Result.success(testLessonContent())) : LessonsRepository {
-    override suspend fun getHome(): Result<HomeContent> = error("unused")
+    override suspend fun getModules(): Result<List<CourseModule>> = error("unused")
     override suspend fun getLessonContent(lessonId: String): Result<LessonContent> = result
 }
 

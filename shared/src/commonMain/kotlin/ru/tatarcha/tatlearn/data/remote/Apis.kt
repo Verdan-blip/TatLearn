@@ -5,14 +5,14 @@ import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.Path
 import ru.tatarcha.tatlearn.data.remote.dto.CredentialsDto
-import ru.tatarcha.tatlearn.data.remote.dto.HomeDto
 import ru.tatarcha.tatlearn.data.remote.dto.LessonContentDto
+import ru.tatarcha.tatlearn.data.remote.dto.ModuleDto
 import ru.tatarcha.tatlearn.data.remote.dto.SessionDto
 
 /** Не используется при `useRemote = false`; эндпоинты — предложение для будущего бэкенда. */
 interface LessonsApi {
-    @GET("home")
-    suspend fun getHome(): HomeDto
+    @GET("modules")
+    suspend fun getModules(): List<ModuleDto>
 
     @GET("lessons/{id}")
     suspend fun getLesson(@Path("id") id: String): LessonContentDto
