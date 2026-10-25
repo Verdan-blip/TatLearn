@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
@@ -58,7 +59,8 @@ fun LoadingState(
     message: String = stringResource(Res.string.loading_message),
     skeleton: @Composable () -> Unit = { HomeSkeleton() },
 ) {
-    Column(modifier.fillMaxSize().background(TamyrTheme.colors.background)) {
+    // statusBarsPadding внутри фона: состояние загрузки используется и без внешней вставки (экран урока на iOS).
+    Column(modifier.fillMaxSize().background(TamyrTheme.colors.background).statusBarsPadding()) {
         skeleton()
         Column(
             Modifier.weight(1f).fillMaxWidth(),
@@ -85,7 +87,7 @@ fun ErrorState(
     illustration: (@Composable () -> Unit)? = { TamyrMascot(MascotPose.Sad, ErrorMascotSize) },
 ) {
     val spacing = TamyrTheme.spacing
-    Column(modifier.fillMaxSize().background(TamyrTheme.colors.background)) {
+    Column(modifier.fillMaxSize().background(TamyrTheme.colors.background).statusBarsPadding()) {
         Column(
             Modifier.weight(1f).fillMaxWidth().padding(horizontal = spacing.xxl),
             verticalArrangement = Arrangement.spacedBy(22.dp, Alignment.CenterVertically),

@@ -8,6 +8,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -111,13 +112,21 @@ fun TamyrTextButton(
     modifier: Modifier = Modifier,
     color: Color = TamyrTheme.colors.accentText,
 ) {
-    Text(
-        text = text,
-        color = color,
-        style = TamyrTheme.typography.body15Bold,
-        textAlign = TextAlign.Center,
-        modifier = modifier.clickable(role = Role.Button, onClick = onClick).padding(TamyrTheme.spacing.s),
-    )
+    // Зона нажатия не меньше 48dp по высоте и ширине (раньше была около 36dp: текст плюс 8dp отступы).
+    Box(
+        modifier = modifier
+            .defaultMinSize(minWidth = TamyrSizes.topBarAction, minHeight = TamyrSizes.topBarAction)
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = TamyrTheme.spacing.s),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = text,
+            color = color,
+            style = TamyrTheme.typography.body15Bold,
+            textAlign = TextAlign.Center,
+        )
+    }
 }
 
 @Preview(name = "Loading")

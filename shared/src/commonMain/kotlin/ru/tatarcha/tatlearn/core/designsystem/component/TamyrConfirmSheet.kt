@@ -108,7 +108,7 @@ fun TamyrConfirmSheet(
                 TamyrTextButton(
                     text = confirmText,
                     onClick = onConfirm,
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
         }
