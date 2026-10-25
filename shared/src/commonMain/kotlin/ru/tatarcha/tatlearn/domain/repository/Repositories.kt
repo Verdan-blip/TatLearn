@@ -35,4 +35,10 @@ interface ProgressRepository {
 
     /** Отмечает урок пройденным, сохраняя лучший результат. */
     suspend fun completeLesson(lessonId: String, scorePercent: Int)
+
+    /** Только для отладки: стирает статусы уроков и историю заданий (XP и серия остаются). */
+    suspend fun resetLessonProgress()
+
+    /** Только для отладки: обнуляет XP и серию. */
+    suspend fun resetStats()
 }

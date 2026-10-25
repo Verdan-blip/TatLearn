@@ -8,6 +8,9 @@ class OnboardingStorage(private val settings: Settings) {
 
     fun markSeen() = settings.putBoolean(KEY_SEEN, true)
 
+    /** Только для отладки: онбординг снова будет показан. */
+    fun reset() = settings.remove(KEY_SEEN)
+
     private companion object {
         const val KEY_SEEN = "onboarding_seen"
     }

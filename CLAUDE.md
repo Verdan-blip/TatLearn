@@ -30,7 +30,7 @@ Koin (DI), Navigation 3 (JetBrains, `navigation3-ui`; runtime comes transitively
 - Access tokens via `TamyrTheme.colors/typography/shapes/spacing`; sizes of fixed components in `TamyrSizes`. Wrap UI in `TamyrTheme`.
 - Components: `TamyrButton` (`loading` -> `TamyrSpinner`; design screen 13), `TamyrCard`, `TamyrProgressBar`, `TamyrTag`, `Diamond/BrandDiamonds/PulsingDiamonds`, `TamyrConfirmSheet` (bottom sheet, design screen 15), `TamyrToast/TamyrToastHost` (Info/Error/Success, 5 s, close button, swipe up; design screen 12), `LoadingState`, `ErrorState`, `LoadStateContent` over `core/common/LoadState`.
 - Font: PT Sans in `composeResources/font` (OFL license: `design/OFL-PTSans.txt`). Design PNGs: `design/screens/NN.png`, re-render with `python3 design/render_screens.py [NN ...]` (system Chrome, no Playwright).
-- Debug UI kit: `ShowcaseScreen`, reached from the "Профиль" tab placeholder via the "Инструменты отладки" button (debug builds only; future home for reset progress / sign out).
+- Debug UI kit: `ShowcaseScreen`, reached from the "Профиль" tab placeholder via the "Инструменты отладки" button (debug builds only): data actions with confirmation (reset lesson progress, reset XP/streak, sign out, reset onboarding), UI kit, simulated network errors.
 - Mascot Myrauzhan: `TamyrMascot(MascotPose, size)` over vector drawables `mascot_*.xml` (sources: `design/mascot/*.svg`, brief: `design/mascot-prompt.md`). Used in onboarding, error state, answer panel, result, matching hint. Not wired yet: Loading (Searching), Tired (wired: below-threshold result), Sleeping, HeadIcon; the cap/diamond ornament needs native/cultural review.
 
 ## Data layer
@@ -54,7 +54,7 @@ Koin (DI), Navigation 3 (JetBrains, `navigation3-ui`; runtime comes transitively
 - Typed answers go through `AnswerNormalizer`: lower-case + punctuation stripped, then Russian-keyboard folding (ә→а, ө→о, ү→у, җ→ж, ң→н, һ→х) gives `Approximate` = accepted with the proper spelling shown.
 - Back/close asks for confirmation (`NavigationBackHandler` from navigationevent-compose; `BackHandler` is deprecated).
 - Audio: `AudioPlayer` (expect fun `createPlatformAudioPlayer`: MediaPlayer / AVPlayer) wrapped by `StubbingAudioPlayer`, which fakes playback while a task has no `audioUrl` (TODO(audio)). `LessonPlanner` skips listening steps without `audioUrl` (MVP has no audio); the data stays in lesson JSON.
-- Tests (85, same set on both platforms): `./gradlew :shared:testAndroidHostTest :shared:iosSimulatorArm64Test`. Settings fake = `MapSettings` from `multiplatform-settings-test` (test-only).
+- Tests (87, same set on both platforms): `./gradlew :shared:testAndroidHostTest :shared:iosSimulatorArm64Test`. Settings fake = `MapSettings` from `multiplatform-settings-test` (test-only).
 - Motion tokens: `TamyrMotion` (step slide, feedback panel slide-up, progress bar tween).
 
 ## Methodology

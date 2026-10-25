@@ -44,6 +44,8 @@ private class ModuleProgress : ProgressRepository {
     override fun observeLessonProgress(): Flow<List<LessonProgress>> = lessonProgress
     override suspend fun recordExerciseResult(result: ExerciseResult): ExerciseOutcome = error("unused")
     override suspend fun completeLesson(lessonId: String, scorePercent: Int) = Unit
+    override suspend fun resetLessonProgress() = Unit
+    override suspend fun resetStats() = Unit
 }
 
 private val alphabetModule = CourseModule("alphabet", "Алфавит", "Алфавит", "alphabet", listOf(Lesson("l1", 1, "А", "А"), Lesson("l2", 2, "Б", "Б")))

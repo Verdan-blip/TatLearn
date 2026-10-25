@@ -43,5 +43,14 @@ INSERT OR REPLACE INTO LessonProgress (lessonId, status, bestScore, updatedAt) V
 insertCompletedExercise:
 INSERT INTO CompletedExercise (lessonId, exerciseType, correct, total, xpEarned, completedAt) VALUES (?, ?, ?, ?, ?, ?);
 
+deleteAllLessonProgress:
+DELETE FROM LessonProgress;
+
+deleteAllCompletedExercises:
+DELETE FROM CompletedExercise;
+
+deleteStats:
+DELETE FROM UserStats;
+
 selectCompletedExercises:
 SELECT id, lessonId, exerciseType, correct, total, xpEarned, completedAt FROM CompletedExercise WHERE lessonId = ? ORDER BY completedAt DESC;

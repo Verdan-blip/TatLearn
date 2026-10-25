@@ -79,6 +79,8 @@ private class FakeProgress : ProgressRepository {
         return ExerciseOutcome(xp, stats.value, extended)
     }
     override suspend fun completeLesson(lessonId: String, scorePercent: Int) { completed = lessonId to scorePercent }
+    override suspend fun resetLessonProgress() = Unit
+    override suspend fun resetStats() = Unit
 }
 
 private class SilentPlayer : AudioPlayer {

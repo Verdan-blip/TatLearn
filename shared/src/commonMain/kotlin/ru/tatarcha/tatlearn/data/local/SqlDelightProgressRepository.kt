@@ -66,6 +66,19 @@ class SqlDelightProgressRepository(
         }
     }
 
+    override suspend fun resetLessonProgress() {
+        withContext(Dispatchers.Default) {
+            queries.transaction {
+                queries.deleteAllLessonProgress()
+                queries.deleteAllCompletedExercises()
+            }
+        }
+    }
+
+    override suspend fun resetStats() {
+        withContext(Dispatchers.Default) { queries.deleteStats() }
+    }
+
     private fun String.toStatus() = LessonStatus.entries.firstOrNull { it.name == this } ?: LessonStatus.NotStarted
 
     private companion object {

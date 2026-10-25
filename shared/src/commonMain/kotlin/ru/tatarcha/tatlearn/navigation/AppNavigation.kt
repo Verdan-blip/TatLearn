@@ -107,7 +107,12 @@ fun AppNavigation(showDebugTools: Boolean = false) {
                     )
                 }
                 entry<ShowcaseKey> {
-                    ShowcaseScreen(viewModel = koinViewModel(), onClose = ::pop)
+                    ShowcaseScreen(
+                        viewModel = koinViewModel(),
+                        onClose = ::pop,
+                        onSignedOut = { resetTo(AuthKey()) },
+                        onOnboardingReset = { resetTo(OnboardingKey) },
+                    )
                 }
             },
         )

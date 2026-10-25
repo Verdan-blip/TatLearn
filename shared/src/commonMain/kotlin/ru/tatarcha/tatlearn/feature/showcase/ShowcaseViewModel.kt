@@ -15,28 +15,46 @@ import ru.tatarcha.tatlearn.domain.model.ExerciseResult
 import ru.tatarcha.tatlearn.domain.model.ExerciseType
 import ru.tatarcha.tatlearn.domain.model.CourseModule
 import ru.tatarcha.tatlearn.domain.model.UserStats
+import ru.tatarcha.tatlearn.data.local.OnboardingStorage
+import ru.tatarcha.tatlearn.domain.repository.AuthRepository
 import ru.tatarcha.tatlearn.domain.repository.LessonsRepository
 import ru.tatarcha.tatlearn.domain.repository.ProgressRepository
 
 /** Только для отладки: прогоняет слой данных из UI kit (фейковый бэкенд, база прогресса). */
+/** Отладочные действия над данными приложения; необратимые подтверждаются листом. */
+enum class DebugAction { ResetLessons, ResetStats, SignOut, ResetOnboarding }
+
 data class ShowcaseUiState(
     val stats: UserStats = UserStats.Empty,
     val home: LoadState<List<CourseModule>> = LoadState.Loading,
     val simulateErrors: Boolean = false,
+    /** Действие, ожидающее подтверждения. */
+    val pendingAction: DebugAction? = null,
 ) : UiState
 
 sealed interface ShowcaseUiEvent : UiEvent {
     data object LoadHome : ShowcaseUiEvent
     data object ToggleSimulateErrors : ShowcaseUiEvent
     data object RecordResult : ShowcaseUiEvent
+    data class ActionRequested(val action: DebugAction) : ShowcaseUiEvent
+    data object ActionConfirmed : ShowcaseUiEvent
+    data object ActionCancelled : ShowcaseUiEvent
 }
 
-data object ShowcaseUiEffect : UiEffect
+sealed interface ShowcaseUiEffect : UiEffect {
+    /** После выхода из аккаунта: стек навигации заменяется экраном входа. */
+    data object NavigateToAuth : ShowcaseUiEffect
+
+    /** После сброса онбординга: стек заменяется онбордингом. */
+    data object NavigateToOnboarding : ShowcaseUiEffect
+}
 
 class ShowcaseViewModel(
     private val lessons: LessonsRepository,
     private val progress: ProgressRepository,
     private val fakeConfig: FakeBackendConfig,
+    private val auth: AuthRepository,
+    private val onboarding: OnboardingStorage,
 ) : MviViewModel<ShowcaseUiState, ShowcaseUiEvent, ShowcaseUiEffect>(ShowcaseUiState()) {
 
     init {
@@ -57,6 +75,29 @@ class ShowcaseViewModel(
             ShowcaseUiEvent.ToggleSimulateErrors -> fakeConfig.setSimulateErrors(!state.value.simulateErrors)
             ShowcaseUiEvent.RecordResult -> viewModelScope.launch {
                 progress.recordExerciseResult(ExerciseResult("lesson_4", ExerciseType.Quiz, correct = 3, total = 4))
+            }
+            is ShowcaseUiEvent.ActionRequested -> setState { copy(pendingAction = event.action) }
+            ShowcaseUiEvent.ActionCancelled -> setState { copy(pendingAction = null) }
+            ShowcaseUiEvent.ActionConfirmed -> confirmAction()
+        }
+    }
+
+    private fun confirmAction() {
+        val action = state.value.pendingAction ?: return
+        setState { copy(pendingAction = null) }
+        viewModelScope.launch {
+            when (action) {
+                DebugAction.ResetLessons -> progress.resetLessonProgress()
+                DebugAction.ResetStats -> progress.resetStats()
+                DebugAction.SignOut -> {
+                    auth.signOut()
+                    sendEffect(ShowcaseUiEffect.NavigateToAuth)
+                }
+                DebugAction.ResetOnboarding -> {
+                    auth.signOut()
+                    onboarding.reset()
+                    sendEffect(ShowcaseUiEffect.NavigateToOnboarding)
+                }
             }
         }
     }

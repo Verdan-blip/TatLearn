@@ -14,7 +14,12 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import ru.tatarcha.tatlearn.core.common.AppException
 import ru.tatarcha.tatlearn.core.common.LoadState
+import ru.tatarcha.tatlearn.data.fake.FakeBackendConfig
 import ru.tatarcha.tatlearn.data.local.OnboardingStorage
+import ru.tatarcha.tatlearn.feature.showcase.DebugAction
+import ru.tatarcha.tatlearn.feature.showcase.ShowcaseUiEffect
+import ru.tatarcha.tatlearn.feature.showcase.ShowcaseUiEvent
+import ru.tatarcha.tatlearn.feature.showcase.ShowcaseViewModel
 import ru.tatarcha.tatlearn.domain.model.CourseModule
 import ru.tatarcha.tatlearn.domain.model.ExerciseOutcome
 import ru.tatarcha.tatlearn.domain.model.ExerciseResult
@@ -95,6 +100,10 @@ private class StatsProgress(initial: UserStats = UserStats.Empty) : ProgressRepo
     override fun observeLessonProgress(): Flow<List<LessonProgress>> = lessonProgress
     override suspend fun recordExerciseResult(result: ExerciseResult): ExerciseOutcome = error("unused")
     override suspend fun completeLesson(lessonId: String, scorePercent: Int) = Unit
+    var lessonResets = 0
+    var statsResets = 0
+    override suspend fun resetLessonProgress() { lessonResets++ }
+    override suspend fun resetStats() { statsResets++ }
 }
 
 private val foodModule = CourseModule(
@@ -409,5 +418,41 @@ class ScreenViewModelsTest {
         onboarding.markSeen()
         assertEquals(AuthKey(), StartDestinationResolver(FakeAuth(), onboarding).resolve())
         assertEquals(HomeKey, StartDestinationResolver(FakeAuth(UserSession("A", "a@b.ru")), onboarding).resolve())
+    }
+
+    // --- Отладочные действия ---
+
+    @Test fun debugActionsNeedConfirmationAndResetOnlyWhatTheyName() = runTest {
+        val progress = StatsProgress()
+        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), progress, FakeBackendConfig(), FakeAuth(), OnboardingStorage(MapSettings()))
+        vm.onEvent(ShowcaseUiEvent.ActionRequested(DebugAction.ResetLessons))
+        assertEquals(DebugAction.ResetLessons, vm.state.value.pendingAction)
+        assertEquals(0, progress.lessonResets)
+        vm.onEvent(ShowcaseUiEvent.ActionCancelled)
+        assertNull(vm.state.value.pendingAction)
+        assertEquals(0, progress.lessonResets)
+        vm.onEvent(ShowcaseUiEvent.ActionRequested(DebugAction.ResetLessons))
+        vm.onEvent(ShowcaseUiEvent.ActionConfirmed)
+        assertEquals(1, progress.lessonResets)
+        assertEquals(0, progress.statsResets)
+        vm.onEvent(ShowcaseUiEvent.ActionRequested(DebugAction.ResetStats))
+        vm.onEvent(ShowcaseUiEvent.ActionConfirmed)
+        assertEquals(1, progress.statsResets)
+        assertNull(vm.state.value.pendingAction)
+    }
+
+    @Test fun signOutAndOnboardingResetClearSessionAndNavigate() = runTest {
+        val auth = FakeAuth(UserSession("Алия", "a@b.ru"))
+        val onboarding = OnboardingStorage(MapSettings()).apply { markSeen() }
+        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeBackendConfig(), auth, onboarding)
+        vm.onEvent(ShowcaseUiEvent.ActionRequested(DebugAction.SignOut))
+        vm.onEvent(ShowcaseUiEvent.ActionConfirmed)
+        assertNull(auth.session.value)
+        assertEquals(ShowcaseUiEffect.NavigateToAuth, vm.effects.first())
+        assertTrue(onboarding.isSeen())
+        vm.onEvent(ShowcaseUiEvent.ActionRequested(DebugAction.ResetOnboarding))
+        vm.onEvent(ShowcaseUiEvent.ActionConfirmed)
+        assertFalse(onboarding.isSeen())
+        assertEquals(ShowcaseUiEffect.NavigateToOnboarding, vm.effects.first())
     }
 }
