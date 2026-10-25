@@ -86,7 +86,7 @@ fun LessonRoute(
 fun LessonScreen(state: LessonUiState, onEvent: (LessonUiEvent) -> Unit) {
     Box(Modifier.fillMaxSize()) {
         when (val load = state.load) {
-            LoadState.Loading -> LoadingState()
+            LoadState.Loading -> LoadingState(skeleton = { ExerciseSkeleton() })
             is LoadState.Error -> ErrorState(code = load.code, onRetry = { onEvent(LessonUiEvent.RetryClicked) })
             is LoadState.Content -> ExerciseFrame(state, onEvent)
         }

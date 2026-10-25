@@ -19,7 +19,7 @@ Koin (DI), Navigation 3 (JetBrains, `navigation3-ui`; runtime comes transitively
 - Compose code style (named params, Scene/Content, previews, theme access): skill `.claude/skills/compose-style`; it is extended on request.
 - Each feature has its own `feature/<name>/CLAUDE.md` (flow, files, decisions and reasons, open questions): read it before working on the feature and update it in the same change when the behavior changes. Analyst-facing spec stays in `.docs/`.
 - MVI/UDF: `UiState` (immutable) / `UiEvent` / `UiEffect` + `MviViewModel`. Each screen = stateful `Route` + stateless `Screen`.
-- Loading/Error are shared components over a `Loading/Content/Error(retry)` state, not routes.
+- Loading/Error are shared components over a `Loading/Content/Error(retry)` state, not routes. The top status-bar inset is applied once at the root (`App`: `windowInsetsPadding(WindowInsets.statusBars)`), so screens, loading and error states need no own status-bar padding. Loading skeletons follow the shape of the destination screen (`HomeSkeleton`, `ExerciseSkeleton` for lessons, module skeleton).
 - No hardcoded strings (use `composeResources/values/strings.xml`) and no hardcoded colors/sizes (theme tokens only). Tatar exercise words are data, not UI strings.
 - Mark unverified Tatar content "needs native-speaker review"; mark missing design states `// TODO(design)`.
 - Compare each finished screen with its PNG in `design/screens/`.
