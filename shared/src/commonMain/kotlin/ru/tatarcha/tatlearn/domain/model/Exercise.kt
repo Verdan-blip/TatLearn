@@ -11,12 +11,14 @@ data class WordPair(val tatar: String, val russian: String)
 /** [notes] сопоставляет татарское слово с подсказкой маскота, которая показывается, пока слово выбрано. */
 data class MatchingExercise(val pairs: List<WordPair>, val notes: Map<String, String> = emptyMap())
 
+/** [audioUrl] — озвучка слова; пока null, кнопка звука на экране не показывается (TODO(audio)). */
 data class QuizQuestion(
     val word: String,
     val transcription: String?,
     val options: List<String>,
     val correctIndex: Int,
     val isNewWord: Boolean,
+    val audioUrl: String? = null,
 )
 
 /** [audioUrl] равен null, пока нет настоящего аудио; тогда плеер показывает заглушку. */

@@ -35,6 +35,7 @@ data class QuizQuestionDto(
     val options: List<String>,
     val correctIndex: Int,
     val isNewWord: Boolean = false,
+    val audioUrl: String? = null,
 )
 
 @Serializable

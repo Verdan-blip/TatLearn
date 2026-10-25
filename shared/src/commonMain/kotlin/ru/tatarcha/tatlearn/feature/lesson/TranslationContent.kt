@@ -57,7 +57,8 @@ fun TranslationContent(step: ExerciseStep.Translation, input: StepInput.Translat
     Column(Modifier.padding(horizontal = spacing.screen).padding(top = spacing.l), verticalArrangement = Arrangement.spacedBy(spacing.l)) {
         TamyrCard(Modifier.fillMaxWidth(), contentPadding = 18.dp) {
             Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                PlayButton(onClick = { onEvent(LessonUiEvent.PlayAudioClicked()) }, diameter = PlayButtonSize)
+                // Кнопка звука только когда у задания есть запись (TODO(audio)).
+                if (step.task.audioUrl != null) PlayButton(onClick = { onEvent(LessonUiEvent.PlayAudioClicked()) }, diameter = PlayButtonSize)
                 Text(stringResource(Res.string.sentence_prompt_format, step.task.promptRu), style = TamyrTheme.typography.title19, color = colors.textPrimary)
             }
         }

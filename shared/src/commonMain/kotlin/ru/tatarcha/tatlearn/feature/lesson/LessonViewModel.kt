@@ -162,7 +162,8 @@ class LessonViewModel(
         val url = when (val step = state.value.step) {
             is ExerciseStep.Listening -> step.task.audioUrl
             is ExerciseStep.Translation -> step.task.audioUrl
-            else -> null // у слов квиза пока нет записей; это закрывает плеер-заглушка. TODO(audio)
+            is ExerciseStep.Quiz -> step.question.audioUrl
+            else -> null
         }
         player.play(url, if (slow) SLOW_RATE else 1f)
     }

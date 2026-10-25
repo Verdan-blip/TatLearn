@@ -35,7 +35,8 @@ fun QuizContent(step: ExerciseStep.Quiz, input: StepInput.Choice, feedback: Step
     Column(Modifier.padding(horizontal = spacing.screen).padding(top = spacing.l)) {
         TamyrCard(Modifier.fillMaxWidth(), contentPadding = 22.dp) {
             Row(horizontalArrangement = Arrangement.spacedBy(spacing.l), verticalAlignment = Alignment.CenterVertically) {
-                PlayButton(onClick = { onEvent(LessonUiEvent.PlayAudioClicked()) })
+                // Кнопка звука только когда у слова есть запись: без озвучки она бы ничего не играла (TODO(audio)).
+                if (q.audioUrl != null) PlayButton(onClick = { onEvent(LessonUiEvent.PlayAudioClicked()) })
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(q.word, style = TamyrTheme.typography.display30, color = TamyrTheme.colors.textPrimary)
                     q.transcription?.let { Text(it, style = TamyrTheme.typography.transcription.copy(fontSize = TamyrTheme.typography.body14.fontSize), color = TamyrTheme.colors.textSecondary) }
