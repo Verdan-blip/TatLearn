@@ -24,9 +24,11 @@ sealed interface HomeUiEvent : UiEvent {
     data object AllModulesClicked : HomeUiEvent
     data class NavItemClicked(val item: HomeNavItem) : HomeUiEvent
     data object ToastDismissed : HomeUiEvent
+    data object DebugToolsClicked : HomeUiEvent
 }
 
 sealed interface HomeUiEffect : UiEffect {
     data class NavigateToLesson(val lessonId: String) : HomeUiEffect
     data class NavigateToModule(val moduleId: String) : HomeUiEffect
+    data object NavigateToDebug : HomeUiEffect
 }

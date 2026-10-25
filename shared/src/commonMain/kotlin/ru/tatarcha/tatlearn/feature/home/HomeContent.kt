@@ -32,6 +32,8 @@ import org.jetbrains.compose.resources.stringResource
 import ru.tatarcha.tatlearn.core.common.LoadState
 import ru.tatarcha.tatlearn.core.designsystem.component.BottomBarItem
 import ru.tatarcha.tatlearn.core.designsystem.component.ComingSoonState
+import ru.tatarcha.tatlearn.core.designsystem.component.TamyrButton
+import ru.tatarcha.tatlearn.core.designsystem.component.TamyrButtonStyle
 import ru.tatarcha.tatlearn.core.designsystem.component.LoadStateContent
 import ru.tatarcha.tatlearn.core.designsystem.component.PreviewFrame
 import ru.tatarcha.tatlearn.core.designsystem.component.StreakBadge
@@ -49,6 +51,7 @@ import ru.tatarcha.tatlearn.domain.model.LearningModule
 import ru.tatarcha.tatlearn.domain.model.Lesson
 import ru.tatarcha.tatlearn.domain.model.UserStats
 import tatlearn.shared.generated.resources.Res
+import tatlearn.shared.generated.resources.debug_tools_open
 import tatlearn.shared.generated.resources.home_chip_alphabet
 import tatlearn.shared.generated.resources.home_chip_numbers
 import tatlearn.shared.generated.resources.home_contest_soon_message
@@ -81,6 +84,7 @@ private val ModuleCardPadding = 14.dp
 fun HomeContent(
     state: HomeUiState,
     onEvent: (HomeUiEvent) -> Unit,
+    showDebugTools: Boolean = false,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         if (state.tab == HomeNavItem.Home) {
@@ -100,7 +104,7 @@ fun HomeContent(
                 )
             }
         } else {
-            ComingSoonTab(tab = state.tab, onEvent = onEvent)
+            ComingSoonTab(tab = state.tab, onEvent = onEvent, showDebugTools = showDebugTools)
         }
         TamyrToastHost(
             toast = state.toast?.let { toast -> homeToastData(toast) },
@@ -115,6 +119,7 @@ fun HomeContent(
 private fun ComingSoonTab(
     tab: HomeNavItem,
     onEvent: (HomeUiEvent) -> Unit,
+    showDebugTools: Boolean,
 ) {
     val (title, message) = when (tab) {
         HomeNavItem.Contest -> stringResource(Res.string.home_contest_soon_title) to stringResource(Res.string.home_contest_soon_message)
@@ -127,7 +132,16 @@ private fun ComingSoonTab(
             .background(TamyrTheme.colors.background)
             .statusBarsPadding(),
     ) {
-        ComingSoonState(title = title, message = message, modifier = Modifier.weight(1f))
+        ComingSoonState(title = title, message = message, modifier = Modifier.weight(1f)) {
+            // Входом в отладочные инструменты служит вкладка «Профиль» (только в отладочной сборке): там позже будут сброс прогресса, выход и т. п.
+            if (showDebugTools && tab == HomeNavItem.Profile) {
+                TamyrButton(
+                    text = stringResource(Res.string.debug_tools_open),
+                    onClick = { onEvent(HomeUiEvent.DebugToolsClicked) },
+                    style = TamyrButtonStyle.Secondary,
+                )
+            }
+        }
         HomeBottomBar(selected = tab, onItemClick = { item -> onEvent(HomeUiEvent.NavItemClicked(item)) })
     }
 }

@@ -30,7 +30,7 @@ Koin (DI), Navigation 3 (JetBrains, `navigation3-ui`; runtime comes transitively
 - Access tokens via `TamyrTheme.colors/typography/shapes/spacing`; sizes of fixed components in `TamyrSizes`. Wrap UI in `TamyrTheme`.
 - Components: `TamyrButton` (`loading` -> `TamyrSpinner`; design screen 13), `TamyrCard`, `TamyrProgressBar`, `TamyrTag`, `Diamond/BrandDiamonds/PulsingDiamonds`, `TamyrConfirmSheet` (bottom sheet, design screen 15), `TamyrToast/TamyrToastHost` (Info/Error/Success, 5 s, close button, swipe up; design screen 12), `LoadingState`, `ErrorState`, `LoadStateContent` over `core/common/LoadState`.
 - Font: PT Sans in `composeResources/font` (OFL license: `design/OFL-PTSans.txt`). Design PNGs: `design/screens/NN.png`, re-render with `python3 design/render_screens.py [NN ...]` (system Chrome, no Playwright).
-- Debug UI kit: `ShowcaseScreen`, reached via the floating "UI" button at the bottom right (shown only for debug builds).
+- Debug UI kit: `ShowcaseScreen`, reached from the "Профиль" tab placeholder via the "Инструменты отладки" button (debug builds only; future home for reset progress / sign out).
 - Mascot Myrauzhan: `TamyrMascot(MascotPose, size)` over vector drawables `mascot_*.xml` (sources: `design/mascot/*.svg`, brief: `design/mascot-prompt.md`). Used in onboarding, error state, answer panel, result, matching hint. Not wired yet: Loading (Searching), Tired (wired: below-threshold result), Sleeping, HeadIcon; the cap/diamond ornament needs native/cultural review.
 
 ## Data layer

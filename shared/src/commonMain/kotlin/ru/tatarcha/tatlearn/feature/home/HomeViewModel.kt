@@ -53,6 +53,7 @@ class HomeViewModel(
             HomeUiEvent.AllModulesClicked -> showToast(HomeToast.AllModulesUnavailable)
             is HomeUiEvent.NavItemClicked -> setState { copy(tab = event.item, toast = null) }
             HomeUiEvent.ToastDismissed -> hideToast()
+            HomeUiEvent.DebugToolsClicked -> sendEffect(HomeUiEffect.NavigateToDebug)
         }
     }
 

@@ -3,6 +3,7 @@ package ru.tatarcha.tatlearn.core.designsystem.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,6 +25,7 @@ import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 /**
  * Экран 16. Заглушка раздела, которого ещё нет: спящий маскот, тег, заголовок и пояснение.
  * Кнопки нет: выход на главную — вкладка «Өй» в нижнем меню (его рисует вызывающий экран).
+ * [extra] — необязательный блок под текстом (в отладочной сборке: вход в инструменты на вкладке «Профиль»).
  * Татарский текст («Тиздән · Скоро», заголовки) подтверждён автором-носителем.
  */
 @Composable
@@ -31,6 +33,7 @@ fun ComingSoonState(
     title: String,
     message: String,
     modifier: Modifier = Modifier,
+    extra: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     val spacing = TamyrTheme.spacing
     Column(
@@ -60,6 +63,7 @@ fun ComingSoonState(
             Text(title, style = TamyrTheme.typography.headline26, color = TamyrTheme.colors.textPrimary, textAlign = TextAlign.Center)
             Text(message, style = TamyrTheme.typography.body16, color = TamyrTheme.colors.textSecondary, textAlign = TextAlign.Center)
         }
+        extra?.invoke(this)
     }
 }
 

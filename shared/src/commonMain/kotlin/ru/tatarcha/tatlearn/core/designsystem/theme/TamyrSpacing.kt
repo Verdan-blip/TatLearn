@@ -47,13 +47,10 @@ object TamyrSizes {
     val lessonButton = 46.dp
     val streakBadgeCompact = 40.dp
     val navIcon = 20.dp
-    /** Отладочная кнопка UI kit: диаметр и отступ снизу, чтобы не закрывать нижнее меню и кнопки экранов. */
-    val debugFab = 48.dp
     val topBarAction = 48.dp
     val lessonStatus = 40.dp
     val lessonRowMinHeight = 64.dp
     val checkIcon = 22.dp
-    val debugFabBottomInset = 96.dp
     val sheetHandleWidth = 40.dp
     val sheetHandleHeight = 4.dp
     val closeTargetPadding = 12.dp

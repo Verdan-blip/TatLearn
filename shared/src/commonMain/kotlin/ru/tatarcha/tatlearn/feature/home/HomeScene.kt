@@ -10,6 +10,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun HomeScene(
     onStartLesson: (lessonId: String) -> Unit,
     onOpenModule: (moduleId: String) -> Unit,
+    onOpenDebug: () -> Unit,
+    showDebugTools: Boolean = false,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     LaunchedEffect(viewModel) {
@@ -17,6 +19,7 @@ fun HomeScene(
             when (effect) {
                 is HomeUiEffect.NavigateToLesson -> onStartLesson(effect.lessonId)
                 is HomeUiEffect.NavigateToModule -> onOpenModule(effect.moduleId)
+                HomeUiEffect.NavigateToDebug -> onOpenDebug()
             }
         }
     }
@@ -24,5 +27,6 @@ fun HomeScene(
     HomeContent(
         state = state,
         onEvent = viewModel::onEvent,
+        showDebugTools = showDebugTools,
     )
 }
