@@ -174,7 +174,8 @@
     <!-- 11 Перевод -->
     <string name="translation_tag">Яз · письмо</string>
     <string name="translation_title">Напиши по-татарски</string>
-    <string name="translation_caption">Специальные татарские буквы — под полем ввода</string>
+    <string name="translation_caption">Нет буквы на клавиатуре? Нажми на неё здесь</string>
+    <string name="translation_letter_description">Буква %1$s, вставить</string>
     <string name="translation_letters">ә ө ү җ ң һ</string>
     <string name="button_loading">Выполняется</string>
     <string name="toast_close">Закрыть уведомление</string>

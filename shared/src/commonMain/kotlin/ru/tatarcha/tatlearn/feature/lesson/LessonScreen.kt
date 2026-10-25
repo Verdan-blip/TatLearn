@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +24,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
@@ -101,7 +106,10 @@ fun LessonScreen(state: LessonUiState, onEvent: (LessonUiEvent) -> Unit) {
 private fun ExerciseFrame(state: LessonUiState, onEvent: (LessonUiEvent) -> Unit) {
     val step = state.step ?: return
     val feedback = state.feedback
-    Column(Modifier.fillMaxSize().background(TamyrTheme.colors.background).statusBarsPadding()) {
+    val focusManager = LocalFocusManager.current
+    val keyboard = LocalSoftwareKeyboardController.current
+    // imePadding поднимает «Проверить» над клавиатурой, чтобы её не нужно было закрывать ради кнопки.
+    Column(Modifier.fillMaxSize().background(TamyrTheme.colors.background).statusBarsPadding().imePadding()) {
         ExerciseHeader(
             progress = state.progress,
             onClose = { onEvent(LessonUiEvent.CloseClicked) },
@@ -116,7 +124,13 @@ private fun ExerciseFrame(state: LessonUiState, onEvent: (LessonUiEvent) -> Unit
             },
             label = "exerciseStep",
         ) {
-            Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    // Тап по свободному месту сворачивает клавиатуру (на iOS другого способа нет).
+                    .pointerInput(Unit) { detectTapGestures(onTap = { dismissKeyboard(focusManager, keyboard) }) }
+                    .verticalScroll(rememberScrollState()),
+            ) {
                 when (step) {
                     is ExerciseStep.Matching -> MatchingContent(step, state.input as StepInput.Matching, onEvent)
                     is ExerciseStep.Quiz -> QuizContent(step, state.input as StepInput.Choice, feedback, onEvent)
