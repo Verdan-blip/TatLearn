@@ -13,11 +13,14 @@ data class ProfileUiState(
     val stats: UserStats = UserStats.Empty,
     /** Показывать уведомление «Сохранено» после возврата с экрана изменения. */
     val savedToast: Boolean = false,
+    /** Настройка «Вибро-отклик» (по умолчанию включена). */
+    val hapticsEnabled: Boolean = true,
 ) : UiState
 
 sealed interface ProfileUiEvent : UiEvent {
     data object EditClicked : ProfileUiEvent
     data object ToastDismissed : ProfileUiEvent
+    data class HapticsToggled(val enabled: Boolean) : ProfileUiEvent
 }
 
 sealed interface ProfileUiEffect : UiEffect {

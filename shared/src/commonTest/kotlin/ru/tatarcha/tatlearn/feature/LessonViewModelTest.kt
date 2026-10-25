@@ -1,6 +1,7 @@
 package ru.tatarcha.tatlearn.feature.lesson
 
 import androidx.compose.ui.text.TextRange
+import ru.tatarcha.tatlearn.feature.RecordingHaptics
 import androidx.compose.ui.text.input.TextFieldValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -98,6 +99,7 @@ private class FixedTime : TimeProvider {
 @OptIn(ExperimentalCoroutinesApi::class)
 class LessonViewModelTest {
     private val progress = FakeProgress()
+    private val haptics = RecordingHaptics()
     private val time = FixedTime()
 
     @BeforeTest fun setUp() = Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -105,7 +107,7 @@ class LessonViewModelTest {
     @AfterTest fun tearDown() = Dispatchers.resetMain()
 
     private fun viewModel(stepIds: List<String> = emptyList(), lessons: LessonsRepository = FakeLessons()) =
-        LessonViewModel(LessonKey("lesson_t", stepIds), lessons, progress, StubbingAudioPlayer(SilentPlayer()), time)
+        LessonViewModel(LessonKey("lesson_t", stepIds), lessons, progress, StubbingAudioPlayer(SilentPlayer()), time, haptics)
 
     private fun LessonViewModel.step() = state.value.step
 
@@ -167,6 +169,18 @@ class LessonViewModelTest {
         vm.onEvent(LessonUiEvent.OptionSelected(0)); vm.onEvent(LessonUiEvent.CheckClicked); vm.onEvent(LessonUiEvent.ContinueClicked)
         vm.onEvent(LessonUiEvent.OptionSelected(1)); vm.onEvent(LessonUiEvent.CheckClicked); vm.onEvent(LessonUiEvent.ContinueClicked)
         assertEquals(false, (vm.effects.first() as LessonUiEffect.NavigateToResult).key.streakExtended)
+    }
+
+    @Test fun checkedStepGivesOneHapticByVerdictAndNothingForOtherEvents() = runTest {
+        val vm = viewModel(listOf("quiz-0", "quiz-1"))
+        vm.onEvent(LessonUiEvent.OptionSelected(0)) // выбор варианта не вибрирует
+        assertTrue(haptics.events.isEmpty())
+        vm.onEvent(LessonUiEvent.CheckClicked) // верно
+        vm.onEvent(LessonUiEvent.ContinueClicked)
+        assertEquals(listOf("correct"), haptics.events)
+        vm.onEvent(LessonUiEvent.OptionSelected(0))
+        vm.onEvent(LessonUiEvent.CheckClicked) // неверно, правильный индекс 1
+        assertEquals(listOf("correct", "wrong"), haptics.events)
     }
 
     @Test fun finishingLessonSendsResultWithMistakes() = runTest {

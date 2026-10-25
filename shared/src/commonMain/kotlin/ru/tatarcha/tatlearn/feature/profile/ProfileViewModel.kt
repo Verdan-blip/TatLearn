@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.onEach
 import ru.tatarcha.tatlearn.core.common.AutoDismiss
 import ru.tatarcha.tatlearn.core.common.MviViewModel
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
+import ru.tatarcha.tatlearn.data.local.HapticsSettings
 import ru.tatarcha.tatlearn.domain.model.Avatar
 import ru.tatarcha.tatlearn.domain.repository.AuthRepository
 import ru.tatarcha.tatlearn.domain.repository.ProfileRepository
@@ -15,6 +16,7 @@ class ProfileViewModel(
     profile: ProfileRepository,
     progress: ProgressRepository,
     auth: AuthRepository,
+    private val haptics: HapticsSettings,
 ) : MviViewModel<ProfileUiState, ProfileUiEvent, ProfileUiEffect>(ProfileUiState()) {
 
     private val toastTimer = AutoDismiss(viewModelScope, TamyrMotion.TOAST_VISIBLE_MS)
@@ -25,6 +27,7 @@ class ProfileViewModel(
             setState { copy(name = current?.name ?: auth.session.value?.name.orEmpty(), avatar = current?.avatar ?: Avatar.Default) }
         }.launchIn(viewModelScope)
         progress.observeStats().onEach { stats -> setState { copy(stats = stats) } }.launchIn(viewModelScope)
+        haptics.enabled.onEach { enabled -> setState { copy(hapticsEnabled = enabled) } }.launchIn(viewModelScope)
         profile.saved.onEach {
             setState { copy(savedToast = true) }
             toastTimer.start { setState { copy(savedToast = false) } }
@@ -34,6 +37,7 @@ class ProfileViewModel(
     override fun onEvent(event: ProfileUiEvent) {
         when (event) {
             ProfileUiEvent.EditClicked -> sendEffect(ProfileUiEffect.NavigateToEdit)
+            is ProfileUiEvent.HapticsToggled -> haptics.setEnabled(event.enabled)
             ProfileUiEvent.ToastDismissed -> {
                 toastTimer.cancel()
                 setState { copy(savedToast = false) }

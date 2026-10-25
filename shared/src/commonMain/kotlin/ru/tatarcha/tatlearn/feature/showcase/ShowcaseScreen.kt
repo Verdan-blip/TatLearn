@@ -3,7 +3,11 @@ package ru.tatarcha.tatlearn.feature.showcase
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import tatlearn.shared.generated.resources.showcase_haptic_celebrate
+import tatlearn.shared.generated.resources.showcase_haptic_correct
+import tatlearn.shared.generated.resources.showcase_haptic_wrong
 import tatlearn.shared.generated.resources.showcase_section_actions
+import tatlearn.shared.generated.resources.showcase_section_haptics
 import tatlearn.shared.generated.resources.showcase_confirm_yes
 import tatlearn.shared.generated.resources.showcase_confirm_title
 import tatlearn.shared.generated.resources.showcase_confirm_sign_out
@@ -142,7 +146,12 @@ fun ShowcaseScreen(
                         style = TamyrButtonStyle.SecondaryAccent,
                     )
                 }
-                Section(Res.string.showcase_section_actions) {
+                Section(Res.string.showcase_section_haptics) {
+                TamyrButton(stringResource(Res.string.showcase_haptic_correct), { viewModel.onEvent(ShowcaseUiEvent.PlayHaptic(HapticKind.Correct)) }, style = TamyrButtonStyle.Secondary)
+                TamyrButton(stringResource(Res.string.showcase_haptic_wrong), { viewModel.onEvent(ShowcaseUiEvent.PlayHaptic(HapticKind.Wrong)) }, style = TamyrButtonStyle.Secondary)
+                TamyrButton(stringResource(Res.string.showcase_haptic_celebrate), { viewModel.onEvent(ShowcaseUiEvent.PlayHaptic(HapticKind.Celebrate)) }, style = TamyrButtonStyle.Secondary)
+            }
+            Section(Res.string.showcase_section_actions) {
                 TamyrButton(stringResource(Res.string.showcase_action_reset_lessons), { viewModel.onEvent(ShowcaseUiEvent.ActionRequested(DebugAction.ResetLessons)) }, style = TamyrButtonStyle.SecondaryAccent)
                 TamyrButton(stringResource(Res.string.showcase_action_reset_stats), { viewModel.onEvent(ShowcaseUiEvent.ActionRequested(DebugAction.ResetStats)) }, style = TamyrButtonStyle.SecondaryAccent)
                 TamyrButton(stringResource(Res.string.showcase_action_sign_out), { viewModel.onEvent(ShowcaseUiEvent.ActionRequested(DebugAction.SignOut)) }, style = TamyrButtonStyle.SecondaryAccent)

@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import ru.tatarcha.tatlearn.core.common.MviViewModel
+import ru.tatarcha.tatlearn.core.haptics.Haptics
 import ru.tatarcha.tatlearn.domain.exercise.PassRules
 import ru.tatarcha.tatlearn.domain.repository.AuthRepository
 import ru.tatarcha.tatlearn.domain.repository.ProfileRepository
@@ -15,6 +16,7 @@ class ResultViewModel(
     auth: AuthRepository,
     progress: ProgressRepository,
     profile: ProfileRepository,
+    haptics: Haptics,
 ) : MviViewModel<ResultUiState, ResultUiEvent, ResultUiEffect>(
     ResultUiState(
         userName = profile.profile.value?.name ?: auth.session.value?.name.orEmpty(),
@@ -30,6 +32,8 @@ class ResultViewModel(
     ),
 ) {
     init {
+        // Праздничный отклик один раз при показе пройденного урока; «не засчитан» без вибро (тон «хорошая попытка»).
+        if (state.value.passed) haptics.celebrate()
         progress.observeStats().onEach { stats -> setState { copy(streak = stats.streak) } }.launchIn(viewModelScope)
     }
 

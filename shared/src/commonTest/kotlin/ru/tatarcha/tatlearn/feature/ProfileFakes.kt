@@ -4,6 +4,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import ru.tatarcha.tatlearn.core.haptics.Haptics
+import ru.tatarcha.tatlearn.core.haptics.PlatformHaptics
 import ru.tatarcha.tatlearn.domain.model.Avatar
 import ru.tatarcha.tatlearn.domain.model.UserProfile
 import ru.tatarcha.tatlearn.domain.model.UserSession
@@ -33,4 +35,20 @@ internal class SessionOnlyAuth(initial: UserSession? = null) : AuthRepository {
     override suspend fun signIn(email: String, password: String): Result<UserSession> = error("unused")
     override suspend fun signUp(email: String, password: String): Result<UserSession> = error("unused")
     override fun signOut() { state.value = null }
+}
+
+/** Записывает смысловые вибро-события вместо вибрации. */
+internal class RecordingHaptics : Haptics {
+    val events = mutableListOf<String>()
+    override fun correct() { events += "correct" }
+    override fun wrong() { events += "wrong" }
+    override fun celebrate() { events += "celebrate" }
+}
+
+/** Записывает платформенные примитивы, чтобы проверять паттерны `PatternHaptics`. */
+internal class RecordingPlatformHaptics : PlatformHaptics {
+    val events = mutableListOf<String>()
+    override fun tickLight() { events += "light" }
+    override fun tickMedium() { events += "medium" }
+    override fun success() { events += "success" }
 }

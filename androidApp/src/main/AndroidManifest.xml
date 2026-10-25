@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Вибро-отклик на ответах (обычное разрешение, без запроса у пользователя) -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:name=".TatLearnApplication"
         android:allowBackup="true"

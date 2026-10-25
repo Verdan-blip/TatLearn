@@ -29,6 +29,12 @@ import ru.tatarcha.tatlearn.data.remote.createLessonsApi
 import ru.tatarcha.tatlearn.domain.repository.AuthRepository
 import ru.tatarcha.tatlearn.domain.repository.LessonsRepository
 import ru.tatarcha.tatlearn.domain.repository.ProgressRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import ru.tatarcha.tatlearn.core.haptics.Haptics
+import ru.tatarcha.tatlearn.core.haptics.PatternHaptics
+import ru.tatarcha.tatlearn.data.local.HapticsSettings
 import ru.tatarcha.tatlearn.data.local.OnboardingStorage
 import ru.tatarcha.tatlearn.data.local.SettingsProfileRepository
 import ru.tatarcha.tatlearn.domain.repository.ProfileRepository
@@ -59,8 +65,8 @@ val presentationModule = module {
     viewModelOf(::ProfileViewModel)
     viewModelOf(::ProfileEditViewModel)
     viewModel { (key: ModuleKey) -> ModuleViewModel(key.moduleId, get(), get()) }
-    viewModel { (key: ResultKey) -> ResultViewModel(key, get(), get(), get()) }
-    viewModel { (key: LessonKey) -> LessonViewModel(key, get(), get(), StubbingAudioPlayer(createPlatformAudioPlayer()), get()) }
+    viewModel { (key: ResultKey) -> ResultViewModel(key, get(), get(), get(), get()) }
+    viewModel { (key: LessonKey) -> LessonViewModel(key, get(), get(), StubbingAudioPlayer(createPlatformAudioPlayer()), get(), get()) }
     viewModelOf(::ShowcaseViewModel)
 }
 
@@ -87,6 +93,9 @@ val databaseModule = module {
 val dataModule = module {
     single { SessionStorage(get()) }
     single { OnboardingStorage(get()) }
+    single { HapticsSettings(get()) }
+    // Паттерны вибро играются на главном потоке (iOS требует UIKit с главного).
+    single<Haptics> { PatternHaptics(get(), get(), CoroutineScope(SupervisorJob() + Dispatchers.Main), get()) }
     single<ProfileRepository> { SettingsProfileRepository(get()) }
     single { FakeBackendConfig() }
     if (BuildConfig.USE_REMOTE) {

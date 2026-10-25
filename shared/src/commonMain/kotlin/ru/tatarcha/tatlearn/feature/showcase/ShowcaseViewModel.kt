@@ -10,6 +10,7 @@ import ru.tatarcha.tatlearn.core.common.UiEffect
 import ru.tatarcha.tatlearn.core.common.UiEvent
 import ru.tatarcha.tatlearn.core.common.UiState
 import ru.tatarcha.tatlearn.core.common.errorCode
+import ru.tatarcha.tatlearn.core.haptics.Haptics
 import ru.tatarcha.tatlearn.data.fake.FakeBackendConfig
 import ru.tatarcha.tatlearn.domain.model.ExerciseResult
 import ru.tatarcha.tatlearn.domain.model.ExerciseType
@@ -22,6 +23,9 @@ import ru.tatarcha.tatlearn.domain.repository.ProfileRepository
 import ru.tatarcha.tatlearn.domain.repository.ProgressRepository
 
 /** Только для отладки: прогоняет слой данных из UI kit (фейковый бэкенд, база прогресса). */
+/** Какой вибро-паттерн проиграть кнопкой в инструментах отладки (подбор паттернов на реальном устройстве). */
+enum class HapticKind { Correct, Wrong, Celebrate }
+
 /** Отладочные действия над данными приложения; необратимые подтверждаются листом. */
 enum class DebugAction { ResetLessons, ResetStats, SignOut, ResetOnboarding }
 
@@ -37,6 +41,7 @@ sealed interface ShowcaseUiEvent : UiEvent {
     data object LoadHome : ShowcaseUiEvent
     data object ToggleSimulateErrors : ShowcaseUiEvent
     data object RecordResult : ShowcaseUiEvent
+    data class PlayHaptic(val kind: HapticKind) : ShowcaseUiEvent
     data class ActionRequested(val action: DebugAction) : ShowcaseUiEvent
     data object ActionConfirmed : ShowcaseUiEvent
     data object ActionCancelled : ShowcaseUiEvent
@@ -57,6 +62,7 @@ class ShowcaseViewModel(
     private val auth: AuthRepository,
     private val onboarding: OnboardingStorage,
     private val profile: ProfileRepository,
+    private val haptics: Haptics,
 ) : MviViewModel<ShowcaseUiState, ShowcaseUiEvent, ShowcaseUiEffect>(ShowcaseUiState()) {
 
     init {
@@ -77,6 +83,11 @@ class ShowcaseViewModel(
             ShowcaseUiEvent.ToggleSimulateErrors -> fakeConfig.setSimulateErrors(!state.value.simulateErrors)
             ShowcaseUiEvent.RecordResult -> viewModelScope.launch {
                 progress.recordExerciseResult(ExerciseResult("lesson_4", ExerciseType.Quiz, correct = 3, total = 4))
+            }
+            is ShowcaseUiEvent.PlayHaptic -> when (event.kind) {
+                HapticKind.Correct -> haptics.correct()
+                HapticKind.Wrong -> haptics.wrong()
+                HapticKind.Celebrate -> haptics.celebrate()
             }
             is ShowcaseUiEvent.ActionRequested -> setState { copy(pendingAction = event.action) }
             ShowcaseUiEvent.ActionCancelled -> setState { copy(pendingAction = null) }

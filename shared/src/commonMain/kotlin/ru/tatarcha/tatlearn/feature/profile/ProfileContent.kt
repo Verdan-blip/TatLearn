@@ -7,7 +7,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -36,6 +41,8 @@ import ru.tatarcha.tatlearn.domain.model.UserStats
 import tatlearn.shared.generated.resources.Res
 import tatlearn.shared.generated.resources.debug_tools_open
 import tatlearn.shared.generated.resources.profile_edit
+import tatlearn.shared.generated.resources.profile_haptics_subtitle
+import tatlearn.shared.generated.resources.profile_haptics_title
 import tatlearn.shared.generated.resources.profile_level
 import tatlearn.shared.generated.resources.profile_level_value
 import tatlearn.shared.generated.resources.profile_local_note
@@ -84,6 +91,7 @@ fun ProfileContent(
                 }
                 NextLevel(state.stats)
             }
+            HapticsRow(enabled = state.hapticsEnabled, onToggle = { onEvent(ProfileUiEvent.HapticsToggled(it)) })
             TamyrButton(stringResource(Res.string.profile_edit), onClick = { onEvent(ProfileUiEvent.EditClicked) }, style = TamyrButtonStyle.Secondary)
             Text(
                 stringResource(Res.string.profile_local_note),
@@ -103,6 +111,38 @@ fun ProfileContent(
         )
     }
 }
+
+/** Строка настройки «Вибро-отклик» (макеты 26 и 38): вся строка нажимаема как переключатель. */
+@Composable
+private fun HapticsRow(enabled: Boolean, onToggle: (Boolean) -> Unit) {
+    val colors = TamyrTheme.colors
+    TamyrCard(
+        Modifier.fillMaxWidth().heightIn(min = HapticsRowMinHeight).toggleable(value = enabled, role = Role.Switch, onValueChange = onToggle),
+        contentPadding = TamyrTheme.spacing.m,
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.blockGap), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.xxs)) {
+                Text(stringResource(Res.string.profile_haptics_title), style = TamyrTheme.typography.body16Bold, color = colors.textPrimary)
+                Text(stringResource(Res.string.profile_haptics_subtitle), style = TamyrTheme.typography.caption13, color = colors.textSecondary)
+            }
+            // Сам переключатель без своей реакции: нажатие обрабатывает вся строка (toggleable), так цель нажатия крупнее.
+            Switch(
+                checked = enabled,
+                onCheckedChange = null,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = colors.onPrimary,
+                    checkedTrackColor = colors.primary,
+                    checkedBorderColor = colors.primary,
+                    uncheckedThumbColor = colors.textSecondary,
+                    uncheckedTrackColor = colors.surfaceMuted,
+                    uncheckedBorderColor = colors.textSecondary,
+                ),
+            )
+        }
+    }
+}
+
+private val HapticsRowMinHeight = 64.dp
 
 /** Плоская плитка статистики: без нижней тени, чтобы не выглядела как кнопка. */
 @Composable
@@ -144,6 +184,12 @@ private fun ProfilePosePreview() = PreviewFrame {
         onEvent = {},
         onOpenDebug = {},
     )
+}
+
+@Preview(name = "Profile · haptics off", widthDp = 390, heightDp = 844)
+@Composable
+private fun ProfileHapticsOffPreview() = PreviewFrame {
+    ProfileContent(ProfileUiState("Алия", Avatar.Color(0), UserStats(xp = 340, streak = 12), hapticsEnabled = false), onEvent = {})
 }
 
 @Preview(name = "Profile · new user", widthDp = 390, heightDp = 844)

@@ -8,6 +8,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import ru.tatarcha.tatlearn.core.common.TimeProvider
+import ru.tatarcha.tatlearn.core.haptics.PatternHaptics
+import ru.tatarcha.tatlearn.data.local.HapticsSettings
 import ru.tatarcha.tatlearn.data.local.OnboardingStorage
 import ru.tatarcha.tatlearn.data.local.SettingsProfileRepository
 import ru.tatarcha.tatlearn.domain.model.Avatar
@@ -159,7 +162,7 @@ class ProfileViewModelsTest {
 
     @Test fun profileTabShowsProfileAndSavedToastAndOpensEdit() = runTest {
         val profile = FakeProfile(UserProfile("id", "Алия", Avatar.Pose(AvatarPose.Searching)))
-        val vm = ProfileViewModel(profile, StatsProgress(UserStats(xp = 340, streak = 12)), SessionOnlyAuth())
+        val vm = ProfileViewModel(profile, StatsProgress(UserStats(xp = 340, streak = 12)), SessionOnlyAuth(), HapticsSettings(MapSettings()))
         assertEquals("Алия", vm.state.value.name)
         assertEquals(Avatar.Pose(AvatarPose.Searching), vm.state.value.avatar)
         assertEquals(4, vm.state.value.stats.level)
@@ -175,9 +178,54 @@ class ProfileViewModelsTest {
     }
 
     @Test fun profileTabFallsBackToSessionNameWithoutProfile() = runTest {
-        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(UserSession("Тимур", "t@b.ru")))
+        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(UserSession("Тимур", "t@b.ru")), HapticsSettings(MapSettings()))
         assertEquals("Тимур", vm.state.value.name)
         assertEquals(Avatar.Default, vm.state.value.avatar)
+    }
+
+    // --- Вибро ---
+
+    @Test fun hapticsSettingDefaultsToOnAndPersists() = runTest {
+        val settings = MapSettings()
+        assertTrue(HapticsSettings(settings).enabled.value)
+        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(), HapticsSettings(settings))
+        assertTrue(vm.state.value.hapticsEnabled)
+        vm.onEvent(ProfileUiEvent.HapticsToggled(false))
+        assertFalse(vm.state.value.hapticsEnabled)
+        assertFalse(HapticsSettings(settings).enabled.value)
+    }
+
+    private class FakeClock(var now: Long = 1_000L) : TimeProvider {
+        override fun nowMillis() = now
+    }
+
+    @Test fun hapticPatternsUseSoftTicksAndRespectSettingAndDebounce() = runTest {
+        val platform = RecordingPlatformHaptics()
+        val settings = HapticsSettings(MapSettings())
+        val clock = FakeClock()
+        val haptics = PatternHaptics(platform, settings, this, clock)
+        haptics.correct()
+        testScheduler.advanceUntilIdle()
+        assertEquals(listOf("success"), platform.events)
+        // Слишком быстрое второе событие подавляется (не «дрожь»).
+        clock.now += 50
+        haptics.wrong()
+        testScheduler.advanceUntilIdle()
+        assertEquals(listOf("success"), platform.events)
+        clock.now += 500
+        haptics.wrong()
+        testScheduler.advanceUntilIdle()
+        assertEquals(listOf("success", "light", "light"), platform.events)
+        clock.now += 500
+        haptics.celebrate()
+        testScheduler.advanceUntilIdle()
+        assertEquals(listOf("success", "light", "light", "success", "light", "medium"), platform.events)
+        // Выключено в профиле: тишина.
+        settings.setEnabled(false)
+        clock.now += 500
+        haptics.correct()
+        testScheduler.advanceUntilIdle()
+        assertEquals(6, platform.events.size)
     }
 
     // --- Изменение профиля ---
