@@ -106,7 +106,8 @@ class LessonViewModelTest {
 
     @Test fun loadsAndPlansAllSteps() = runTest {
         val vm = viewModel()
-        assertEquals(6, vm.state.value.steps.size)
+        // Аудирование без audioUrl не планируется (MVP), поэтому 5 шагов, а не 6.
+        assertEquals(5, vm.state.value.steps.size)
         assertIs<LoadState.Content<Unit>>(vm.state.value.load)
         assertIs<ExerciseStep.Matching>(vm.step())
     }
@@ -216,13 +217,13 @@ class LessonViewModelTest {
     }
 
     @Test fun mistakesNeverEndTheLessonEarly() = runTest {
-        val vm = viewModel(listOf("quiz-0", "quiz-1", "listening-0", "sentence-0"))
-        listOf(1, 0, 1).forEach { pick ->
+        val vm = viewModel(listOf("quiz-0", "quiz-1", "sentence-0"))
+        listOf(1, 0).forEach { pick ->
             vm.onEvent(LessonUiEvent.OptionSelected(pick))
             vm.onEvent(LessonUiEvent.CheckClicked)
             vm.onEvent(LessonUiEvent.ContinueClicked)
         }
-        assertEquals(3, vm.state.value.stepIndex)
+        assertEquals(2, vm.state.value.stepIndex)
         assertIs<ExerciseStep.SentenceBuilder>(vm.step())
     }
 

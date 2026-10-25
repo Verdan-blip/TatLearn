@@ -24,9 +24,16 @@ class StreakAndPlannerTest {
         assertEquals(60, UserStats(xp = 340, streak = 0).xpToNextLevel)
     }
 
+    @Test fun plannerSkipsListeningWithoutAudioAndKeepsItWithAudio() {
+        val content = testLessonContent()
+        assertEquals(emptyList(), LessonPlanner.plan(content).filterIsInstance<ExerciseStep.Listening>())
+        val withAudio = content.copy(listening = content.listening.map { it.copy(audioUrl = "https://example.org/a.mp3") })
+        assertEquals(listOf("listening-0"), LessonPlanner.plan(withAudio).filterIsInstance<ExerciseStep.Listening>().map { it.id })
+    }
+
     @Test fun plannerOrdersStepsAndFilters() {
         val steps = LessonPlanner.plan(testLessonContent())
-        assertEquals(listOf("matching", "quiz-0", "quiz-1", "listening-0", "sentence-0", "translation-0"), steps.map { it.id })
+        assertEquals(listOf("matching", "quiz-0", "quiz-1", "sentence-0", "translation-0"), steps.map { it.id })
         assertEquals(listOf("quiz-1", "translation-0"), LessonPlanner.plan(testLessonContent(), setOf("translation-0", "quiz-1")).map { it.id })
     }
 

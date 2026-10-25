@@ -3,7 +3,11 @@ package ru.tatarcha.tatlearn.domain.exercise
 import ru.tatarcha.tatlearn.domain.model.LessonContent
 import kotlin.random.Random
 
-/** Превращает контент урока в упорядоченный список шагов: сопоставление, квиз, аудирование, предложения, перевод. */
+/**
+ * Превращает контент урока в упорядоченный список шагов: сопоставление, квиз, аудирование, предложения, перевод.
+ * Аудирование на MVP не планируется, пока у задания нет `audioUrl` (озвучки нет, ответ на слух не определить):
+ * данные остаются в JSON, и шаги включатся сами, когда записи появятся.
+ */
 object LessonPlanner {
 
     fun plan(content: LessonContent, onlyStepIds: Set<String> = emptySet()): List<ExerciseStep> {
@@ -19,7 +23,9 @@ object LessonPlanner {
                 )
             }
             content.quiz.forEachIndexed { i, q -> add(ExerciseStep.Quiz("quiz-$i", q)) }
-            content.listening.forEachIndexed { i, t -> add(ExerciseStep.Listening("listening-$i", t)) }
+            content.listening.forEachIndexed { i, t ->
+                if (t.audioUrl != null) add(ExerciseStep.Listening("listening-$i", t))
+            }
             content.sentences.forEachIndexed { i, t -> add(ExerciseStep.SentenceBuilder("sentence-$i", t)) }
             content.translations.forEachIndexed { i, t -> add(ExerciseStep.Translation("translation-$i", t)) }
         }
