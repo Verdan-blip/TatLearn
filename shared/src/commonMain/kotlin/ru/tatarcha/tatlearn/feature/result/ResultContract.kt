@@ -19,6 +19,8 @@ data class ResultUiState(
     val isMistakesRun: Boolean = false,
     /** Текущая серия из базы прогресса; 0 скрывает карточку серии. */
     val streak: Int = 0,
+    /** Показывать ли «Стрик продлён»: серию продлили именно этим уроком. */
+    val streakExtended: Boolean = false,
 ) : UiState
 
 sealed interface ResultUiEvent : UiEvent {

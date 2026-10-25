@@ -34,6 +34,7 @@ class LessonViewModel(
 
     private var startedAtMillis = 0L
     private var xpEarned = 0
+    private var streakExtended = false
     private var correctSteps = 0
     private var checkedSteps = 0
     private val mistakeIds = mutableListOf<String>()
@@ -212,6 +213,7 @@ class LessonViewModel(
         viewModelScope.launch {
             val outcome = progress.recordExerciseResult(ExerciseResult(key.lessonId, step.type, if (correct) 1 else 0, 1))
             xpEarned += outcome.xpEarned
+            if (outcome.streakExtended) streakExtended = true
             setState { copy(feedback = feedback.copy(xpGained = outcome.xpEarned)) }
         }
     }
@@ -236,7 +238,7 @@ class LessonViewModel(
                 progress.completeLesson(key.lessonId, if (isMistakesRun) XpRules.PASS_THRESHOLD_PERCENT else accuracy)
             }
             val seconds = ((time.nowMillis() - startedAtMillis) / MILLIS_PER_SECOND).toInt().coerceAtLeast(0)
-            sendEffect(LessonUiEffect.NavigateToResult(ResultKey(key.lessonId, xpEarned, accuracy, seconds, mistakeIds.toList(), correctSteps, checkedSteps, isMistakesRun)))
+            sendEffect(LessonUiEffect.NavigateToResult(ResultKey(key.lessonId, xpEarned, accuracy, seconds, mistakeIds.toList(), correctSteps, checkedSteps, isMistakesRun, streakExtended)))
         }
     }
 

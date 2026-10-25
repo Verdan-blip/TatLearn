@@ -25,4 +25,5 @@ data class ExerciseResult(
     val accuracyPercent: Int get() = if (total == 0) 0 else correct * 100 / total
 }
 
-data class ExerciseOutcome(val xpEarned: Int, val stats: UserStats)
+/** [streakExtended] — этот ответ первый за сегодня, а серия была вчерашней, то есть её только что продлили. */
+data class ExerciseOutcome(val xpEarned: Int, val stats: UserStats, val streakExtended: Boolean = false)

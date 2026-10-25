@@ -177,7 +177,7 @@ private fun PassedSummary(
             modifier = Modifier.weight(1f),
         )
     }
-    if (state.streak > 0) {
+    if (state.streak > 0 && state.streakExtended) {
         TamyrCard(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = TamyrTheme.spacing.section,
@@ -384,13 +384,13 @@ private fun ResultPreview(state: ResultUiState) = PreviewFrame {
 @Preview(name = "With mistakes and streak", group = PREVIEW_GROUP)
 @Composable
 private fun ResultMistakesPreview() = ResultPreview(
-    ResultUiState("Алия", xpEarned = 24, accuracyPercent = 90, durationSeconds = 272, mistakes = 1, mistakeStepIds = listOf("quiz-1"), streak = 13),
+    ResultUiState("Алия", xpEarned = 24, accuracyPercent = 90, durationSeconds = 272, mistakes = 1, mistakeStepIds = listOf("quiz-1"), streak = 13, streakExtended = true),
 )
 
 @Preview(name = "Perfect lesson", group = PREVIEW_GROUP)
 @Composable
 private fun ResultPerfectPreview() = ResultPreview(
-    ResultUiState("Алия", xpEarned = 36, accuracyPercent = 100, durationSeconds = 305, mistakes = 0, streak = 4),
+    ResultUiState("Алия", xpEarned = 36, accuracyPercent = 100, durationSeconds = 305, mistakes = 0, streak = 4, streakExtended = true),
 )
 
 @Preview(name = "Not passed", group = PREVIEW_GROUP)
@@ -450,5 +450,5 @@ private fun ResultNoStreakPreview() = ResultPreview(
 @Preview(name = "Long duration and big numbers", group = PREVIEW_GROUP)
 @Composable
 private fun ResultLongPreview() = ResultPreview(
-    ResultUiState("Александра-Мөхәммәдия", xpEarned = 1240, accuracyPercent = 100, durationSeconds = 3725, mistakes = 0, streak = 365),
+    ResultUiState("Александра-Мөхәммәдия", xpEarned = 1240, accuracyPercent = 100, durationSeconds = 3725, mistakes = 0, streak = 365, streakExtended = true),
 )

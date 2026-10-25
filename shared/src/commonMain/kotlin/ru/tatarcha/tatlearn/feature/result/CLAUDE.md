@@ -14,3 +14,4 @@
 - Правило «повтор ошибок засчитывает урок» и серия за любую попытку: рабочие допущения, ждут подтверждения.
 - Список слов с ошибками на экране «не засчитан» (вариант C): нужны слова шагов в `ResultKey`.
 - Татарский заголовок для «не засчитан» (needs native-speaker review).
+- «Стрик продлён» показывается только при `ResultKey.streakExtended`: `ProgressRepository.recordExerciseResult` возвращает `ExerciseOutcome.streakExtended` (последняя активность была вчера), `LessonViewModel` собирает флаг за урок.

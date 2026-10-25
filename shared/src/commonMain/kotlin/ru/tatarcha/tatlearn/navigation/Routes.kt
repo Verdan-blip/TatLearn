@@ -22,6 +22,8 @@ data class ResultKey(
     val totalAnswers: Int = 0,
     /** Это повтор ошибок (урок запущен с `stepIds`). */
     val isMistakesRun: Boolean = false,
+    /** Серию продлили в этом уроке (первое занятие за сегодня при вчерашней серии): только тогда показывается «Стрик продлён». */
+    val streakExtended: Boolean = false,
 ) : NavKey
 
 /** Каталог дизайн-системы только для отладки. */

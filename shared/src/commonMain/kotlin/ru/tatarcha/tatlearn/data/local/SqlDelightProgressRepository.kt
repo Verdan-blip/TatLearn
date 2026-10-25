@@ -40,11 +40,13 @@ class SqlDelightProgressRepository(
             val now = time.nowMillis()
             val today = time.epochDay()
             var stats = UserStats.Empty
+            var streakExtended = false
             queries.transaction {
                 queries.insertCompletedExercise(
                     result.lessonId, result.type.name, result.correct.toLong(), result.total.toLong(), xpEarned.toLong(), now,
                 )
                 val old = queries.selectStats().executeAsOneOrNull()
+                streakExtended = old?.lastActiveDay == today - 1
                 val streak = StreakCalculator.next(old?.streak?.toInt() ?: 0, old?.lastActiveDay, today)
                 stats = UserStats(xp = (old?.xp?.toInt() ?: 0) + xpEarned, streak = streak)
                 queries.upsertStats(stats.xp.toLong(), stats.streak.toLong(), today)
@@ -54,7 +56,7 @@ class SqlDelightProgressRepository(
                     queries.upsertLessonProgress(result.lessonId, LessonStatus.InProgress.name, lesson?.bestScore ?: 0, now)
                 }
             }
-            ExerciseOutcome(xpEarned, stats)
+            ExerciseOutcome(xpEarned, stats, streakExtended)
         }
 
     override suspend fun completeLesson(lessonId: String, scorePercent: Int) {

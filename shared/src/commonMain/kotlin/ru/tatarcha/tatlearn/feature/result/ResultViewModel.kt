@@ -23,6 +23,7 @@ class ResultViewModel(
         mistakeStepIds = key.mistakeStepIds,
         passed = PassRules.isPassed(key.accuracyPercent, key.isMistakesRun, key.mistakeStepIds.size),
         isMistakesRun = key.isMistakesRun,
+        streakExtended = key.streakExtended,
         missingAnswers = if (key.isMistakesRun) key.mistakeStepIds.size else PassRules.missingAnswers(key.correctAnswers, key.totalAnswers),
     ),
 ) {

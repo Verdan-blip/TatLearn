@@ -65,15 +65,18 @@ private class FakeLessons(private val result: Result<LessonContent> = Result.suc
 
 private class FakeProgress : ProgressRepository {
     val recorded = mutableListOf<ExerciseResult>()
+    /** Серия была вчерашней: первый ответ за сегодня её продлевает, остальные нет. */
+    var extendsStreakOnFirstAnswer = false
     var completed: Pair<String, Int>? = null
     private val stats = MutableStateFlow(UserStats.Empty)
     override fun observeStats(): Flow<UserStats> = stats
     override fun observeLessonProgress(): Flow<List<LessonProgress>> = stats.map { emptyList() }
     override suspend fun recordExerciseResult(result: ExerciseResult): ExerciseOutcome {
+        val extended = extendsStreakOnFirstAnswer && recorded.isEmpty()
         recorded += result
         val xp = result.correct * XpRules.PER_CORRECT_STEP
         stats.value = UserStats(stats.value.xp + xp, 1)
-        return ExerciseOutcome(xp, stats.value)
+        return ExerciseOutcome(xp, stats.value, extended)
     }
     override suspend fun completeLesson(lessonId: String, scorePercent: Int) { completed = lessonId to scorePercent }
 }
@@ -147,6 +150,21 @@ class LessonViewModelTest {
         vm.onEvent(LessonUiEvent.CheckClicked)
         vm.onEvent(LessonUiEvent.OptionSelected(1))
         assertEquals(0, (vm.state.value.input as StepInput.Choice).selected)
+    }
+
+    @Test fun resultKnowsWhetherThisLessonExtendedTheStreak() = runTest {
+        progress.extendsStreakOnFirstAnswer = true
+        val vm = viewModel(listOf("quiz-0", "quiz-1"))
+        vm.onEvent(LessonUiEvent.OptionSelected(0)); vm.onEvent(LessonUiEvent.CheckClicked); vm.onEvent(LessonUiEvent.ContinueClicked)
+        vm.onEvent(LessonUiEvent.OptionSelected(1)); vm.onEvent(LessonUiEvent.CheckClicked); vm.onEvent(LessonUiEvent.ContinueClicked)
+        assertTrue((vm.effects.first() as LessonUiEffect.NavigateToResult).key.streakExtended)
+    }
+
+    @Test fun resultHidesStreakExtendedWhenItWasAlreadyActiveToday() = runTest {
+        val vm = viewModel(listOf("quiz-0", "quiz-1"))
+        vm.onEvent(LessonUiEvent.OptionSelected(0)); vm.onEvent(LessonUiEvent.CheckClicked); vm.onEvent(LessonUiEvent.ContinueClicked)
+        vm.onEvent(LessonUiEvent.OptionSelected(1)); vm.onEvent(LessonUiEvent.CheckClicked); vm.onEvent(LessonUiEvent.ContinueClicked)
+        assertEquals(false, (vm.effects.first() as LessonUiEffect.NavigateToResult).key.streakExtended)
     }
 
     @Test fun finishingLessonSendsResultWithMistakes() = runTest {
