@@ -15,9 +15,11 @@ plugins {
 val generateBuildConfig = tasks.register("generateBuildConfig") {
     val baseUrl = providers.gradleProperty("tamyr.baseUrl").orElse("")
     val useRemote = providers.gradleProperty("tamyr.useRemote").orElse("false")
+    val registrationEnabled = providers.gradleProperty("tamyr.registrationEnabled").orElse("false")
     val outDir = layout.buildDirectory.dir("generated/buildconfig")
     inputs.property("baseUrl", baseUrl)
     inputs.property("useRemote", useRemote)
+    inputs.property("registrationEnabled", registrationEnabled)
     outputs.dir(outDir)
     doLast {
         val file = outDir.get().file("ru/tatarcha/tatlearn/core/common/BuildConfig.kt").asFile
@@ -30,6 +32,9 @@ val generateBuildConfig = tasks.register("generateBuildConfig") {
             object BuildConfig {
                 const val BASE_URL = "${baseUrl.get()}"
                 const val USE_REMOTE = ${useRemote.get()}
+
+                /** Фича-флаг: регистрация и вход. false — гостевой режим (профиль на устройстве). */
+                const val REGISTRATION_ENABLED = ${registrationEnabled.get()}
             }
             """.trimIndent(),
         )

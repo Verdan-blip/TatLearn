@@ -15,11 +15,14 @@ import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import ru.tatarcha.tatlearn.core.common.BuildConfig
 import ru.tatarcha.tatlearn.feature.auth.AuthScene
+import ru.tatarcha.tatlearn.feature.intro.IntroScene
 import ru.tatarcha.tatlearn.feature.home.HomeScene
 import ru.tatarcha.tatlearn.feature.lesson.LessonRoute
 import ru.tatarcha.tatlearn.feature.module.ModuleScene
 import ru.tatarcha.tatlearn.feature.onboarding.OnboardingScene
+import ru.tatarcha.tatlearn.feature.profile.ProfileEditScene
 import ru.tatarcha.tatlearn.feature.result.ResultScene
 import ru.tatarcha.tatlearn.feature.showcase.ShowcaseScreen
 
@@ -30,6 +33,8 @@ private val navSavedStateConfig = SavedStateConfiguration {
             subclass(OnboardingKey::class)
             subclass(AuthKey::class)
             subclass(HomeKey::class)
+            subclass(IntroKey::class)
+            subclass(ProfileEditKey::class)
             subclass(ModuleKey::class)
             subclass(LessonKey::class)
             subclass(ResultKey::class)
@@ -64,7 +69,18 @@ fun AppNavigation(showDebugTools: Boolean = false) {
             ),
             entryProvider = entryProvider {
                 entry<OnboardingKey> {
-                    OnboardingScene(onNavigateToAuth = { mode -> backStack.add(AuthKey(mode)) })
+                    OnboardingScene(
+                        // Регистрация закрыта фича-флагом: онбординг ведёт на знакомство вместо входа.
+                        onNavigateToAuth = { mode ->
+                            if (BuildConfig.REGISTRATION_ENABLED) backStack.add(AuthKey(mode)) else resetTo(IntroKey)
+                        },
+                    )
+                }
+                entry<IntroKey> {
+                    IntroScene(onDone = { resetTo(HomeKey) })
+                }
+                entry<ProfileEditKey> {
+                    ProfileEditScene(onClose = ::pop)
                 }
                 entry<AuthKey> { key ->
                     AuthScene(
@@ -78,6 +94,7 @@ fun AppNavigation(showDebugTools: Boolean = false) {
                         onOpenDebug = { backStack.add(ShowcaseKey) },
                         onStartLesson = { lessonId -> backStack.add(LessonKey(lessonId)) },
                         onOpenModule = { moduleId -> backStack.add(ModuleKey(moduleId)) },
+                        onEditProfile = { backStack.add(ProfileEditKey) },
                     )
                 }
                 entry<ModuleKey> { key ->
@@ -110,7 +127,7 @@ fun AppNavigation(showDebugTools: Boolean = false) {
                     ShowcaseScreen(
                         viewModel = koinViewModel(),
                         onClose = ::pop,
-                        onSignedOut = { resetTo(AuthKey()) },
+                        onSignedOut = { resetTo(if (BuildConfig.REGISTRATION_ENABLED) AuthKey() else IntroKey) },
                         onOnboardingReset = { resetTo(OnboardingKey) },
                     )
                 }

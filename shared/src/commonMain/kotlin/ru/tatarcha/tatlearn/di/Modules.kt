@@ -30,6 +30,8 @@ import ru.tatarcha.tatlearn.domain.repository.AuthRepository
 import ru.tatarcha.tatlearn.domain.repository.LessonsRepository
 import ru.tatarcha.tatlearn.domain.repository.ProgressRepository
 import ru.tatarcha.tatlearn.data.local.OnboardingStorage
+import ru.tatarcha.tatlearn.data.local.SettingsProfileRepository
+import ru.tatarcha.tatlearn.domain.repository.ProfileRepository
 import ru.tatarcha.tatlearn.feature.auth.AuthMode
 import ru.tatarcha.tatlearn.feature.auth.AuthViewModel
 import ru.tatarcha.tatlearn.feature.home.HomeViewModel
@@ -37,8 +39,11 @@ import ru.tatarcha.tatlearn.feature.onboarding.OnboardingViewModel
 import ru.tatarcha.tatlearn.feature.result.ResultViewModel
 import ru.tatarcha.tatlearn.core.audio.StubbingAudioPlayer
 import ru.tatarcha.tatlearn.core.audio.createPlatformAudioPlayer
+import ru.tatarcha.tatlearn.feature.intro.IntroViewModel
 import ru.tatarcha.tatlearn.feature.lesson.LessonViewModel
 import ru.tatarcha.tatlearn.feature.module.ModuleViewModel
+import ru.tatarcha.tatlearn.feature.profile.ProfileEditViewModel
+import ru.tatarcha.tatlearn.feature.profile.ProfileViewModel
 import ru.tatarcha.tatlearn.navigation.LessonKey
 import ru.tatarcha.tatlearn.navigation.ModuleKey
 import ru.tatarcha.tatlearn.navigation.ResultKey
@@ -46,12 +51,15 @@ import ru.tatarcha.tatlearn.navigation.StartDestinationResolver
 import ru.tatarcha.tatlearn.feature.showcase.ShowcaseViewModel
 
 val presentationModule = module {
-    single { StartDestinationResolver(get(), get()) }
+    single { StartDestinationResolver(get(), get(), get(), BuildConfig.REGISTRATION_ENABLED) }
     viewModelOf(::OnboardingViewModel)
     viewModel { (mode: AuthMode) -> AuthViewModel(mode, get()) }
     viewModelOf(::HomeViewModel)
+    viewModelOf(::IntroViewModel)
+    viewModelOf(::ProfileViewModel)
+    viewModelOf(::ProfileEditViewModel)
     viewModel { (key: ModuleKey) -> ModuleViewModel(key.moduleId, get(), get()) }
-    viewModel { (key: ResultKey) -> ResultViewModel(key, get(), get()) }
+    viewModel { (key: ResultKey) -> ResultViewModel(key, get(), get(), get()) }
     viewModel { (key: LessonKey) -> LessonViewModel(key, get(), get(), StubbingAudioPlayer(createPlatformAudioPlayer()), get()) }
     viewModelOf(::ShowcaseViewModel)
 }
@@ -79,6 +87,7 @@ val databaseModule = module {
 val dataModule = module {
     single { SessionStorage(get()) }
     single { OnboardingStorage(get()) }
+    single<ProfileRepository> { SettingsProfileRepository(get()) }
     single { FakeBackendConfig() }
     if (BuildConfig.USE_REMOTE) {
         single<LessonsRepository> { RemoteLessonsRepository(get()) }

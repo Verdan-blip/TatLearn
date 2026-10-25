@@ -18,6 +18,7 @@ import ru.tatarcha.tatlearn.domain.model.UserStats
 import ru.tatarcha.tatlearn.data.local.OnboardingStorage
 import ru.tatarcha.tatlearn.domain.repository.AuthRepository
 import ru.tatarcha.tatlearn.domain.repository.LessonsRepository
+import ru.tatarcha.tatlearn.domain.repository.ProfileRepository
 import ru.tatarcha.tatlearn.domain.repository.ProgressRepository
 
 /** Только для отладки: прогоняет слой данных из UI kit (фейковый бэкенд, база прогресса). */
@@ -55,6 +56,7 @@ class ShowcaseViewModel(
     private val fakeConfig: FakeBackendConfig,
     private val auth: AuthRepository,
     private val onboarding: OnboardingStorage,
+    private val profile: ProfileRepository,
 ) : MviViewModel<ShowcaseUiState, ShowcaseUiEvent, ShowcaseUiEffect>(ShowcaseUiState()) {
 
     init {
@@ -96,6 +98,7 @@ class ShowcaseViewModel(
                 DebugAction.ResetOnboarding -> {
                     auth.signOut()
                     onboarding.reset()
+                    profile.clear()
                     sendEffect(ShowcaseUiEffect.NavigateToOnboarding)
                 }
             }

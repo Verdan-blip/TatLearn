@@ -5,11 +5,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import org.koin.compose.viewmodel.koinViewModel
+import ru.tatarcha.tatlearn.feature.profile.ProfileScene
 
 @Composable
 fun HomeScene(
     onStartLesson: (lessonId: String) -> Unit,
     onOpenModule: (moduleId: String) -> Unit,
+    onEditProfile: () -> Unit,
     onOpenDebug: () -> Unit,
     showDebugTools: Boolean = false,
     viewModel: HomeViewModel = koinViewModel(),
@@ -19,7 +21,6 @@ fun HomeScene(
             when (effect) {
                 is HomeUiEffect.NavigateToLesson -> onStartLesson(effect.lessonId)
                 is HomeUiEffect.NavigateToModule -> onOpenModule(effect.moduleId)
-                HomeUiEffect.NavigateToDebug -> onOpenDebug()
             }
         }
     }
@@ -27,6 +28,13 @@ fun HomeScene(
     HomeContent(
         state = state,
         onEvent = viewModel::onEvent,
-        showDebugTools = showDebugTools,
+        profileTab = { modifier ->
+            ProfileScene(
+                onEdit = onEditProfile,
+                modifier = modifier,
+                // Вход в инструменты отладки живёт на вкладке «Профиль» и только в отладочной сборке.
+                onOpenDebug = if (showDebugTools) onOpenDebug else null,
+            )
+        },
     )
 }

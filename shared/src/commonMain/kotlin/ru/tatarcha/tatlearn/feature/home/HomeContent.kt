@@ -32,8 +32,6 @@ import org.jetbrains.compose.resources.stringResource
 import ru.tatarcha.tatlearn.core.common.LoadState
 import ru.tatarcha.tatlearn.core.designsystem.component.BottomBarItem
 import ru.tatarcha.tatlearn.core.designsystem.component.ComingSoonState
-import ru.tatarcha.tatlearn.core.designsystem.component.TamyrButton
-import ru.tatarcha.tatlearn.core.designsystem.component.TamyrButtonStyle
 import ru.tatarcha.tatlearn.core.designsystem.component.LoadStateContent
 import ru.tatarcha.tatlearn.core.designsystem.component.PreviewFrame
 import ru.tatarcha.tatlearn.core.designsystem.component.StreakBadge
@@ -45,13 +43,14 @@ import ru.tatarcha.tatlearn.core.designsystem.component.TamyrToastHost
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrToastKind
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrSizes
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
+import ru.tatarcha.tatlearn.domain.model.Avatar
 import ru.tatarcha.tatlearn.domain.model.CurrentLesson
+import ru.tatarcha.tatlearn.feature.profile.ProfileAvatar
 import ru.tatarcha.tatlearn.domain.model.HomeContent
 import ru.tatarcha.tatlearn.domain.model.LearningModule
 import ru.tatarcha.tatlearn.domain.model.Lesson
 import ru.tatarcha.tatlearn.domain.model.UserStats
 import tatlearn.shared.generated.resources.Res
-import tatlearn.shared.generated.resources.debug_tools_open
 import tatlearn.shared.generated.resources.home_chip_alphabet
 import tatlearn.shared.generated.resources.home_chip_numbers
 import tatlearn.shared.generated.resources.home_contest_soon_message
@@ -70,8 +69,6 @@ import tatlearn.shared.generated.resources.home_nav_contest
 import tatlearn.shared.generated.resources.home_nav_dictionary
 import tatlearn.shared.generated.resources.home_nav_home
 import tatlearn.shared.generated.resources.home_nav_profile
-import tatlearn.shared.generated.resources.home_profile_soon_message
-import tatlearn.shared.generated.resources.home_profile_soon_title
 import tatlearn.shared.generated.resources.home_streak_days
 import tatlearn.shared.generated.resources.home_toast_all_unavailable
 
@@ -84,7 +81,8 @@ private val ModuleCardPadding = 14.dp
 fun HomeContent(
     state: HomeUiState,
     onEvent: (HomeUiEvent) -> Unit,
-    showDebugTools: Boolean = false,
+    /** Содержимое вкладки «Профиль»; нижнее меню рисует главная. */
+    profileTab: @Composable (Modifier) -> Unit = {},
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         if (state.tab == HomeNavItem.Home) {
@@ -98,13 +96,19 @@ fun HomeContent(
             ) { content ->
                 HomeLoaded(
                     userName = state.userName,
+                    avatar = state.avatar,
                     stats = state.stats,
                     content = content,
                     onEvent = onEvent,
                 )
             }
+        } else if (state.tab == HomeNavItem.Profile) {
+            Column(Modifier.fillMaxSize().background(TamyrTheme.colors.background).statusBarsPadding()) {
+                profileTab(Modifier.weight(1f))
+                HomeBottomBar(selected = HomeNavItem.Profile, onItemClick = { item -> onEvent(HomeUiEvent.NavItemClicked(item)) })
+            }
         } else {
-            ComingSoonTab(tab = state.tab, onEvent = onEvent, showDebugTools = showDebugTools)
+            ComingSoonTab(tab = state.tab, onEvent = onEvent)
         }
         TamyrToastHost(
             toast = state.toast?.let { toast -> homeToastData(toast) },
@@ -119,11 +123,9 @@ fun HomeContent(
 private fun ComingSoonTab(
     tab: HomeNavItem,
     onEvent: (HomeUiEvent) -> Unit,
-    showDebugTools: Boolean,
 ) {
     val (title, message) = when (tab) {
         HomeNavItem.Contest -> stringResource(Res.string.home_contest_soon_title) to stringResource(Res.string.home_contest_soon_message)
-        HomeNavItem.Profile -> stringResource(Res.string.home_profile_soon_title) to stringResource(Res.string.home_profile_soon_message)
         else -> stringResource(Res.string.home_dictionary_soon_title) to stringResource(Res.string.home_dictionary_soon_message)
     }
     Column(
@@ -132,16 +134,7 @@ private fun ComingSoonTab(
             .background(TamyrTheme.colors.background)
             .statusBarsPadding(),
     ) {
-        ComingSoonState(title = title, message = message, modifier = Modifier.weight(1f)) {
-            // Входом в отладочные инструменты служит вкладка «Профиль» (только в отладочной сборке): там позже будут сброс прогресса, выход и т. п.
-            if (showDebugTools && tab == HomeNavItem.Profile) {
-                TamyrButton(
-                    text = stringResource(Res.string.debug_tools_open),
-                    onClick = { onEvent(HomeUiEvent.DebugToolsClicked) },
-                    style = TamyrButtonStyle.Secondary,
-                )
-            }
-        }
+        ComingSoonState(title = title, message = message, modifier = Modifier.weight(1f))
         HomeBottomBar(selected = tab, onItemClick = { item -> onEvent(HomeUiEvent.NavItemClicked(item)) })
     }
 }
@@ -149,6 +142,7 @@ private fun ComingSoonTab(
 @Composable
 private fun HomeLoaded(
     userName: String,
+    avatar: Avatar,
     stats: UserStats,
     content: HomeContent,
     onEvent: (HomeUiEvent) -> Unit,
@@ -167,6 +161,8 @@ private fun HomeLoaded(
         ) {
             Header(
                 userName = userName,
+                avatar = avatar,
+                onAvatarClick = { onEvent(HomeUiEvent.NavItemClicked(HomeNavItem.Profile)) },
                 modifier = Modifier.padding(top = TamyrTheme.spacing.l),
             )
             CurrentLessonCard(
@@ -211,6 +207,8 @@ private fun homeToastData(toast: HomeToast): TamyrToastData = TamyrToastData(
 @Composable
 private fun Header(
     userName: String,
+    avatar: Avatar,
+    onAvatarClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -230,20 +228,13 @@ private fun Header(
                 color = TamyrTheme.colors.textPrimary,
             )
         }
-        Box(
-            modifier = Modifier
-                .size(TamyrSizes.homeAvatar)
-                .clip(TamyrTheme.shapes.circle)
-                .background(TamyrTheme.colors.successContainer)
-                .border(TamyrSizes.borderThin, TamyrTheme.colors.border, TamyrTheme.shapes.circle),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = userName.take(1).toUpperCase(Locale.current),
-                style = TamyrTheme.typography.body17Bold,
-                color = TamyrTheme.colors.primary,
-            )
-        }
+        // Аватар из профиля; нажатие открывает вкладку «Профиль».
+        ProfileAvatar(
+            avatar = avatar,
+            name = userName,
+            size = TamyrSizes.homeAvatar,
+            modifier = Modifier.clickable(role = Role.Button, onClick = onAvatarClick),
+        )
     }
 }
 

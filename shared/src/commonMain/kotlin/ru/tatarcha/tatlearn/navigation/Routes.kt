@@ -7,6 +7,8 @@ import ru.tatarcha.tatlearn.feature.auth.AuthMode
 /** Типизированные ключи Navigation 3. Стек навигации — список этих ключей. */
 @Serializable data object OnboardingKey : NavKey
 @Serializable data class AuthKey(val mode: AuthMode = AuthMode.SignIn) : NavKey
+@Serializable data object IntroKey : NavKey
+@Serializable data object ProfileEditKey : NavKey
 @Serializable data object HomeKey : NavKey
 @Serializable data class ModuleKey(val moduleId: String) : NavKey
 /** [stepIds] ограничивает урок этими шагами («повторить ошибки»); пусто — весь урок. */

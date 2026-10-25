@@ -1,6 +1,7 @@
 package ru.tatarcha.tatlearn.feature.home
 
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -14,14 +15,22 @@ import ru.tatarcha.tatlearn.domain.HomeContentBuilder
 import ru.tatarcha.tatlearn.domain.model.CourseModule
 import ru.tatarcha.tatlearn.domain.model.LessonProgress
 import ru.tatarcha.tatlearn.domain.repository.AuthRepository
+import ru.tatarcha.tatlearn.domain.model.Avatar
 import ru.tatarcha.tatlearn.domain.repository.LessonsRepository
+import ru.tatarcha.tatlearn.domain.repository.ProfileRepository
 import ru.tatarcha.tatlearn.domain.repository.ProgressRepository
 
 class HomeViewModel(
     private val lessons: LessonsRepository,
     progress: ProgressRepository,
     auth: AuthRepository,
-) : MviViewModel<HomeUiState, HomeUiEvent, HomeUiEffect>(HomeUiState(userName = auth.session.value?.name.orEmpty())) {
+    profile: ProfileRepository,
+) : MviViewModel<HomeUiState, HomeUiEvent, HomeUiEffect>(
+    HomeUiState(
+        userName = profile.profile.value?.name ?: auth.session.value?.name.orEmpty(),
+        avatar = profile.profile.value?.avatar ?: Avatar.Default,
+    ),
+) {
 
     private val toastTimer = AutoDismiss(viewModelScope, TamyrMotion.TOAST_VISIBLE_MS)
 
@@ -35,7 +44,10 @@ class HomeViewModel(
             lessonProgress = items
             publish()
         }.launchIn(viewModelScope)
-        auth.session.onEach { session -> setState { copy(userName = session?.name.orEmpty()) } }.launchIn(viewModelScope)
+        // Имя и аватар из профиля; пока профиля нет (поток с входом), имя берётся из сессии.
+        combine(profile.profile, auth.session) { current, session -> current to session }.onEach { (current, session) ->
+            setState { copy(userName = current?.name ?: session?.name.orEmpty(), avatar = current?.avatar ?: Avatar.Default) }
+        }.launchIn(viewModelScope)
         load()
     }
 
@@ -53,7 +65,6 @@ class HomeViewModel(
             HomeUiEvent.AllModulesClicked -> showToast(HomeToast.AllModulesUnavailable)
             is HomeUiEvent.NavItemClicked -> setState { copy(tab = event.item, toast = null) }
             HomeUiEvent.ToastDismissed -> hideToast()
-            HomeUiEvent.DebugToolsClicked -> sendEffect(HomeUiEffect.NavigateToDebug)
         }
     }
 

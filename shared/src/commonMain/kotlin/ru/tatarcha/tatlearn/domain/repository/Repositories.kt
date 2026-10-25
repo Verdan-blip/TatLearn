@@ -1,12 +1,15 @@
 package ru.tatarcha.tatlearn.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import ru.tatarcha.tatlearn.domain.model.Avatar
 import ru.tatarcha.tatlearn.domain.model.ExerciseOutcome
 import ru.tatarcha.tatlearn.domain.model.ExerciseResult
 import ru.tatarcha.tatlearn.domain.model.CourseModule
 import ru.tatarcha.tatlearn.domain.model.LessonContent
 import ru.tatarcha.tatlearn.domain.model.LessonProgress
+import ru.tatarcha.tatlearn.domain.model.UserProfile
 import ru.tatarcha.tatlearn.domain.model.UserSession
 import ru.tatarcha.tatlearn.domain.model.UserStats
 
@@ -41,4 +44,19 @@ interface ProgressRepository {
 
     /** Только для отладки: обнуляет XP и серию. */
     suspend fun resetStats()
+}
+
+/** Гостевой профиль на устройстве (имя и аватар); не зависит от сессии входа. */
+interface ProfileRepository {
+    /** Null, пока знакомство не пройдено. */
+    val profile: StateFlow<UserProfile?>
+
+    /** Срабатывает после каждого сохранения профиля (экран профиля показывает «Сохранено»). */
+    val saved: SharedFlow<Unit>
+
+    /** Сохраняет имя (уже нормализованное) и аватар; при первом сохранении создаёт локальный идентификатор. */
+    fun save(name: String, avatar: Avatar)
+
+    /** Только для отладки (и будущего «Удалить данные»): стирает профиль, знакомство покажется снова. */
+    fun clear()
 }

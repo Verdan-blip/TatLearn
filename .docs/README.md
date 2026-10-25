@@ -11,6 +11,8 @@
 | [02-auth.md](02-auth.md) | Вход / Регистрация | 02 |
 | [03-home.md](03-home.md) | Главная | 03 |
 | [18-module.md](18-module.md) | Экран модуля | 18–23 |
+| [19-intro.md](19-intro.md) | Знакомство (гостевой режим) | 25, 28, 29 |
+| [20-profile.md](20-profile.md) | Профиль и изменение профиля | 26, 27, 30–33 |
 | [04-lesson-matching.md](04-lesson-matching.md) | Урок: общая механика + «Сопоставление» | 04 |
 | [05-lesson-quiz.md](05-lesson-quiz.md) | Упражнение «Квиз» | 05 |
 | [06-result.md](06-result.md) | Результат урока | 06 |

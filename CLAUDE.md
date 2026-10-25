@@ -1,7 +1,7 @@
 # Тамыр (TatLearn) — conventions
 
 App for learning Tatar (Russian-speaking audience). Kotlin Multiplatform + Compose Multiplatform, Android + iOS, all UI/logic in `commonMain`.
-Source of truth for UI: `design/Tatar App Screens.dc.html` (23 screens, 390×844). Skills: `design` (what "design" means here), `design-extend` (how to draw new screens/elements), `compose-style`.
+Source of truth for UI: `design/Tatar App Screens.dc.html` (33 screens, 390×844). Skills: `design` (what "design" means here), `design-extend` (how to draw new screens/elements), `compose-style`.
 
 ## Modules / build
 - `:shared` — all code (KMP library, iOS framework `Shared`); `:androidApp` — Android entry point; `iosApp/` — Xcode project (entry point only).
@@ -13,7 +13,7 @@ Source of truth for UI: `design/Tatar App Screens.dc.html` (23 screens, 390×844
 Koin (DI), Navigation 3 (JetBrains, `navigation3-ui`; runtime comes transitively), Ktor + Ktorfit (KSP), Coil 3, SQLDelight, multiplatform-settings, kotlinx.serialization.
 
 ## Package layout (`shared/src/commonMain/kotlin/ru/tatarcha/tatlearn`)
-`core/{designsystem,network,database,common}`, `feature/{onboarding,auth,home,module,exercises,result}`, `data`, `domain`, `di`, `navigation`.
+`core/{designsystem,network,database,common}`, `feature/{onboarding,auth,intro,profile,home,module,exercises,result}`, `data`, `domain`, `di`, `navigation`.
 
 ## UI rules
 - Compose code style (named params, Scene/Content, previews, theme access): skill `.claude/skills/compose-style`; it is extended on request.
@@ -37,13 +37,13 @@ Koin (DI), Navigation 3 (JetBrains, `navigation3-ui`; runtime comes transitively
 - `domain/{model,repository}`: interfaces return `Result<T>` with `AppException(code)`; UI maps to `LoadState.Error(code)`.
 - `data/fake`: `Fake*Repository` read API-shaped JSON from `composeResources/files` (`modules.json` = catalog of modules with their lessons, `lessons/<id>.json` = lesson tasks; DTOs are shared with the Ktorfit API, mappers in `data/mapper`), 300-800 ms delay, `FakeBackendConfig.setSimulateErrors` for screens 07/08.
 - `data/remote`: Ktorfit `LessonsApi`/`AuthApi` + `Remote*Repository`; enabled by `tamyr.useRemote=true` in gradle.properties (`tamyr.baseUrl` too) -> generated `BuildConfig`.
-- `data/local`: `SqlDelightProgressRepository` (Progress.sq), `SessionStorage` (multiplatform-settings).
+- `data/local`: `SqlDelightProgressRepository` (Progress.sq), `SessionStorage` and `SettingsProfileRepository` (guest profile: name, avatar, local UUID; multiplatform-settings).
 - Koin starts in `TatLearnApplication` (Android) / `MainViewController` (iOS) via `initKoin`; `platformModule` is expect/actual (SqlDriver, Settings, HttpClientEngine).
 - iOS static framework needs `-lsqlite3` (Config.xcconfig + linkerOpts).
 - All lesson content is unverified by a native speaker (`needsNativeReview` in JSON).
 
 ## Screens / flow
-- Start: signed in -> Home; onboarding seen -> Auth; else Onboarding (`StartDestinationResolver`). Auth success and Result "continue" reset the back stack to Home. Home module tile -> `ModuleKey` (module screen, `feature/module`).
+- Feature flag `tamyr.registrationEnabled` (gradle.properties -> `BuildConfig.REGISTRATION_ENABLED`, default false = guest mode): Onboarding -> Intro (name + avatar, `feature/intro`) -> Home; sign-in/sign-up (`feature/auth`) are hidden. Flag on: legacy flow. `StartDestinationResolver`: guest mode: profile exists -> Home; onboarding seen -> Intro; else Onboarding; a signed-in user without profile gets one from the session name. Flag on: signed in -> Home; onboarding seen -> Auth; else Onboarding. Auth success and Result "continue" reset the back stack to Home. Home module tile -> `ModuleKey` (module screen, `feature/module`).
 - Feature layout: `XContract.kt` (UiState/UiEvent/UiEffect), `XViewModel`, `XScreen.kt` (`XRoute` stateful + `XScreen` stateless).
 - Compose Resources strings do not support `%%` or zero-padded specifiers (`%02d`): use a single `%` and format numbers in code.
 - Testing iOS states without taps: launch with `-onboarding_seen YES`, `-session_name X -session_email Y` (NSUserDefaults args domain).
@@ -54,7 +54,7 @@ Koin (DI), Navigation 3 (JetBrains, `navigation3-ui`; runtime comes transitively
 - Typed answers go through `AnswerNormalizer`: lower-case + punctuation stripped, then Russian-keyboard folding (ә→а, ө→о, ү→у, җ→ж, ң→н, һ→х) gives `Approximate` = accepted with the proper spelling shown.
 - Back/close asks for confirmation (`NavigationBackHandler` from navigationevent-compose; `BackHandler` is deprecated).
 - Audio: `AudioPlayer` (expect fun `createPlatformAudioPlayer`: MediaPlayer / AVPlayer) wrapped by `StubbingAudioPlayer`, which fakes playback while a task has no `audioUrl` (TODO(audio)). `LessonPlanner` skips listening steps without `audioUrl` (MVP has no audio); the data stays in lesson JSON.
-- Tests (87, same set on both platforms): `./gradlew :shared:testAndroidHostTest :shared:iosSimulatorArm64Test`. Settings fake = `MapSettings` from `multiplatform-settings-test` (test-only).
+- Tests (102, same set on both platforms): `./gradlew :shared:testAndroidHostTest :shared:iosSimulatorArm64Test`. Settings fake = `MapSettings` from `multiplatform-settings-test` (test-only).
 - Motion tokens: `TamyrMotion` (step slide, feedback panel slide-up, progress bar tween).
 
 ## Methodology

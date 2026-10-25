@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
@@ -46,6 +48,8 @@ fun TamyrTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     trailing: (@Composable () -> Unit)? = null,
+    placeholder: String? = null,
+    counter: String? = null,
 ) {
     // Хранит курсор/выделение у себя, пока вызывающий код работает только с обычным текстом.
     var fieldValue by remember { mutableStateOf(TextFieldValue(value)) }
@@ -66,6 +70,8 @@ fun TamyrTextField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         trailing = trailing,
+        placeholder = placeholder,
+        counter = counter,
     )
 }
 
@@ -84,6 +90,8 @@ fun TamyrTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     trailing: (@Composable () -> Unit)? = null,
+    placeholder: String? = null,
+    counter: String? = null,
 ) {
     val colors = TamyrTheme.colors
     val interaction = remember { MutableInteractionSource() }
@@ -96,8 +104,17 @@ fun TamyrTextField(
     val borderWidth = if (focused || errorText != null) TamyrSizes.borderAccent else TamyrSizes.borderThin
 
     Column(modifier, verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.s)) {
-        if (label != null) {
-            Text(label, style = TamyrTheme.typography.body14Bold, color = colors.textSecondary)
+        if (label != null || counter != null) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                if (label != null) Text(label, style = TamyrTheme.typography.body14Bold, color = colors.textSecondary)
+                if (counter != null) {
+                    Text(
+                        counter,
+                        style = TamyrTheme.typography.caption13Bold,
+                        color = if (errorText != null) colors.accentText else colors.textSecondary,
+                    )
+                }
+            }
         }
         BasicTextField(
             value = value,
@@ -119,16 +136,27 @@ fun TamyrTextField(
                         .padding(horizontal = TamyrTheme.spacing.l, vertical = TamyrTheme.spacing.s),
                     verticalAlignment = if (singleLine) Alignment.CenterVertically else Alignment.Top,
                 ) {
-                    Box(Modifier.weight(1f)) { inner() }
+                    Box(Modifier.weight(1f)) {
+                        if (value.text.isEmpty() && placeholder != null) {
+                            Text(placeholder, style = textStyle, color = colors.textSecondary)
+                        }
+                        inner()
+                    }
                     trailing?.invoke()
                 }
             },
         )
         if (errorText != null) {
-            // TODO(design): стиля ошибки валидации нет в макете.
-            Text(errorText, style = TamyrTheme.typography.caption13, color = colors.accentText)
+            // Ошибка с значком «!» и жирным терракотовым текстом (макеты 29 и 30), чтобы читалась не только цветом.
+            Row(horizontalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.xs), verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(ErrorMarkSize).clip(TamyrTheme.shapes.circle).background(colors.accent), contentAlignment = Alignment.Center) {
+                    Text("!", style = TamyrTheme.typography.label12Bold, color = colors.onAccent)
+                }
+                Text(errorText, style = TamyrTheme.typography.caption13Bold, color = colors.accentText)
+            }
         }
     }
 }
 
 private val FieldHeight = 52.dp
+private val ErrorMarkSize = 16.dp

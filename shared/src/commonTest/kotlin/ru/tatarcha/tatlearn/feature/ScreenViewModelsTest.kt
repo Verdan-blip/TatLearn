@@ -93,7 +93,7 @@ private class HomeLessons(var result: Result<List<CourseModule>>) : LessonsRepos
     override suspend fun getLessonContent(lessonId: String): Result<LessonContent> = error("unused")
 }
 
-private class StatsProgress(initial: UserStats = UserStats.Empty) : ProgressRepository {
+internal class StatsProgress(initial: UserStats = UserStats.Empty) : ProgressRepository {
     val stats = MutableStateFlow(initial)
     val lessonProgress = MutableStateFlow<List<LessonProgress>>(emptyList())
     override fun observeStats(): Flow<UserStats> = stats
@@ -259,7 +259,7 @@ class ScreenViewModelsTest {
 
     @Test fun homeLoadsContentAndStats() = runTest {
         val progress = StatsProgress(UserStats(xp = 120, streak = 3))
-        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), progress, FakeAuth(UserSession("Алия", "a@b.ru")))
+        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), progress, FakeAuth(UserSession("Алия", "a@b.ru")), FakeProfile())
         assertEquals("Алия", vm.state.value.userName)
         assertIs<LoadState.Content<HomeContent>>(vm.state.value.content)
         assertEquals(3, vm.state.value.stats.streak)
@@ -269,7 +269,7 @@ class ScreenViewModelsTest {
 
     @Test fun homeErrorThenRetrySucceeds() = runTest {
         val lessons = HomeLessons(Result.failure(AppException("NET_TIMEOUT")))
-        val vm = HomeViewModel(lessons, StatsProgress(), FakeAuth())
+        val vm = HomeViewModel(lessons, StatsProgress(), FakeAuth(), FakeProfile())
         assertEquals(LoadState.Error("NET_TIMEOUT"), vm.state.value.content)
         lessons.result = Result.success(catalog())
         vm.onEvent(HomeUiEvent.RetryClicked)
@@ -279,7 +279,7 @@ class ScreenViewModelsTest {
 
     @Test fun startLessonNavigatesOnlyWhenLoaded() = runTest {
         val lessons = HomeLessons(Result.failure(AppException("NET_ERROR")))
-        val vm = HomeViewModel(lessons, StatsProgress(), FakeAuth())
+        val vm = HomeViewModel(lessons, StatsProgress(), FakeAuth(), FakeProfile())
         vm.onEvent(HomeUiEvent.StartLessonClicked)
         lessons.result = Result.success(catalog())
         vm.onEvent(HomeUiEvent.RetryClicked)
@@ -288,7 +288,7 @@ class ScreenViewModelsTest {
     }
 
     @Test fun moduleClickOpensItsScreenEvenWhenLocked() = runTest {
-        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth())
+        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth(), FakeProfile())
         vm.onEvent(HomeUiEvent.ModuleClicked("food"))
         assertEquals(HomeUiEffect.NavigateToModule("food"), vm.effects.first())
         vm.onEvent(HomeUiEvent.ModuleClicked("nature"))
@@ -298,7 +298,7 @@ class ScreenViewModelsTest {
 
     @Test fun finishedLessonMovesCurrentLessonAndUpdatesProgress() = runTest {
         val progress = StatsProgress()
-        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), progress, FakeAuth())
+        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), progress, FakeAuth(), FakeProfile())
         progress.lessonProgress.value = listOf(LessonProgress("lesson_3", LessonStatus.Completed, 90))
         val home = (vm.state.value.content as LoadState.Content).data
         assertEquals("lesson_4", home.currentLesson.lesson.id)
@@ -308,12 +308,12 @@ class ScreenViewModelsTest {
     }
 
     @Test fun emptyCatalogShowsNotFound() = runTest {
-        val vm = HomeViewModel(HomeLessons(Result.success(emptyList())), StatsProgress(), FakeAuth())
+        val vm = HomeViewModel(HomeLessons(Result.success(emptyList())), StatsProgress(), FakeAuth(), FakeProfile())
         assertEquals(LoadState.Error("NOT_FOUND"), vm.state.value.content)
     }
 
     @Test fun allModulesAndNavItemsShowStubToasts() = runTest {
-        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth())
+        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth(), FakeProfile())
         vm.onEvent(HomeUiEvent.AllModulesClicked)
         assertEquals(HomeToast.AllModulesUnavailable, vm.state.value.toast)
         vm.onEvent(HomeUiEvent.ToastDismissed)
@@ -326,7 +326,7 @@ class ScreenViewModelsTest {
     }
 
     @Test fun homeToastDisappearsAfterFiveSeconds() = runTest {
-        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth())
+        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth(), FakeProfile())
         vm.onEvent(HomeUiEvent.AllModulesClicked)
         testScheduler.advanceTimeBy(TamyrMotion.TOAST_VISIBLE_MS + 1)
         assertNull(vm.state.value.toast)
@@ -337,7 +337,7 @@ class ScreenViewModelsTest {
     private val resultKey = ResultKey("lesson_4", xpEarned = 24, accuracyPercent = 75, durationSeconds = 130, mistakeStepIds = listOf("quiz-1", "sentence-0"))
 
     @Test fun resultStateComesFromKey() = runTest {
-        val vm = ResultViewModel(resultKey, FakeAuth(UserSession("Алия", "a@b.ru")), StatsProgress(UserStats(50, 4)))
+        val vm = ResultViewModel(resultKey, FakeAuth(UserSession("Алия", "a@b.ru")), StatsProgress(UserStats(50, 4)), FakeProfile())
         val state = vm.state.value
         assertEquals("Алия", state.userName)
         assertEquals(24, state.xpEarned)
@@ -348,7 +348,7 @@ class ScreenViewModelsTest {
 
     @Test fun resultBelowThresholdIsNotPassed() = runTest {
         val key = resultKey.copy(accuracyPercent = 70, correctAnswers = 7, totalAnswers = 10, mistakeStepIds = listOf("a", "b", "c"))
-        val state = ResultViewModel(key, FakeAuth(), StatsProgress()).state.value
+        val state = ResultViewModel(key, FakeAuth(), StatsProgress(), FakeProfile()).state.value
         assertEquals(false, state.passed)
         assertEquals(1, state.missingAnswers)
         assertEquals(false, state.isMistakesRun)
@@ -356,19 +356,19 @@ class ScreenViewModelsTest {
 
     @Test fun resultAtThresholdIsPassed() = runTest {
         val key = resultKey.copy(accuracyPercent = 80, correctAnswers = 8, totalAnswers = 10)
-        assertTrue(ResultViewModel(key, FakeAuth(), StatsProgress()).state.value.passed)
+        assertTrue(ResultViewModel(key, FakeAuth(), StatsProgress(), FakeProfile()).state.value.passed)
     }
 
     @Test fun mistakesRunShowsUnfixedMistakes() = runTest {
         val key = resultKey.copy(accuracyPercent = 50, isMistakesRun = true, mistakeStepIds = listOf("quiz-1"))
-        val state = ResultViewModel(key, FakeAuth(), StatsProgress()).state.value
+        val state = ResultViewModel(key, FakeAuth(), StatsProgress(), FakeProfile()).state.value
         assertEquals(false, state.passed)
         assertEquals(1, state.missingAnswers)
         assertTrue(state.isMistakesRun)
     }
 
     @Test fun resultEffects() = runTest {
-        val vm = ResultViewModel(resultKey, FakeAuth(), StatsProgress())
+        val vm = ResultViewModel(resultKey, FakeAuth(), StatsProgress(), FakeProfile())
         vm.onEvent(ResultUiEvent.RetryMistakesClicked)
         assertEquals(ResultUiEffect.NavigateToMistakes("lesson_4", listOf("quiz-1", "sentence-0")), vm.effects.first())
         vm.onEvent(ResultUiEvent.ContinueClicked)
@@ -414,17 +414,17 @@ class ScreenViewModelsTest {
     @Test fun startDestinationFollowsSessionAndOnboarding() {
         val settings = MapSettings()
         val onboarding = OnboardingStorage(settings)
-        assertEquals(OnboardingKey, StartDestinationResolver(FakeAuth(), onboarding).resolve())
+        assertEquals(OnboardingKey, StartDestinationResolver(FakeAuth(), onboarding, FakeProfile(), registrationEnabled = true).resolve())
         onboarding.markSeen()
-        assertEquals(AuthKey(), StartDestinationResolver(FakeAuth(), onboarding).resolve())
-        assertEquals(HomeKey, StartDestinationResolver(FakeAuth(UserSession("A", "a@b.ru")), onboarding).resolve())
+        assertEquals(AuthKey(), StartDestinationResolver(FakeAuth(), onboarding, FakeProfile(), registrationEnabled = true).resolve())
+        assertEquals(HomeKey, StartDestinationResolver(FakeAuth(UserSession("A", "a@b.ru")), onboarding, FakeProfile(), registrationEnabled = true).resolve())
     }
 
     // --- Отладочные действия ---
 
     @Test fun debugActionsNeedConfirmationAndResetOnlyWhatTheyName() = runTest {
         val progress = StatsProgress()
-        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), progress, FakeBackendConfig(), FakeAuth(), OnboardingStorage(MapSettings()))
+        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), progress, FakeBackendConfig(), FakeAuth(), OnboardingStorage(MapSettings()), FakeProfile())
         vm.onEvent(ShowcaseUiEvent.ActionRequested(DebugAction.ResetLessons))
         assertEquals(DebugAction.ResetLessons, vm.state.value.pendingAction)
         assertEquals(0, progress.lessonResets)
@@ -444,7 +444,7 @@ class ScreenViewModelsTest {
     @Test fun signOutAndOnboardingResetClearSessionAndNavigate() = runTest {
         val auth = FakeAuth(UserSession("Алия", "a@b.ru"))
         val onboarding = OnboardingStorage(MapSettings()).apply { markSeen() }
-        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeBackendConfig(), auth, onboarding)
+        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeBackendConfig(), auth, onboarding, FakeProfile())
         vm.onEvent(ShowcaseUiEvent.ActionRequested(DebugAction.SignOut))
         vm.onEvent(ShowcaseUiEvent.ActionConfirmed)
         assertNull(auth.session.value)

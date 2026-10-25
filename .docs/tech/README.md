@@ -11,6 +11,7 @@
 | [01-onboarding.md](01-onboarding.md) | Онбординг | `01.png` |
 | [02-auth.md](02-auth.md) | Вход / Регистрация | `02.png` |
 | [03-home.md](03-home.md) | Главная | `03.png` |
+| [19-intro.md](../19-intro.md), [20-profile.md](../20-profile.md) | Знакомство и профиль: `IntroViewModel`, `ProfileViewModel`, `ProfileEditViewModel`, `SettingsProfileRepository`, `StartDestinationResolver` | `25.png`–`33.png` |
 | [18-module.md](../18-module.md) | Экран модуля: `ModuleKey`, `ModuleViewModel`, `ModuleDetailsBuilder` | `18.png`–`23.png` |
 | [04-lesson-matching.md](04-lesson-matching.md) | Упражнение «Сопоставление» | `04.png` |
 | [05-lesson-quiz.md](05-lesson-quiz.md) | Упражнение «Квиз» | `05.png` |
