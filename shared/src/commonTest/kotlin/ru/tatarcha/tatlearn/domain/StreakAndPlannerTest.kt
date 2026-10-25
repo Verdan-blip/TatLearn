@@ -31,6 +31,14 @@ class StreakAndPlannerTest {
         assertEquals(listOf("listening-0"), LessonPlanner.plan(withAudio).filterIsInstance<ExerciseStep.Listening>().map { it.id })
     }
 
+    @Test fun shownStreakIsZeroWhenADayWasMissed() {
+        assertEquals(0, StreakCalculator.current(5, null, today = 100))
+        assertEquals(5, StreakCalculator.current(5, 100, today = 100))
+        assertEquals(5, StreakCalculator.current(5, 99, today = 100))
+        assertEquals(0, StreakCalculator.current(5, 98, today = 100))
+        assertEquals(0, StreakCalculator.current(1, 90, today = 100))
+    }
+
     @Test fun plannerOrdersStepsAndFilters() {
         val steps = LessonPlanner.plan(testLessonContent())
         assertEquals(listOf("matching", "quiz-0", "quiz-1", "sentence-0", "translation-0"), steps.map { it.id })

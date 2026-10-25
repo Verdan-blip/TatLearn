@@ -28,7 +28,10 @@ class SqlDelightProgressRepository(
 
     override fun observeStats(): Flow<UserStats> =
         queries.selectStats().asFlow().mapToOneOrNull(Dispatchers.Default)
-            .map { row -> row?.let { UserStats(it.xp.toInt(), it.streak.toInt()) } ?: UserStats.Empty }
+            .map { row ->
+                row?.let { UserStats(it.xp.toInt(), StreakCalculator.current(it.streak.toInt(), it.lastActiveDay, time.epochDay())) }
+                    ?: UserStats.Empty
+            }
 
     override fun observeLessonProgress(): Flow<List<LessonProgress>> =
         queries.selectLessonProgress().asFlow().mapToList(Dispatchers.Default)
