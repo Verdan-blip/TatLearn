@@ -93,13 +93,18 @@ fun ProfileAvatar(avatar: Avatar, name: String, size: Dp, modifier: Modifier = M
             val crop = avatar.pose.crop
             val scale = SOURCE_SIZE / crop.size
             val full = size * scale
-            Box(modifier.size(size).clip(TamyrTheme.shapes.circle).background(colors.surfaceMuted).then(border)) {
+            // requiredSize крупнее родителя Compose центрирует (а не прижимает к левому верхнему углу), поэтому смещаем от центра:
+            // центр кадра головы должен оказаться в центре круга.
+            val shiftX = full * ((SOURCE_SIZE / 2 - (crop.x + crop.size / 2)) / SOURCE_SIZE)
+            val shiftY = full * ((SOURCE_SIZE / 2 - (crop.y + crop.size / 2)) / SOURCE_SIZE)
+            Box(
+                modifier.size(size).clip(TamyrTheme.shapes.circle).background(colors.surfaceMuted).then(border),
+                contentAlignment = Alignment.Center,
+            ) {
                 Image(
                     painter = painterResource(avatar.pose.mascot.drawable),
                     contentDescription = null,
-                    modifier = Modifier
-                        .requiredSize(full)
-                        .offset(x = -(full * (crop.x / SOURCE_SIZE)), y = -(full * (crop.y / SOURCE_SIZE))),
+                    modifier = Modifier.requiredSize(full).offset(x = shiftX, y = shiftY),
                 )
             }
         }
