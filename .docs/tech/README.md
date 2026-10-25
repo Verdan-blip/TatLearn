@@ -14,6 +14,7 @@
 | [04-lesson-matching.md](04-lesson-matching.md) | Упражнение «Сопоставление» | `04.png` |
 | [05-lesson-quiz.md](05-lesson-quiz.md) | Упражнение «Квиз» | `05.png` |
 | [06-result.md](06-result.md) | Результат урока | `06.png` |
+| [16-coming-soon.md](../16-coming-soon.md) | Заглушка раздела: `ComingSoonState`, вкладки главной | `16.png` |
 | [07-08-loading-error.md](07-08-loading-error.md) | Загрузка и ошибка (общие состояния) | `07.png`, `08.png` |
 | [09-lesson-listening.md](09-lesson-listening.md) | Упражнение «Аудирование» | `09.png` |
 | [10-lesson-sentence.md](10-lesson-sentence.md) | Упражнение «Сборка предложения» | `10.png` |

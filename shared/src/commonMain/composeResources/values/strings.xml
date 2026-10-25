@@ -91,7 +91,6 @@
     <string name="home_toast_module_unavailable">Экран модуля пока недоступен</string>
     <string name="home_toast_module_locked">Модуль пока закрыт</string>
     <string name="home_toast_all_unavailable">Список модулей пока недоступен</string>
-    <string name="home_toast_section_unavailable">Этот раздел пока недоступен</string>
     <string name="home_continue_tag">Дәвам ит · Продолжить</string>
     <string name="home_lesson_progress">%1$d / %2$d</string>
     <string name="home_lesson_button">Урок %1$d · %2$s</string>
@@ -104,6 +103,13 @@
     <string name="home_nav_dictionary">Сүзлек</string>
     <string name="home_nav_contest">Ярыш</string>
     <string name="home_nav_profile">Профиль</string>
+    <string name="coming_soon_tag">Тиздән · Скоро</string>
+    <string name="home_dictionary_soon_title">Сүзлек әзерләнә</string>
+    <string name="home_dictionary_soon_message">Словарь ещё готовится. Мыраужан вздремнул, но скоро проснётся.</string>
+    <string name="home_contest_soon_title">Ярыш әзерләнә</string>
+    <string name="home_contest_soon_message">Соревнования ещё готовятся. Мыраужан вздремнул, но скоро проснётся.</string>
+    <string name="home_profile_soon_title">Профиль әзерләнә</string>
+    <string name="home_profile_soon_message">Профиль ещё готовится. Мыраужан вздремнул, но скоро проснётся.</string>
 
     <!-- 06 Результат -->
     <string name="result_title">Дәрес тәмам!</string>

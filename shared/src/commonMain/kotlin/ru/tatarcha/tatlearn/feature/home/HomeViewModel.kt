@@ -36,10 +36,10 @@ class HomeViewModel(
                     sendEffect(HomeUiEffect.NavigateToLesson(content.data.currentLesson.lesson.id))
                 }
             }
-            // TODO(design): экранов модуля, списка модулей, словаря, соревнований и профиля нет, пока показываем заглушку.
+            // TODO(design): экранов модуля и списка модулей нет, пока показываем заглушку; вкладки словаря, соревнований и профиля — заглушка-экран 16.
             is HomeUiEvent.ModuleClicked -> onModuleClicked(event.moduleId)
             HomeUiEvent.AllModulesClicked -> showToast(HomeToast.AllModulesUnavailable)
-            is HomeUiEvent.NavItemClicked -> if (event.item != HomeNavItem.Home) showToast(HomeToast.SectionUnavailable)
+            is HomeUiEvent.NavItemClicked -> setState { copy(tab = event.item, toast = null) }
             HomeUiEvent.ToastDismissed -> hideToast()
         }
     }

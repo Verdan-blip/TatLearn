@@ -5,5 +5,4 @@ sealed interface HomeToast {
     data class ModuleLocked(val hint: String?) : HomeToast
     data object ModuleUnavailable : HomeToast
     data object AllModulesUnavailable : HomeToast
-    data object SectionUnavailable : HomeToast
 }

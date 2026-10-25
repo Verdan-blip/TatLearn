@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.tatarcha.tatlearn.core.common.LoadState
 import ru.tatarcha.tatlearn.core.designsystem.component.BottomBarItem
+import ru.tatarcha.tatlearn.core.designsystem.component.ComingSoonState
 import ru.tatarcha.tatlearn.core.designsystem.component.LoadStateContent
 import ru.tatarcha.tatlearn.core.designsystem.component.PreviewFrame
 import ru.tatarcha.tatlearn.core.designsystem.component.StreakBadge
@@ -50,7 +51,11 @@ import ru.tatarcha.tatlearn.domain.model.UserStats
 import tatlearn.shared.generated.resources.Res
 import tatlearn.shared.generated.resources.home_chip_alphabet
 import tatlearn.shared.generated.resources.home_chip_numbers
+import tatlearn.shared.generated.resources.home_contest_soon_message
+import tatlearn.shared.generated.resources.home_contest_soon_title
 import tatlearn.shared.generated.resources.home_continue_tag
+import tatlearn.shared.generated.resources.home_dictionary_soon_message
+import tatlearn.shared.generated.resources.home_dictionary_soon_title
 import tatlearn.shared.generated.resources.home_greeting
 import tatlearn.shared.generated.resources.home_lesson_button
 import tatlearn.shared.generated.resources.home_lesson_progress
@@ -62,11 +67,12 @@ import tatlearn.shared.generated.resources.home_nav_contest
 import tatlearn.shared.generated.resources.home_nav_dictionary
 import tatlearn.shared.generated.resources.home_nav_home
 import tatlearn.shared.generated.resources.home_nav_profile
+import tatlearn.shared.generated.resources.home_profile_soon_message
+import tatlearn.shared.generated.resources.home_profile_soon_title
 import tatlearn.shared.generated.resources.home_streak_days
 import tatlearn.shared.generated.resources.home_toast_all_unavailable
 import tatlearn.shared.generated.resources.home_toast_module_locked
 import tatlearn.shared.generated.resources.home_toast_module_unavailable
-import tatlearn.shared.generated.resources.home_toast_section_unavailable
 
 private const val ICON_ALPHABET = "alphabet"
 private const val ICON_FOOD = "food"
@@ -79,26 +85,52 @@ fun HomeContent(
     onEvent: (HomeUiEvent) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        LoadStateContent(
-            state = state.content,
-            onRetry = { onEvent(HomeUiEvent.RetryClicked) },
-            modifier = Modifier
-                .fillMaxSize()
-                .background(TamyrTheme.colors.background)
-                .statusBarsPadding(),
-        ) { content ->
-            HomeLoaded(
-                userName = state.userName,
-                stats = state.stats,
-                content = content,
-                onEvent = onEvent,
-            )
+        if (state.tab == HomeNavItem.Home) {
+            LoadStateContent(
+                state = state.content,
+                onRetry = { onEvent(HomeUiEvent.RetryClicked) },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(TamyrTheme.colors.background)
+                    .statusBarsPadding(),
+            ) { content ->
+                HomeLoaded(
+                    userName = state.userName,
+                    stats = state.stats,
+                    content = content,
+                    onEvent = onEvent,
+                )
+            }
+        } else {
+            ComingSoonTab(tab = state.tab, onEvent = onEvent)
         }
         TamyrToastHost(
             toast = state.toast?.let { toast -> homeToastData(toast) },
             onDismiss = { onEvent(HomeUiEvent.ToastDismissed) },
             modifier = Modifier.align(Alignment.TopCenter),
         )
+    }
+}
+
+/** Заглушка вкладки, которой ещё нет (экран 16); нижнее меню остаётся, «Өй» ведёт на главную. */
+@Composable
+private fun ComingSoonTab(
+    tab: HomeNavItem,
+    onEvent: (HomeUiEvent) -> Unit,
+) {
+    val (title, message) = when (tab) {
+        HomeNavItem.Contest -> stringResource(Res.string.home_contest_soon_title) to stringResource(Res.string.home_contest_soon_message)
+        HomeNavItem.Profile -> stringResource(Res.string.home_profile_soon_title) to stringResource(Res.string.home_profile_soon_message)
+        else -> stringResource(Res.string.home_dictionary_soon_title) to stringResource(Res.string.home_dictionary_soon_message)
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(TamyrTheme.colors.background)
+            .statusBarsPadding(),
+    ) {
+        ComingSoonState(title = title, message = message, modifier = Modifier.weight(1f))
+        HomeBottomBar(selected = tab, onItemClick = { item -> onEvent(HomeUiEvent.NavItemClicked(item)) })
     }
 }
 
@@ -152,7 +184,7 @@ private fun HomeLoaded(
                 onClick = { moduleId -> onEvent(HomeUiEvent.ModuleClicked(moduleId)) },
             )
         }
-        HomeBottomBar(onItemClick = { item -> onEvent(HomeUiEvent.NavItemClicked(item)) })
+        HomeBottomBar(selected = HomeNavItem.Home, onItemClick = { item -> onEvent(HomeUiEvent.NavItemClicked(item)) })
     }
 }
 
@@ -162,7 +194,6 @@ private fun homeToastData(toast: HomeToast): TamyrToastData = TamyrToastData(
         is HomeToast.ModuleLocked -> toast.hint ?: stringResource(Res.string.home_toast_module_locked)
         HomeToast.ModuleUnavailable -> stringResource(Res.string.home_toast_module_unavailable)
         HomeToast.AllModulesUnavailable -> stringResource(Res.string.home_toast_all_unavailable)
-        HomeToast.SectionUnavailable -> stringResource(Res.string.home_toast_section_unavailable)
     },
     kind = TamyrToastKind.Info,
 )
@@ -427,13 +458,13 @@ private fun ModuleChip(module: LearningModule) {
 }
 
 @Composable
-private fun HomeBottomBar(onItemClick: (HomeNavItem) -> Unit) {
+private fun HomeBottomBar(selected: HomeNavItem, onItemClick: (HomeNavItem) -> Unit) {
     TamyrBottomBar(
         items = listOf(
-            BottomBarItem(stringResource(Res.string.home_nav_home), selected = true, onClick = { onItemClick(HomeNavItem.Home) }) { HomeNavIcon(it) },
-            BottomBarItem(stringResource(Res.string.home_nav_dictionary), selected = false, onClick = { onItemClick(HomeNavItem.Dictionary) }) { BookNavIcon(it) },
-            BottomBarItem(stringResource(Res.string.home_nav_contest), selected = false, onClick = { onItemClick(HomeNavItem.Contest) }) { TrophyNavIcon(it) },
-            BottomBarItem(stringResource(Res.string.home_nav_profile), selected = false, onClick = { onItemClick(HomeNavItem.Profile) }) { PersonNavIcon(it) },
+            BottomBarItem(stringResource(Res.string.home_nav_home), selected = selected == HomeNavItem.Home, onClick = { onItemClick(HomeNavItem.Home) }) { HomeNavIcon(it) },
+            BottomBarItem(stringResource(Res.string.home_nav_dictionary), selected = selected == HomeNavItem.Dictionary, onClick = { onItemClick(HomeNavItem.Dictionary) }) { BookNavIcon(it) },
+            BottomBarItem(stringResource(Res.string.home_nav_contest), selected = selected == HomeNavItem.Contest, onClick = { onItemClick(HomeNavItem.Contest) }) { TrophyNavIcon(it) },
+            BottomBarItem(stringResource(Res.string.home_nav_profile), selected = selected == HomeNavItem.Profile, onClick = { onItemClick(HomeNavItem.Profile) }) { PersonNavIcon(it) },
         ),
     )
 }
@@ -486,14 +517,14 @@ private fun HomeLockedToastPreview() = HomePreview(
     ),
 )
 
-@Preview(name = "Section unavailable toast", group = PREVIEW_GROUP)
+@Preview(name = "Dictionary tab (coming soon)", group = PREVIEW_GROUP)
 @Composable
-private fun HomeSectionToastPreview() = HomePreview(
+private fun HomeComingSoonPreview() = HomePreview(
     HomeUiState(
         userName = "Алия",
         stats = UserStats(xp = 340, streak = 12),
         content = LoadState.Content(previewContent()),
-        toast = HomeToast.SectionUnavailable,
+        tab = HomeNavItem.Dictionary,
     ),
 )
 

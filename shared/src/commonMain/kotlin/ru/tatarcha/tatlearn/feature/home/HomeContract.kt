@@ -13,6 +13,8 @@ data class HomeUiState(
     val stats: UserStats = UserStats.Empty,
     val content: LoadState<HomeContent> = LoadState.Loading,
     val toast: HomeToast? = null,
+    /** Выбранная вкладка нижнего меню; всё, кроме [HomeNavItem.Home], пока заглушка. */
+    val tab: HomeNavItem = HomeNavItem.Home,
 ) : UiState
 
 sealed interface HomeUiEvent : UiEvent {
