@@ -8,6 +8,7 @@ import ru.tatarcha.tatlearn.feature.auth.AuthMode
 @Serializable data object OnboardingKey : NavKey
 @Serializable data class AuthKey(val mode: AuthMode = AuthMode.SignIn) : NavKey
 @Serializable data object HomeKey : NavKey
+@Serializable data class ModuleKey(val moduleId: String) : NavKey
 /** [stepIds] ограничивает урок этими шагами («повторить ошибки»); пусто — весь урок. */
 @Serializable data class LessonKey(val lessonId: String, val stepIds: List<String> = emptyList()) : NavKey
 

@@ -278,16 +278,13 @@ class ScreenViewModelsTest {
         assertEquals(HomeUiEffect.NavigateToLesson("lesson_3"), vm.effects.first())
     }
 
-    @Test fun lockedModuleClickShowsItsHint() = runTest {
-        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth())
-        vm.onEvent(HomeUiEvent.ModuleClicked("nature"))
-        assertEquals(HomeToast.ModuleLocked("Откроется после «Еды»"), vm.state.value.toast)
-    }
-
-    @Test fun openModuleClickShowsUnavailable() = runTest {
+    @Test fun moduleClickOpensItsScreenEvenWhenLocked() = runTest {
         val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth())
         vm.onEvent(HomeUiEvent.ModuleClicked("food"))
-        assertEquals(HomeToast.ModuleUnavailable, vm.state.value.toast)
+        assertEquals(HomeUiEffect.NavigateToModule("food"), vm.effects.first())
+        vm.onEvent(HomeUiEvent.ModuleClicked("nature"))
+        assertEquals(HomeUiEffect.NavigateToModule("nature"), vm.effects.first())
+        assertNull(vm.state.value.toast)
     }
 
     @Test fun finishedLessonMovesCurrentLessonAndUpdatesProgress() = runTest {

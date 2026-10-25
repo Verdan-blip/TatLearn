@@ -9,12 +9,14 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun HomeScene(
     onStartLesson: (lessonId: String) -> Unit,
+    onOpenModule: (moduleId: String) -> Unit,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     LaunchedEffect(viewModel) {
         viewModel.effects.collect { effect ->
             when (effect) {
                 is HomeUiEffect.NavigateToLesson -> onStartLesson(effect.lessonId)
+                is HomeUiEffect.NavigateToModule -> onOpenModule(effect.moduleId)
             }
         }
     }

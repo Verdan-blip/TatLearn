@@ -17,13 +17,10 @@ object HomeContentBuilder {
     /** Null, если каталог пуст: показывать на главной нечего. */
     fun build(modules: List<CourseModule>, progress: List<LessonProgress>): HomeContent? {
         if (modules.none { it.lessons.isNotEmpty() }) return null
-        val completed = progress.filter { it.status == LessonStatus.Completed }.map { it.lessonId }.toSet()
-        val byId = modules.associateBy { it.id }
-        fun isDone(module: CourseModule) = module.lessons.isNotEmpty() && module.lessons.all { it.id in completed }
+        val completed = completedIds(progress)
 
         val learning = modules.mapIndexed { index, module ->
-            val required = module.requires?.let(byId::get) ?: modules.getOrNull(index - 1)
-            val lockedBy = required?.takeIf { !isDone(it) }?.id
+            val lockedBy = requiredModule(modules, index)?.takeIf { !isDone(it, completed) }?.id
             val done = module.lessons.count { it.id in completed }
             LearningModule(
                 id = module.id,
@@ -53,6 +50,16 @@ object HomeContentBuilder {
             ),
         )
     }
+
+    internal fun completedIds(progress: List<LessonProgress>): Set<String> =
+        progress.filter { it.status == LessonStatus.Completed }.map { it.lessonId }.toSet()
+
+    internal fun isDone(module: CourseModule, completed: Set<String>): Boolean =
+        module.lessons.isNotEmpty() && module.lessons.all { it.id in completed }
+
+    /** Модуль, пройдя который открывается модуль [index]: `requires` или предыдущий в списке (у первого его нет). */
+    internal fun requiredModule(modules: List<CourseModule>, index: Int): CourseModule? =
+        modules[index].requires?.let { id -> modules.firstOrNull { it.id == id } } ?: modules.getOrNull(index - 1)
 
     private const val PERCENT = 100
 }

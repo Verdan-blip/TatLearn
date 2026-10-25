@@ -71,8 +71,6 @@ import tatlearn.shared.generated.resources.home_profile_soon_message
 import tatlearn.shared.generated.resources.home_profile_soon_title
 import tatlearn.shared.generated.resources.home_streak_days
 import tatlearn.shared.generated.resources.home_toast_all_unavailable
-import tatlearn.shared.generated.resources.home_toast_module_locked
-import tatlearn.shared.generated.resources.home_toast_module_unavailable
 
 private const val ICON_ALPHABET = "alphabet"
 private const val ICON_FOOD = "food"
@@ -191,8 +189,6 @@ private fun HomeLoaded(
 @Composable
 private fun homeToastData(toast: HomeToast): TamyrToastData = TamyrToastData(
     text = when (toast) {
-        is HomeToast.ModuleLocked -> toast.hint ?: stringResource(Res.string.home_toast_module_locked)
-        HomeToast.ModuleUnavailable -> stringResource(Res.string.home_toast_module_unavailable)
         HomeToast.AllModulesUnavailable -> stringResource(Res.string.home_toast_all_unavailable)
     },
     kind = TamyrToastKind.Info,
@@ -506,14 +502,14 @@ private fun HomeContentPreview() = HomePreview(
     HomeUiState("Алия", UserStats(xp = 340, streak = 12), LoadState.Content(previewContent())),
 )
 
-@Preview(name = "Locked module toast", group = PREVIEW_GROUP)
+@Preview(name = "Stub toast", group = PREVIEW_GROUP)
 @Composable
-private fun HomeLockedToastPreview() = HomePreview(
+private fun HomeStubToastPreview() = HomePreview(
     HomeUiState(
         userName = "Алия",
         stats = UserStats(xp = 340, streak = 12),
         content = LoadState.Content(previewContent()),
-        toast = HomeToast.ModuleLocked("Откроется после «Еды»"),
+        toast = HomeToast.AllModulesUnavailable,
     ),
 )
 

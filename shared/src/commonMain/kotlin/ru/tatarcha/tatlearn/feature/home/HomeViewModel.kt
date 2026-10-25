@@ -48,18 +48,12 @@ class HomeViewModel(
                     sendEffect(HomeUiEffect.NavigateToLesson(content.data.currentLesson.lesson.id))
                 }
             }
-            // TODO(design): экранов модуля и списка модулей нет, пока показываем заглушку; вкладки словаря, соревнований и профиля — заглушка-экран 16.
-            is HomeUiEvent.ModuleClicked -> onModuleClicked(event.moduleId)
+            // TODO(design): списка модулей («Все») нет, пока показываем заглушку; вкладки словаря, соревнований и профиля — заглушка-экран 16.
+            is HomeUiEvent.ModuleClicked -> sendEffect(HomeUiEffect.NavigateToModule(event.moduleId))
             HomeUiEvent.AllModulesClicked -> showToast(HomeToast.AllModulesUnavailable)
             is HomeUiEvent.NavItemClicked -> setState { copy(tab = event.item, toast = null) }
             HomeUiEvent.ToastDismissed -> hideToast()
         }
-    }
-
-    private fun onModuleClicked(moduleId: String) {
-        val content = state.value.content as? LoadState.Content ?: return
-        val module = content.data.modules.firstOrNull { it.id == moduleId } ?: return
-        showToast(if (module.isLocked) HomeToast.ModuleLocked(module.lockHint) else HomeToast.ModuleUnavailable)
     }
 
     private fun showToast(toast: HomeToast) {

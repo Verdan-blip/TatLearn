@@ -28,4 +28,5 @@ sealed interface HomeUiEvent : UiEvent {
 
 sealed interface HomeUiEffect : UiEffect {
     data class NavigateToLesson(val lessonId: String) : HomeUiEffect
+    data class NavigateToModule(val moduleId: String) : HomeUiEffect
 }

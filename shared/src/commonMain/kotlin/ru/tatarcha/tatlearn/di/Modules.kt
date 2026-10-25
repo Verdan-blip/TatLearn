@@ -38,7 +38,9 @@ import ru.tatarcha.tatlearn.feature.result.ResultViewModel
 import ru.tatarcha.tatlearn.core.audio.StubbingAudioPlayer
 import ru.tatarcha.tatlearn.core.audio.createPlatformAudioPlayer
 import ru.tatarcha.tatlearn.feature.lesson.LessonViewModel
+import ru.tatarcha.tatlearn.feature.module.ModuleViewModel
 import ru.tatarcha.tatlearn.navigation.LessonKey
+import ru.tatarcha.tatlearn.navigation.ModuleKey
 import ru.tatarcha.tatlearn.navigation.ResultKey
 import ru.tatarcha.tatlearn.navigation.StartDestinationResolver
 import ru.tatarcha.tatlearn.feature.showcase.ShowcaseViewModel
@@ -48,6 +50,7 @@ val presentationModule = module {
     viewModelOf(::OnboardingViewModel)
     viewModel { (mode: AuthMode) -> AuthViewModel(mode, get()) }
     viewModelOf(::HomeViewModel)
+    viewModel { (key: ModuleKey) -> ModuleViewModel(key.moduleId, get(), get()) }
     viewModel { (key: ResultKey) -> ResultViewModel(key, get(), get()) }
     viewModel { (key: LessonKey) -> LessonViewModel(key, get(), get(), StubbingAudioPlayer(createPlatformAudioPlayer()), get()) }
     viewModelOf(::ShowcaseViewModel)

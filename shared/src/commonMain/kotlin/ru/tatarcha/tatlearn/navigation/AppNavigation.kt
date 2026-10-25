@@ -30,6 +30,7 @@ import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import ru.tatarcha.tatlearn.feature.auth.AuthScene
 import ru.tatarcha.tatlearn.feature.home.HomeScene
 import ru.tatarcha.tatlearn.feature.lesson.LessonRoute
+import ru.tatarcha.tatlearn.feature.module.ModuleScene
 import ru.tatarcha.tatlearn.feature.onboarding.OnboardingScene
 import ru.tatarcha.tatlearn.feature.result.ResultScene
 import ru.tatarcha.tatlearn.feature.showcase.ShowcaseScreen
@@ -44,6 +45,7 @@ private val navSavedStateConfig = SavedStateConfiguration {
             subclass(OnboardingKey::class)
             subclass(AuthKey::class)
             subclass(HomeKey::class)
+            subclass(ModuleKey::class)
             subclass(LessonKey::class)
             subclass(ResultKey::class)
             subclass(ShowcaseKey::class)
@@ -86,7 +88,18 @@ fun AppNavigation(showDebugTools: Boolean = false) {
                     )
                 }
                 entry<HomeKey> {
-                    HomeScene(onStartLesson = { lessonId -> backStack.add(LessonKey(lessonId)) })
+                    HomeScene(
+                        onStartLesson = { lessonId -> backStack.add(LessonKey(lessonId)) },
+                        onOpenModule = { moduleId -> backStack.add(ModuleKey(moduleId)) },
+                    )
+                }
+                entry<ModuleKey> { key ->
+                    ModuleScene(
+                        key = key,
+                        onBack = ::pop,
+                        onStartLesson = { lessonId -> backStack.add(LessonKey(lessonId)) },
+                        onOpenModule = { moduleId -> backStack.add(ModuleKey(moduleId)) },
+                    )
                 }
                 entry<LessonKey> { key ->
                     LessonRoute(
