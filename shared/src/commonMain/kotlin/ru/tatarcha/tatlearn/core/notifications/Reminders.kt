@@ -41,6 +41,19 @@ class Reminders(
         platform.cancel()
     }
 
+    /** Отладка: разрешение и тестовое уведомление с настоящим текстом; false, если разрешения нет. */
+    suspend fun sendTest(): Boolean {
+        if (!platform.requestPermission()) return false
+        platform.showNow(texts())
+        return true
+    }
+
+    /** Отладка: выключает напоминание и снова позволяет показать предложение после урока. */
+    fun resetOffer() {
+        disable()
+        settings.promptShown = false
+    }
+
     /** Запуск приложения: пересоздаёт расписание (подхватывает смену языка и сбои после обновления системы). */
     suspend fun restore() {
         if (settings.enabled.value) platform.schedule(settings.hour.value, texts())

@@ -1,10 +1,12 @@
 package ru.tatarcha.tatlearn.feature.result
 
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.tatarcha.tatlearn.core.common.MviViewModel
+import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
 import ru.tatarcha.tatlearn.core.haptics.Haptics
 import ru.tatarcha.tatlearn.core.notifications.Reminders
 import ru.tatarcha.tatlearn.domain.exercise.PassRules
@@ -38,9 +40,13 @@ class ResultViewModel(
         // Праздничный отклик один раз при показе пройденного урока; «не засчитан» без вибро (тон «хорошая попытка»).
         if (state.value.passed) haptics.celebrate()
         // Предложение напоминаний только один раз и только после засчитанного урока: к этому моменту у человека уже есть польза.
+        // Шторка выезжает уже на показанном экране, а не вместе с переходом на него. Если человек успел уйти, предложение не тратится.
         if (state.value.passed && reminders.shouldOfferPrompt) {
-            reminders.markPromptShown()
-            setState { copy(reminderPrompt = ReminderPrompt(hour = reminders.hour.value)) }
+            viewModelScope.launch {
+                delay(TamyrMotion.REMINDER_PROMPT_DELAY_MS)
+                reminders.markPromptShown()
+                setState { copy(reminderPrompt = ReminderPrompt(hour = reminders.hour.value)) }
+            }
         }
         progress.observeStats().onEach { stats -> setState { copy(streak = stats.streak) } }.launchIn(viewModelScope)
     }

@@ -20,6 +20,9 @@
     <string name="showcase_section_haptics">Вибро (проверка на устройстве; учитывает «Вибро-отклик» в профиле)</string>
     <string name="showcase_haptic_correct">Вибро: верный ответ</string>
     <string name="showcase_haptic_wrong">Вибро: неверный ответ</string>
+    <string name="showcase_section_reminders">Напоминание (проверка на устройстве)</string>
+    <string name="showcase_reminder_send">Показать тестовое уведомление (на iOS через 5 с, сверните приложение)</string>
+    <string name="showcase_reminder_reset">Сбросить предложение напоминаний и выключить</string>
     <string name="showcase_haptic_celebrate">Вибро: урок пройден</string>
     <string name="showcase_section_actions">Действия (отладка)</string>
     <string name="showcase_action_reset_lessons">Сбросить прогресс уроков</string>

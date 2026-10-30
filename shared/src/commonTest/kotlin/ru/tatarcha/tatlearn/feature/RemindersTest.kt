@@ -4,9 +4,12 @@ import com.russhwolf.settings.MapSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
 import ru.tatarcha.tatlearn.core.notifications.Reminders
 import ru.tatarcha.tatlearn.data.local.HapticsSettings
 import ru.tatarcha.tatlearn.data.local.ReminderSettings
@@ -80,25 +83,44 @@ class RemindersTest {
     @Test fun passedLessonOffersRemindersOnlyOnce() = runTest {
         val settings = ReminderSettings(MapSettings())
         val first = result(passedKey, testReminders(settings = settings))
+        advanceUntilIdle()
         assertEquals(ReminderPrompt(hour = ReminderSettings.DEFAULT_HOUR), first.state.value.reminderPrompt)
-        assertNull(result(passedKey, testReminders(settings = settings)).state.value.reminderPrompt)
+        val second = result(passedKey, testReminders(settings = settings))
+        advanceUntilIdle()
+        assertNull(second.state.value.reminderPrompt)
+    }
+
+    @Test fun offerAppearsOnlyAfterScreenHasBeenShown() = runTest {
+        val vm = result(passedKey, testReminders())
+        assertNull(vm.state.value.reminderPrompt)
+        advanceTimeBy(TamyrMotion.REMINDER_PROMPT_DELAY_MS - 1)
+        assertNull(vm.state.value.reminderPrompt)
+        advanceTimeBy(2)
+        assertNotNull(vm.state.value.reminderPrompt)
     }
 
     @Test fun failedLessonDoesNotUseUpTheOffer() = runTest {
         val settings = ReminderSettings(MapSettings())
-        assertNull(result(failedKey, testReminders(settings = settings)).state.value.reminderPrompt)
-        assertNotNull(result(passedKey, testReminders(settings = settings)).state.value.reminderPrompt)
+        val failed = result(failedKey, testReminders(settings = settings))
+        advanceUntilIdle()
+        assertNull(failed.state.value.reminderPrompt)
+        val passed = result(passedKey, testReminders(settings = settings))
+        advanceUntilIdle()
+        assertNotNull(passed.state.value.reminderPrompt)
     }
 
     @Test fun alreadyEnabledRemindersAreNotOffered() = runTest {
         val reminders = testReminders()
         reminders.enable(8)
-        assertNull(result(passedKey, reminders).state.value.reminderPrompt)
+        val vm = result(passedKey, reminders)
+        advanceUntilIdle()
+        assertNull(vm.state.value.reminderPrompt)
     }
 
     @Test fun resultPromptEnablesChosenHour() = runTest {
         val platform = FakePlatformReminders()
         val vm = result(passedKey, testReminders(platform))
+        advanceUntilIdle()
         vm.onEvent(ResultUiEvent.ReminderHourSelected(21))
         assertEquals(21, vm.state.value.reminderPrompt?.hour)
         vm.onEvent(ResultUiEvent.ReminderEnableClicked)
@@ -110,10 +132,29 @@ class RemindersTest {
         val platform = FakePlatformReminders()
         val reminders = testReminders(platform)
         val vm = result(passedKey, reminders)
+        advanceUntilIdle()
         vm.onEvent(ResultUiEvent.ReminderLaterClicked)
         assertNull(vm.state.value.reminderPrompt)
         assertFalse(reminders.enabled.value)
         assertTrue(platform.scheduledHours.isEmpty())
+    }
+
+    @Test fun debugTestNotificationNeedsPermission() = runTest {
+        val denied = FakePlatformReminders(granted = false)
+        assertFalse(testReminders(denied).sendTest())
+        assertEquals(0, denied.shownNow)
+        val granted = FakePlatformReminders()
+        assertTrue(testReminders(granted).sendTest())
+        assertEquals(1, granted.shownNow)
+    }
+
+    @Test fun resetOfferDisablesAndAllowsOfferAgain() = runTest {
+        val reminders = testReminders()
+        reminders.enable(8)
+        reminders.markPromptShown()
+        reminders.resetOffer()
+        assertFalse(reminders.enabled.value)
+        assertTrue(reminders.shouldOfferPrompt)
     }
 
     private fun profile(reminders: Reminders) =

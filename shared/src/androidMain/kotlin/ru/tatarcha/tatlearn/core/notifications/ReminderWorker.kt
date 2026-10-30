@@ -21,36 +21,34 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
             channelName = inputData.getString(KEY_CHANNEL).orEmpty(),
         )
         if (hour < 0) return Result.failure()
-        show(texts)
+        showReminderNotification(applicationContext, texts)
         enqueueReminder(applicationContext, hour, texts)
         return Result.success()
     }
+}
 
-    private fun show(texts: ReminderTexts) {
-        val manager = NotificationManagerCompat.from(applicationContext)
-        if (!manager.areNotificationsEnabled()) return
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            manager.createNotificationChannel(
-                NotificationChannel(CHANNEL_ID, texts.channelName, NotificationManager.IMPORTANCE_DEFAULT),
-            )
-        }
-        val launch = applicationContext.packageManager.getLaunchIntentForPackage(applicationContext.packageName)
-        val tap = launch?.let { PendingIntent.getActivity(applicationContext, 0, it, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT) }
-        // TODO(design): маленькая иконка уведомления сейчас иконка приложения; нужна одноцветная.
-        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-            .setSmallIcon(applicationContext.applicationInfo.icon)
-            .setContentTitle(texts.title)
-            .setContentText(texts.body)
-            .setContentIntent(tap)
-            .setAutoCancel(true)
-            .build()
-        // Разрешение проверено выше через areNotificationsEnabled.
-        @Suppress("MissingPermission")
-        manager.notify(NOTIFICATION_ID, notification)
-    }
+private const val CHANNEL_ID = "lesson_reminder"
+private const val NOTIFICATION_ID = 1
 
-    private companion object {
-        const val CHANNEL_ID = "lesson_reminder"
-        const val NOTIFICATION_ID = 1
+internal fun showReminderNotification(context: Context, texts: ReminderTexts) {
+    val manager = NotificationManagerCompat.from(context)
+    if (!manager.areNotificationsEnabled()) return
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        manager.createNotificationChannel(
+            NotificationChannel(CHANNEL_ID, texts.channelName, NotificationManager.IMPORTANCE_DEFAULT),
+        )
     }
+    val launch = context.packageManager.getLaunchIntentForPackage(context.packageName)
+    val tap = launch?.let { PendingIntent.getActivity(context, 0, it, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT) }
+    // TODO(design): маленькая иконка уведомления сейчас иконка приложения; нужна одноцветная.
+    val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+        .setSmallIcon(context.applicationInfo.icon)
+        .setContentTitle(texts.title)
+        .setContentText(texts.body)
+        .setContentIntent(tap)
+        .setAutoCancel(true)
+        .build()
+    // Разрешение проверено выше через areNotificationsEnabled.
+    @Suppress("MissingPermission")
+    manager.notify(NOTIFICATION_ID, notification)
 }

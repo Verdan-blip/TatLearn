@@ -34,6 +34,8 @@ class AndroidReminders(private val context: Context) : PlatformReminders {
     override fun cancel() {
         WorkManager.getInstance(context).cancelUniqueWork(REMINDER_WORK_NAME)
     }
+
+    override fun showNow(texts: ReminderTexts) = showReminderNotification(context, texts)
 }
 
 internal const val REMINDER_WORK_NAME = "daily_reminder"

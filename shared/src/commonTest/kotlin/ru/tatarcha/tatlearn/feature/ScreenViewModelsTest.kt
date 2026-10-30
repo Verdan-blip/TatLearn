@@ -434,7 +434,7 @@ class ScreenViewModelsTest {
 
     @Test fun showcasePlaysRequestedHaptics() = runTest {
         val haptics = RecordingHaptics()
-        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeBackendConfig(), FakeAuth(), OnboardingStorage(MapSettings()), FakeProfile(), haptics)
+        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeBackendConfig(), FakeAuth(), OnboardingStorage(MapSettings()), FakeProfile(), haptics, testReminders())
         vm.onEvent(ShowcaseUiEvent.PlayHaptic(HapticKind.Wrong))
         vm.onEvent(ShowcaseUiEvent.PlayHaptic(HapticKind.Correct))
         vm.onEvent(ShowcaseUiEvent.PlayHaptic(HapticKind.Celebrate))
@@ -445,7 +445,7 @@ class ScreenViewModelsTest {
 
     @Test fun debugActionsNeedConfirmationAndResetOnlyWhatTheyName() = runTest {
         val progress = StatsProgress()
-        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), progress, FakeBackendConfig(), FakeAuth(), OnboardingStorage(MapSettings()), FakeProfile(), RecordingHaptics())
+        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), progress, FakeBackendConfig(), FakeAuth(), OnboardingStorage(MapSettings()), FakeProfile(), RecordingHaptics(), testReminders())
         vm.onEvent(ShowcaseUiEvent.ActionRequested(DebugAction.ResetLessons))
         assertEquals(DebugAction.ResetLessons, vm.state.value.pendingAction)
         assertEquals(0, progress.lessonResets)
@@ -465,7 +465,7 @@ class ScreenViewModelsTest {
     @Test fun signOutAndOnboardingResetClearSessionAndNavigate() = runTest {
         val auth = FakeAuth(UserSession("Алия", "a@b.ru"))
         val onboarding = OnboardingStorage(MapSettings()).apply { markSeen() }
-        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeBackendConfig(), auth, onboarding, FakeProfile(), RecordingHaptics())
+        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeBackendConfig(), auth, onboarding, FakeProfile(), RecordingHaptics(), testReminders())
         vm.onEvent(ShowcaseUiEvent.ActionRequested(DebugAction.SignOut))
         vm.onEvent(ShowcaseUiEvent.ActionConfirmed)
         assertNull(auth.session.value)

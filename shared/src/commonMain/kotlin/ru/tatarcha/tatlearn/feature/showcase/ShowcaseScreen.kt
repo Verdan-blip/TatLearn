@@ -7,7 +7,10 @@ import tatlearn.shared.generated.resources.showcase_haptic_celebrate
 import tatlearn.shared.generated.resources.showcase_haptic_correct
 import tatlearn.shared.generated.resources.showcase_haptic_wrong
 import tatlearn.shared.generated.resources.showcase_section_actions
+import tatlearn.shared.generated.resources.showcase_reminder_reset
+import tatlearn.shared.generated.resources.showcase_reminder_send
 import tatlearn.shared.generated.resources.showcase_section_haptics
+import tatlearn.shared.generated.resources.showcase_section_reminders
 import tatlearn.shared.generated.resources.showcase_confirm_yes
 import tatlearn.shared.generated.resources.showcase_confirm_title
 import tatlearn.shared.generated.resources.showcase_confirm_sign_out
@@ -150,6 +153,10 @@ fun ShowcaseScreen(
                 TamyrButton(stringResource(Res.string.showcase_haptic_correct), { viewModel.onEvent(ShowcaseUiEvent.PlayHaptic(HapticKind.Correct)) }, style = TamyrButtonStyle.Secondary)
                 TamyrButton(stringResource(Res.string.showcase_haptic_wrong), { viewModel.onEvent(ShowcaseUiEvent.PlayHaptic(HapticKind.Wrong)) }, style = TamyrButtonStyle.Secondary)
                 TamyrButton(stringResource(Res.string.showcase_haptic_celebrate), { viewModel.onEvent(ShowcaseUiEvent.PlayHaptic(HapticKind.Celebrate)) }, style = TamyrButtonStyle.Secondary)
+            }
+            Section(Res.string.showcase_section_reminders) {
+                TamyrButton(stringResource(Res.string.showcase_reminder_send), { viewModel.onEvent(ShowcaseUiEvent.SendTestReminder) }, style = TamyrButtonStyle.Secondary)
+                TamyrButton(stringResource(Res.string.showcase_reminder_reset), { viewModel.onEvent(ShowcaseUiEvent.ResetReminderOffer) }, style = TamyrButtonStyle.SecondaryAccent)
             }
             Section(Res.string.showcase_section_actions) {
                 TamyrButton(stringResource(Res.string.showcase_action_reset_lessons), { viewModel.onEvent(ShowcaseUiEvent.ActionRequested(DebugAction.ResetLessons)) }, style = TamyrButtonStyle.SecondaryAccent)

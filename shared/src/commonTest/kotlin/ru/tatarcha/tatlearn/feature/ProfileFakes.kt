@@ -64,6 +64,8 @@ internal class FakePlatformReminders(var granted: Boolean = true) : PlatformRemi
     override suspend fun requestPermission() = granted
     override fun schedule(hour: Int, texts: ReminderTexts) { scheduledHours += hour }
     override fun cancel() { cancels++ }
+    var shownNow = 0
+    override fun showNow(texts: ReminderTexts) { shownNow++ }
 }
 
 internal fun testReminders(

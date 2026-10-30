@@ -11,6 +11,7 @@ import ru.tatarcha.tatlearn.core.common.UiEvent
 import ru.tatarcha.tatlearn.core.common.UiState
 import ru.tatarcha.tatlearn.core.common.errorCode
 import ru.tatarcha.tatlearn.core.haptics.Haptics
+import ru.tatarcha.tatlearn.core.notifications.Reminders
 import ru.tatarcha.tatlearn.data.fake.FakeBackendConfig
 import ru.tatarcha.tatlearn.domain.model.ExerciseResult
 import ru.tatarcha.tatlearn.domain.model.ExerciseType
@@ -42,6 +43,8 @@ sealed interface ShowcaseUiEvent : UiEvent {
     data object ToggleSimulateErrors : ShowcaseUiEvent
     data object RecordResult : ShowcaseUiEvent
     data class PlayHaptic(val kind: HapticKind) : ShowcaseUiEvent
+    data object SendTestReminder : ShowcaseUiEvent
+    data object ResetReminderOffer : ShowcaseUiEvent
     data class ActionRequested(val action: DebugAction) : ShowcaseUiEvent
     data object ActionConfirmed : ShowcaseUiEvent
     data object ActionCancelled : ShowcaseUiEvent
@@ -63,6 +66,7 @@ class ShowcaseViewModel(
     private val onboarding: OnboardingStorage,
     private val profile: ProfileRepository,
     private val haptics: Haptics,
+    private val reminders: Reminders,
 ) : MviViewModel<ShowcaseUiState, ShowcaseUiEvent, ShowcaseUiEffect>(ShowcaseUiState()) {
 
     init {
@@ -89,6 +93,8 @@ class ShowcaseViewModel(
                 HapticKind.Wrong -> haptics.wrong()
                 HapticKind.Celebrate -> haptics.celebrate()
             }
+            ShowcaseUiEvent.SendTestReminder -> viewModelScope.launch { reminders.sendTest() }
+            ShowcaseUiEvent.ResetReminderOffer -> reminders.resetOffer()
             is ShowcaseUiEvent.ActionRequested -> setState { copy(pendingAction = event.action) }
             ShowcaseUiEvent.ActionCancelled -> setState { copy(pendingAction = null) }
             ShowcaseUiEvent.ActionConfirmed -> confirmAction()

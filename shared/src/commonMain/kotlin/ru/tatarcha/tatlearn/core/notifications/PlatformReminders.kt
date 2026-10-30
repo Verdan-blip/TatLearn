@@ -12,6 +12,9 @@ interface PlatformReminders {
     fun schedule(hour: Int, texts: ReminderTexts)
 
     fun cancel()
+
+    /** Отладка: показать уведомление прямо сейчас (на iOS через несколько секунд: на переднем плане iOS его не показывает). */
+    fun showNow(texts: ReminderTexts)
 }
 
 /** [channelName] нужен только Android (название канала уведомлений в системных настройках). */

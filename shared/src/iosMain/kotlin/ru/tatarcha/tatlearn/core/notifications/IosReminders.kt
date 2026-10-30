@@ -7,6 +7,7 @@ import platform.UserNotifications.UNCalendarNotificationTrigger
 import platform.UserNotifications.UNMutableNotificationContent
 import platform.UserNotifications.UNNotificationRequest
 import platform.UserNotifications.UNNotificationSound
+import platform.UserNotifications.UNTimeIntervalNotificationTrigger
 import platform.UserNotifications.UNUserNotificationCenter
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -27,25 +28,33 @@ class IosReminders : PlatformReminders {
     }
 
     override fun schedule(hour: Int, texts: ReminderTexts) {
-        val content = UNMutableNotificationContent().apply {
-            setTitle(texts.title)
-            setBody(texts.body)
-            setSound(UNNotificationSound.defaultSound)
-        }
         val time = NSDateComponents().apply {
             setHour(hour.toLong())
             setMinute(0)
         }
         val trigger = UNCalendarNotificationTrigger.triggerWithDateMatchingComponents(time, repeats = true)
         // Тот же идентификатор заменяет прежнее расписание.
-        center.addNotificationRequest(UNNotificationRequest.requestWithIdentifier(REQUEST_ID, content, trigger), withCompletionHandler = null)
+        center.addNotificationRequest(UNNotificationRequest.requestWithIdentifier(REQUEST_ID, content(texts), trigger), withCompletionHandler = null)
+    }
+
+    override fun showNow(texts: ReminderTexts) {
+        val trigger = UNTimeIntervalNotificationTrigger.triggerWithTimeInterval(DEBUG_DELAY_SECONDS, repeats = false)
+        center.addNotificationRequest(UNNotificationRequest.requestWithIdentifier(DEBUG_REQUEST_ID, content(texts), trigger), withCompletionHandler = null)
     }
 
     override fun cancel() {
         center.removePendingNotificationRequestsWithIdentifiers(listOf(REQUEST_ID))
     }
 
+    private fun content(texts: ReminderTexts) = UNMutableNotificationContent().apply {
+        setTitle(texts.title)
+        setBody(texts.body)
+        setSound(UNNotificationSound.defaultSound)
+    }
+
     private companion object {
         const val REQUEST_ID = "daily_reminder"
+        const val DEBUG_REQUEST_ID = "debug_reminder"
+        const val DEBUG_DELAY_SECONDS = 5.0
     }
 }
