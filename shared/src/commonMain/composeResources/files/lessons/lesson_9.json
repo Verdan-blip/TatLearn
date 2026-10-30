@@ -44,7 +44,8 @@
         "хорошо"
       ],
       "correctIndex": 2,
-      "isNewWord": true
+      "isNewWord": true,
+      "audioUrl": "audio/rahmat.m4a"
     },
     {
       "word": "Хәлләрегез ничек?",
@@ -64,7 +65,8 @@
         "привет",
         "до свидания"
       ],
-      "correctIndex": 3
+      "correctIndex": 3,
+      "audioUrl": "audio/sau_bulygyz.m4a"
     },
     {
       "word": "Минем исемем Ренат",
@@ -79,7 +81,7 @@
   ],
   "listening": [
     {
-      "audioUrl": null,
+      "audioUrl": "audio/isenmesez.m4a",
       "options": [
         "Рәхмәт",
         "Исәнмесез",
@@ -89,7 +91,7 @@
       "explanation": "Рәхмәт — спасибо · Исәнмесез — здравствуйте · Яхшы — хорошо"
     },
     {
-      "audioUrl": null,
+      "audioUrl": "audio/sau_bulygyz.m4a",
       "options": [
         "Исәнме",
         "Яхшы",
