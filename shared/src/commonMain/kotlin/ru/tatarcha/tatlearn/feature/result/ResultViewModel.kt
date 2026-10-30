@@ -48,7 +48,7 @@ class ResultViewModel(
                 setState { copy(reminderPrompt = ReminderPrompt(hour = reminders.hour.value)) }
             }
         }
-        progress.observeStats().onEach { stats -> setState { copy(streak = stats.streak) } }.launchIn(viewModelScope)
+        progress.observeStats().onEach { stats -> setState { copy(streak = stats.streak, stats = stats) } }.launchIn(viewModelScope)
     }
 
     override fun onEvent(event: ResultUiEvent) {

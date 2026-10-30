@@ -4,7 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import ru.tatarcha.tatlearn.core.common.ReduceMotion
 import org.koin.core.parameter.parametersOf
 import ru.tatarcha.tatlearn.navigation.ResultKey
 
@@ -24,8 +27,10 @@ fun ResultScene(
         }
     }
     val state by viewModel.state.collectAsState()
+    val reduceMotion = koinInject<ReduceMotion>()
     ResultContent(
         state = state,
         onEvent = viewModel::onEvent,
+        reduceMotion = remember { reduceMotion.isEnabled() },
     )
 }

@@ -3,6 +3,7 @@ package ru.tatarcha.tatlearn.feature.result
 import ru.tatarcha.tatlearn.core.common.UiEffect
 import ru.tatarcha.tatlearn.core.common.UiEvent
 import ru.tatarcha.tatlearn.core.common.UiState
+import ru.tatarcha.tatlearn.domain.model.UserStats
 
 data class ResultUiState(
     val userName: String,
@@ -19,6 +20,8 @@ data class ResultUiState(
     val isMistakesRun: Boolean = false,
     /** Текущая серия из базы прогресса; 0 скрывает карточку серии. */
     val streak: Int = 0,
+    /** XP и уровень после урока из базы; null, пока не загружены (строка уровня скрыта). */
+    val stats: UserStats? = null,
     /** Показывать ли «Стрик продлён»: серию продлили именно этим уроком. */
     val streakExtended: Boolean = false,
     /** Не null, пока показано окно с предложением включить напоминания (после первого пройденного урока). */

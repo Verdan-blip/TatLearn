@@ -375,6 +375,7 @@ class ScreenViewModelsTest {
         assertEquals(75, state.accuracyPercent)
         assertEquals(2, state.mistakes)
         assertEquals(4, state.streak)
+        assertEquals(UserStats(50, 4), state.stats)
     }
 
     @Test fun resultBelowThresholdIsNotPassed() = runTest {

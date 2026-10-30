@@ -93,4 +93,7 @@ object TamyrMotion {
     const val GAIN_CHIP_OUT_MS = 300
     /** При «уменьшить анимацию» итог показывается сразу, а подсветка просто держится это время. */
     const val GAIN_REDUCED_HOLD_MS = 1_000
+    /** XP на экране результата набегают от нуля до итога после короткой паузы. */
+    const val XP_COUNT_DELAY_MS = 200
+    const val XP_COUNT_MS = 800
 }

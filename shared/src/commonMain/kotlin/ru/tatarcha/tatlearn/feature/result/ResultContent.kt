@@ -3,18 +3,25 @@ package ru.tatarcha.tatlearn.feature.result
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,7 +49,10 @@ import ru.tatarcha.tatlearn.core.notifications.Reminders
 import ru.tatarcha.tatlearn.core.notifications.reminderHourLabels
 import ru.tatarcha.tatlearn.data.local.ReminderSettings
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
+import ru.tatarcha.tatlearn.core.designsystem.component.TamyrProgressBar
 import ru.tatarcha.tatlearn.domain.exercise.XpRules
+import ru.tatarcha.tatlearn.domain.model.UserStats
+import ru.tatarcha.tatlearn.domain.xpAnimationFrame
 import tatlearn.shared.generated.resources.Res
 import tatlearn.shared.generated.resources.result_accuracy
 import tatlearn.shared.generated.resources.result_accuracy_value
@@ -64,7 +74,10 @@ import tatlearn.shared.generated.resources.result_time
 import tatlearn.shared.generated.resources.result_time_value
 import tatlearn.shared.generated.resources.result_title
 import tatlearn.shared.generated.resources.result_xp
+import tatlearn.shared.generated.resources.result_xp_description
 import tatlearn.shared.generated.resources.result_xp_value
+import tatlearn.shared.generated.resources.result_failed_caption
+import tatlearn.shared.generated.resources.home_level_xp
 import tatlearn.shared.generated.resources.reminder_sheet_enable
 import tatlearn.shared.generated.resources.reminder_sheet_later
 import tatlearn.shared.generated.resources.reminder_sheet_message
@@ -78,10 +91,13 @@ private const val PERCENT = 100f
 fun ResultContent(
     state: ResultUiState,
     onEvent: (ResultUiEvent) -> Unit,
+    /** Включена системная настройка «уменьшить анимацию»: XP показываются сразу итогом. */
+    reduceMotion: Boolean = false,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         ResultBody(
             state = state,
+            reduceMotion = reduceMotion,
             onEvent = onEvent,
         )
         ReminderSheet(
@@ -121,9 +137,11 @@ private fun ReminderSheet(
 @Composable
 private fun ResultBody(
     state: ResultUiState,
+    reduceMotion: Boolean,
     onEvent: (ResultUiEvent) -> Unit,
 ) {
     val name = state.userName.ifBlank { stringResource(Res.string.result_fallback_name) }
+    val xpProgress by rememberXpCountProgress(reduceMotion)
 
     Column(
         modifier = Modifier
@@ -131,18 +149,22 @@ private fun ResultBody(
             .background(TamyrTheme.colors.background)
             .safeDrawingPadding(),
     ) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(horizontal = TamyrTheme.spacing.screen),
-            verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.xl, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            if (state.passed) {
-                PassedSummary(state = state, name = name)
-            } else {
-                FailedSummary(state = state, name = name)
+        // Содержимое по центру; на маленьких экранах, где оно не помещается, прокручивается.
+        BoxWithConstraints(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = maxHeight)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = TamyrTheme.spacing.screen),
+                verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.xl, Alignment.CenterVertically),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                if (state.passed) {
+                    PassedSummary(state = state, name = name, xpProgress = xpProgress)
+                } else {
+                    FailedSummary(state = state, name = name, xpProgress = xpProgress)
+                }
             }
         }
         Column(
@@ -185,7 +207,9 @@ private fun ResultBody(
 private fun PassedSummary(
     state: ResultUiState,
     name: String,
+    xpProgress: Float,
 ) {
+    val xpDescription = stringResource(Res.string.result_xp_description, state.xpEarned)
     TamyrMascot(
         pose = MascotPose.Cheer,
         size = TamyrSizes.resultMascot,
@@ -213,9 +237,11 @@ private fun PassedSummary(
     ) {
         StatTile(
             label = stringResource(Res.string.result_xp),
-            value = stringResource(Res.string.result_xp_value, state.xpEarned),
+            value = stringResource(Res.string.result_xp_value, (state.xpEarned * xpProgress).roundToInt()),
             tint = TamyrTheme.colors.goldText,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .semantics(mergeDescendants = true) { contentDescription = xpDescription },
         )
         StatTile(
             label = stringResource(Res.string.result_accuracy),
@@ -228,6 +254,13 @@ private fun PassedSummary(
             value = stringResource(Res.string.result_time_value, formatDuration(state.durationSeconds)),
             tint = TamyrTheme.colors.textPrimary,
             modifier = Modifier.weight(1f),
+        )
+    }
+    state.stats?.let { stats ->
+        LevelCard(
+            stats = stats,
+            xpEarned = state.xpEarned,
+            progress = xpProgress,
         )
     }
     if (state.streak > 0 && state.streakExtended) {
@@ -265,7 +298,9 @@ private fun PassedSummary(
 private fun FailedSummary(
     state: ResultUiState,
     name: String,
+    xpProgress: Float,
 ) {
+    val shownXp = (state.xpEarned * xpProgress).roundToInt()
     TamyrMascot(
         pose = MascotPose.Tired,
         size = TamyrSizes.resultMascotCompact,
@@ -290,14 +325,52 @@ private fun FailedSummary(
     ThresholdCard(state = state)
     Text(
         text = if (state.streak > 0) {
-            stringResource(Res.string.result_failed_reward_streak, state.xpEarned, state.streak)
+            stringResource(Res.string.result_failed_reward_streak, shownXp, state.streak)
         } else {
-            stringResource(Res.string.result_failed_reward, state.xpEarned)
+            stringResource(Res.string.result_failed_reward, shownXp)
         },
         style = TamyrTheme.typography.body14,
         color = TamyrTheme.colors.textSecondary,
         textAlign = TextAlign.Center,
     )
+    Text(
+        text = stringResource(Res.string.result_failed_caption),
+        style = TamyrTheme.typography.body14,
+        color = TamyrTheme.colors.textSecondary,
+        textAlign = TextAlign.Center,
+    )
+}
+
+/** Полоса уровня под плитками: XP набегают вместе со счётом, при переходе уровня полоса тихо начинается заново. */
+@Composable
+private fun LevelCard(
+    stats: UserStats,
+    xpEarned: Int,
+    progress: Float,
+) {
+    val frame = xpAnimationFrame(
+        before = (stats.xp - xpEarned).coerceAtLeast(0),
+        after = stats.xp,
+        progress = progress,
+    )
+    TamyrCard(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = TamyrTheme.spacing.m,
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.s)) {
+            Text(
+                text = stringResource(Res.string.home_level_xp, frame.level, frame.xp),
+                style = TamyrTheme.typography.body15Bold,
+                color = TamyrTheme.colors.textPrimary,
+            )
+            TamyrProgressBar(
+                progress = frame.barFraction,
+                height = TamyrSizes.moduleProgress,
+                color = TamyrTheme.colors.gold,
+                animationMillis = 0,
+            )
+        }
+    }
 }
 
 @Composable
@@ -437,7 +510,7 @@ private fun ResultPreview(state: ResultUiState) = PreviewFrame {
 @Preview(name = "With mistakes and streak", group = PREVIEW_GROUP)
 @Composable
 private fun ResultMistakesPreview() = ResultPreview(
-    ResultUiState("Алия", xpEarned = 24, accuracyPercent = 90, durationSeconds = 272, mistakes = 1, mistakeStepIds = listOf("quiz-1"), streak = 13, streakExtended = true),
+    ResultUiState("Алия", xpEarned = 24, accuracyPercent = 90, durationSeconds = 272, mistakes = 1, mistakeStepIds = listOf("quiz-1"), streak = 13, streakExtended = true, stats = UserStats(xp = 364, streak = 13)),
 )
 
 @Preview(name = "Reminder offer", group = PREVIEW_GROUP)

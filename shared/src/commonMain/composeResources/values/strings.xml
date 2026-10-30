@@ -215,6 +215,8 @@
     <string name="result_continue">Дәвам итәргә · Продолжить</string>
     <string name="result_retry_mistakes">Кабатларга · Повторить ошибки (%1$d)</string>
     <string name="result_xp_value">+%1$d</string>
+    <string name="result_xp_description">Получено %1$d XP</string>
+    <string name="result_failed_caption">Это тоже опыт</string>
     <string name="result_accuracy_value">%1$d%</string>
     <string name="result_time_value">%1$s</string>
     <string name="result_fallback_name">друг</string>
