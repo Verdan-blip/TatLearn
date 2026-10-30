@@ -78,7 +78,6 @@
     "titleTt": "Табигать",
     "titleRu": "Природа",
     "icon": "nature",
-    "requires": "food",
     "lessons": [
       {
         "id": "lesson_7",
