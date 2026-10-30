@@ -36,16 +36,32 @@ data class QuizQuestionDto(
     val correctIndex: Int,
     val isNewWord: Boolean = false,
     val audioUrl: String? = null,
+    val explanation: String? = null,
 )
 
 @Serializable
-data class ListeningTaskDto(val audioUrl: String? = null, val options: List<String>, val correctIndex: Int)
+data class ListeningTaskDto(
+    val audioUrl: String? = null,
+    val options: List<String>,
+    val correctIndex: Int,
+    val explanation: String? = null,
+)
 
 @Serializable
-data class SentenceTaskDto(val promptRu: String, val wordBank: List<String>, val answer: List<String>)
+data class SentenceTaskDto(
+    val promptRu: String,
+    val wordBank: List<String>,
+    val answer: List<String>,
+    val explanation: String? = null,
+)
 
 @Serializable
-data class TranslationTaskDto(val promptRu: String, val acceptedAnswers: List<String>, val audioUrl: String? = null)
+data class TranslationTaskDto(
+    val promptRu: String,
+    val acceptedAnswers: List<String>,
+    val audioUrl: String? = null,
+    val explanation: String? = null,
+)
 
 @Serializable
 data class LessonContentDto(

@@ -85,7 +85,8 @@
         "өй",
         "әни"
       ],
-      "correctIndex": 1
+      "correctIndex": 1,
+      "explanation": "өч — три · өй — дом · әни — мама"
     },
     {
       "audioUrl": "audio/kuz.m4a",
@@ -94,7 +95,8 @@
         "күл",
         "үлән"
       ],
-      "correctIndex": 0
+      "correctIndex": 0,
+      "explanation": "күз — глаз · күл — озеро · үлән — трава"
     }
   ],
   "sentences": [

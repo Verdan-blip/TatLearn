@@ -22,10 +22,10 @@ fun ModuleDto.toDomain() = CourseModule(id, titleTt, titleRu, icon, lessons.map 
 fun LessonContentDto.toDomain() = LessonContent(
     lesson = lesson.toDomain(),
     matching = MatchingExercise(matching.pairs.map { WordPair(it.tatar, it.russian) }, matching.notes),
-    quiz = quiz.map { QuizQuestion(it.word, it.transcription, it.options, it.correctIndex, it.isNewWord, it.audioUrl) },
-    listening = listening.map { ListeningTask(it.audioUrl, it.options, it.correctIndex) },
-    sentences = sentences.map { SentenceTask(it.promptRu, it.wordBank, it.answer) },
-    translations = translations.map { TranslationTask(it.promptRu, it.acceptedAnswers, it.audioUrl) },
+    quiz = quiz.map { QuizQuestion(it.word, it.transcription, it.options, it.correctIndex, it.isNewWord, it.audioUrl, it.explanation) },
+    listening = listening.map { ListeningTask(it.audioUrl, it.options, it.correctIndex, it.explanation) },
+    sentences = sentences.map { SentenceTask(it.promptRu, it.wordBank, it.answer, it.explanation) },
+    translations = translations.map { TranslationTask(it.promptRu, it.acceptedAnswers, it.audioUrl, it.explanation) },
 )
 
 fun SessionDto.toDomain() = UserSession(name, email)

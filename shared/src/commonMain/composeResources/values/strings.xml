@@ -254,6 +254,8 @@
     <string name="listening_tag">Тыңла · аудирование</string>
     <string name="listening_title">Что ты услышал?</string>
     <string name="listening_slower">Помедленнее</string>
+    <string name="listening_play_description">Воспроизвести</string>
+    <string name="listening_audio_error">Не удалось воспроизвести звук. Нажмите ещё раз.</string>
 
     <!-- 10 Сборка предложения -->
     <string name="sentence_tag">Җөмлә төзе · сборка</string>

@@ -85,7 +85,8 @@
         "көз",
         "кыш"
       ],
-      "correctIndex": 2
+      "correctIndex": 2,
+      "explanation": "яз — весна · көз — осень · кыш — зима"
     },
     {
       "audioUrl": "audio/yangyr.m4a",
@@ -94,7 +95,8 @@
         "яңгыр",
         "кар"
       ],
-      "correctIndex": 1
+      "correctIndex": 1,
+      "explanation": "кояш — солнце · яңгыр — дождь · кар — снег"
     }
   ],
   "sentences": [

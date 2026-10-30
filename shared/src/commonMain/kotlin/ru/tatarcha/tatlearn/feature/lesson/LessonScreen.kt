@@ -134,7 +134,7 @@ private fun ExerciseFrame(state: LessonUiState, onEvent: (LessonUiEvent) -> Unit
                 when (step) {
                     is ExerciseStep.Matching -> MatchingContent(step, state.input as StepInput.Matching, onEvent)
                     is ExerciseStep.Quiz -> QuizContent(step, state.input as StepInput.Choice, feedback, onEvent)
-                    is ExerciseStep.Listening -> ListeningContent(step, state.input as StepInput.Choice, feedback, onEvent)
+                    is ExerciseStep.Listening -> ListeningContent(step, state.input as StepInput.Choice, feedback, state.audio, onEvent)
                     is ExerciseStep.SentenceBuilder -> SentenceContent(step, state.input as StepInput.Sentence, feedback, onEvent)
                     is ExerciseStep.Translation -> TranslationContent(step, state.input as StepInput.Translation, feedback, onEvent)
                 }
@@ -165,7 +165,9 @@ private fun feedbackDetail(feedback: StepFeedback): String? {
             feedback.correctAnswer?.let { add(stringResource(Res.string.exercise_correct_answer, it)) }
         }
     }
-    return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
+    val summary = parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
+    val explanation = feedback.explanation.takeUnless { feedback.isCorrect }
+    return listOfNotNull(summary, explanation).takeIf { it.isNotEmpty() }?.joinToString("\n")
 }
 
 /** Активна ли «Проверить» на текущем шаге. У сопоставления своего состояния кнопки проверки нет. */
@@ -290,7 +292,11 @@ private fun ListeningCorrectPreview() = LessonPreview(
 @Preview(name = "Listening · wrong", group = Group, widthDp = 390, heightDp = 844)
 @Composable
 private fun ListeningWrongPreview() = LessonPreview(
-    LessonPreviewData.state(LessonPreviewData.listening, StepInput.Choice(selected = 2), feedback = wrong("Рәхмәт")),
+    LessonPreviewData.state(
+        LessonPreviewData.listening,
+        StepInput.Choice(selected = 2),
+        feedback = StepFeedback(isCorrect = false, correctAnswer = "Рәхмәт", explanation = "Рәхмәт — спасибо · Рәхим ит — пожалуйста · Исәнме — привет"),
+    ),
 )
 
 @Preview(name = "Listening · audio error", group = Group, widthDp = 390, heightDp = 844)

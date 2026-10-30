@@ -85,7 +85,8 @@
         "эт",
         "ат"
       ],
-      "correctIndex": 0
+      "correctIndex": 0,
+      "explanation": "песи — кошка · эт — собака · ат — лошадь"
     },
     {
       "audioUrl": "audio/syer.m4a",
@@ -94,7 +95,8 @@
         "сыер",
         "бүре"
       ],
-      "correctIndex": 1
+      "correctIndex": 1,
+      "explanation": "куян — заяц · сыер — корова · бүре — волк"
     }
   ],
   "sentences": [

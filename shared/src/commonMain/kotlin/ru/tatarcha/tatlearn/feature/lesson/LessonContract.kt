@@ -41,6 +41,8 @@ data class StepFeedback(
     val correctAnswer: String? = null,
     /** Введённый ответ принят после свёртки татарских букв; сюда кладётся правильное написание. */
     val spellingHint: String? = null,
+    /** Короткое пояснение к заданию, показывается только после ошибки. */
+    val explanation: String? = null,
     val xpGained: Int = 0,
 )
 

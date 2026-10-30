@@ -85,7 +85,8 @@
         "ике",
         "өч"
       ],
-      "correctIndex": 1
+      "correctIndex": 1,
+      "explanation": "бер — один · ике — два · өч — три"
     },
     {
       "audioUrl": "audio/tugyz.m4a",
@@ -94,7 +95,8 @@
         "сигез",
         "ун"
       ],
-      "correctIndex": 0
+      "correctIndex": 0,
+      "explanation": "тугыз — девять · сигез — восемь · ун — десять"
     }
   ],
   "sentences": [

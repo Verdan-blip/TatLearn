@@ -85,7 +85,8 @@
         "утыз",
         "кырык"
       ],
-      "correctIndex": 0
+      "correctIndex": 0,
+      "explanation": "егерме — двадцать · утыз — тридцать · кырык — сорок"
     },
     {
       "audioUrl": "audio/yoz.m4a",
@@ -94,7 +95,8 @@
         "йөз",
         "унбер"
       ],
-      "correctIndex": 1
+      "correctIndex": 1,
+      "explanation": "илле — пятьдесят · йөз — сто · унбер — одиннадцать"
     }
   ],
   "sentences": [

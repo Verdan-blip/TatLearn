@@ -11,7 +11,7 @@ data class WordPair(val tatar: String, val russian: String)
 /** [notes] сопоставляет татарское слово с подсказкой маскота, которая показывается, пока слово выбрано. */
 data class MatchingExercise(val pairs: List<WordPair>, val notes: Map<String, String> = emptyMap())
 
-/** [audioUrl] — озвучка слова; пока null, кнопка звука на экране не показывается (TODO(audio)). */
+/** [audioUrl] — озвучка слова; пока null, кнопка звука на экране не показывается (TODO(audio)). [explanation] показывается после ошибки. */
 data class QuizQuestion(
     val word: String,
     val transcription: String?,
@@ -19,11 +19,12 @@ data class QuizQuestion(
     val correctIndex: Int,
     val isNewWord: Boolean,
     val audioUrl: String? = null,
+    val explanation: String? = null,
 )
 
 /** [audioUrl] равен null, пока нет настоящего аудио; тогда плеер показывает заглушку. */
-data class ListeningTask(val audioUrl: String?, val options: List<String>, val correctIndex: Int)
+data class ListeningTask(val audioUrl: String?, val options: List<String>, val correctIndex: Int, val explanation: String? = null)
 
-data class SentenceTask(val promptRu: String, val wordBank: List<String>, val answer: List<String>)
+data class SentenceTask(val promptRu: String, val wordBank: List<String>, val answer: List<String>, val explanation: String? = null)
 
-data class TranslationTask(val promptRu: String, val acceptedAnswers: List<String>, val audioUrl: String?)
+data class TranslationTask(val promptRu: String, val acceptedAnswers: List<String>, val audioUrl: String?, val explanation: String? = null)

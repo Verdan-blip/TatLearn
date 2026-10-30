@@ -50,6 +50,10 @@ class ContentFilesTest {
                 assertEquals(it.options.size, it.options.toSet().size, "${file.name}: duplicate quiz options for ${it.word}")
             }
             lesson.listening.forEach { assertTrue(it.correctIndex in it.options.indices, "${file.name}: listening correctIndex out of range") }
+            lesson.listening.forEach { task ->
+                val explanation = task.explanation ?: error("${file.name}: listening task without explanation")
+                task.options.forEach { option -> assertTrue(option in explanation, "${file.name}: explanation does not mention '$option'") }
+            }
             // Задание на слух без записи не попадёт в урок (LessonPlanner его пропускает), поэтому запись обязательна.
             lesson.listening.forEach { assertFile(file.name, it.audioUrl ?: error("${file.name}: listening task without audioUrl")) }
             (lesson.quiz.mapNotNull { it.audioUrl } + lesson.translations.mapNotNull { it.audioUrl }).forEach { assertFile(file.name, it) }

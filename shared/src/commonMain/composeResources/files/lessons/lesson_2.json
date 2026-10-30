@@ -85,7 +85,8 @@
         "җыр",
         "җәй"
       ],
-      "correctIndex": 1
+      "correctIndex": 1,
+      "explanation": "җир — земля · җыр — песня · җәй — лето"
     },
     {
       "audioUrl": "audio/men.m4a",
@@ -94,7 +95,8 @@
         "таң",
         "мең"
       ],
-      "correctIndex": 2
+      "correctIndex": 2,
+      "explanation": "яңа — новый · таң — рассвет · мең — тысяча"
     }
   ],
   "sentences": [

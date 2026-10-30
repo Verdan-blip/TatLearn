@@ -85,7 +85,8 @@
         "чәй",
         "ит"
       ],
-      "correctIndex": 2
+      "correctIndex": 2,
+      "explanation": "сөт — молоко · чәй — чай · ит — мясо"
     },
     {
       "audioUrl": "audio/alma.m4a",
@@ -94,7 +95,8 @@
         "балык",
         "ипи"
       ],
-      "correctIndex": 0
+      "correctIndex": 0,
+      "explanation": "алма — яблоко · балык — рыба · ипи — хлеб"
     }
   ],
   "sentences": [

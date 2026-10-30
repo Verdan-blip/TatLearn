@@ -183,25 +183,25 @@ class LessonViewModel(
                 val picked = input.selected ?: return
                 val q = step.question
                 val answer = q.options[q.correctIndex]
-                finishStep(picked == q.correctIndex, if (picked == q.correctIndex) StepFeedback(true, detail = "${q.word} — $answer") else StepFeedback(false, correctAnswer = answer))
+                finishStep(picked == q.correctIndex, if (picked == q.correctIndex) StepFeedback(true, detail = "${q.word} — $answer") else StepFeedback(false, correctAnswer = answer, explanation = q.explanation))
             }
             step is ExerciseStep.Listening && input is StepInput.Choice -> {
                 val picked = input.selected ?: return
                 val answer = step.task.options[step.task.correctIndex]
-                finishStep(picked == step.task.correctIndex, if (picked == step.task.correctIndex) StepFeedback(true, detail = answer) else StepFeedback(false, correctAnswer = answer))
+                finishStep(picked == step.task.correctIndex, if (picked == step.task.correctIndex) StepFeedback(true, detail = answer) else StepFeedback(false, correctAnswer = answer, explanation = step.task.explanation))
             }
             step is ExerciseStep.SentenceBuilder && input is StepInput.Sentence -> {
                 val words = input.placed.map { step.task.wordBank[it] }
                 val correct = words == step.task.answer
                 val answer = step.task.answer.joinToString(" ")
-                finishStep(correct, if (correct) StepFeedback(true, detail = answer) else StepFeedback(false, correctAnswer = answer))
+                finishStep(correct, if (correct) StepFeedback(true, detail = answer) else StepFeedback(false, correctAnswer = answer, explanation = step.task.explanation))
             }
             step is ExerciseStep.Translation && input is StepInput.Translation -> {
                 val expected = step.task.acceptedAnswers.first()
                 when (AnswerNormalizer.check(input.value.text, step.task.acceptedAnswers)) {
                     AnswerNormalizer.Verdict.Exact -> finishStep(true, StepFeedback(true, detail = expected))
                     AnswerNormalizer.Verdict.Approximate -> finishStep(true, StepFeedback(true, spellingHint = expected))
-                    AnswerNormalizer.Verdict.Wrong -> finishStep(false, StepFeedback(false, correctAnswer = expected))
+                    AnswerNormalizer.Verdict.Wrong -> finishStep(false, StepFeedback(false, correctAnswer = expected, explanation = step.task.explanation))
                 }
             }
         }

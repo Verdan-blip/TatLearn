@@ -51,7 +51,7 @@ internal fun testLessonContent() = LessonContent(
     lesson = Lesson("lesson_t", 1, "Тест", "Тест"),
     matching = MatchingExercise(listOf(WordPair("ипи", "хлеб"), WordPair("су", "вода"), WordPair("дус", "друг"))),
     quiz = listOf(
-        QuizQuestion("китап", null, listOf("книга", "стол"), 0, isNewWord = true),
+        QuizQuestion("китап", null, listOf("книга", "стол"), 0, isNewWord = true, explanation = "китап — книга"),
         QuizQuestion("өстәл", null, listOf("окно", "стол"), 1, isNewWord = false),
     ),
     listening = listOf(ListeningTask(null, listOf("Рәхмәт", "Исәнме"), 0)),
@@ -133,6 +133,7 @@ class LessonViewModelTest {
         val feedback = vm.state.value.feedback!!
         assertTrue(feedback.isCorrect)
         assertEquals("китап — книга", feedback.detail)
+        assertNull(feedback.explanation)
         assertEquals(XpRules.PER_CORRECT_STEP, feedback.xpGained)
         vm.onEvent(LessonUiEvent.ContinueClicked)
         assertEquals(1, vm.state.value.stepIndex)
@@ -146,6 +147,7 @@ class LessonViewModelTest {
         val feedback = vm.state.value.feedback!!
         assertEquals(false, feedback.isCorrect)
         assertEquals("книга", feedback.correctAnswer)
+        assertEquals("китап — книга", feedback.explanation)
         assertEquals(0, progress.recorded.single().correct)
     }
 

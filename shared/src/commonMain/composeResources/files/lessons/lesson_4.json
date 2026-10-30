@@ -85,7 +85,8 @@
         "әти",
         "әби"
       ],
-      "correctIndex": 1
+      "correctIndex": 1,
+      "explanation": "әни — мама · әти — папа · әби — бабушка"
     },
     {
       "audioUrl": "audio/babay.m4a",
@@ -94,7 +95,8 @@
         "апа",
         "абый"
       ],
-      "correctIndex": 0
+      "correctIndex": 0,
+      "explanation": "бабай — дедушка · апа — старшая сестра · абый — старший брат"
     }
   ],
   "sentences": [
