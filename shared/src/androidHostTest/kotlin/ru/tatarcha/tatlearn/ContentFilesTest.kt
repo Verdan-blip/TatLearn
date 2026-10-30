@@ -18,6 +18,13 @@ class ContentFilesTest {
 
     private fun modules(): List<ModuleDto> = json.decodeFromString(File(root, "modules.json").readText())
 
+    /** Локальный путь (не `http`) должен указывать на непустой файл в composeResources/files. */
+    private fun assertFile(lessonFile: String, audioUrl: String) {
+        if (audioUrl.startsWith("http")) return
+        val audio = File(root, audioUrl)
+        assertTrue(audio.exists() && audio.length() > 0, "$lessonFile: audio file is missing or empty: $audioUrl")
+    }
+
     @Test fun modulesFileParsesAndHasUniqueIds() {
         val modules = modules()
         assertTrue(modules.isNotEmpty())
@@ -43,6 +50,9 @@ class ContentFilesTest {
                 assertEquals(it.options.size, it.options.toSet().size, "${file.name}: duplicate quiz options for ${it.word}")
             }
             lesson.listening.forEach { assertTrue(it.correctIndex in it.options.indices, "${file.name}: listening correctIndex out of range") }
+            // Задание на слух без записи не попадёт в урок (LessonPlanner его пропускает), поэтому запись обязательна.
+            lesson.listening.forEach { assertFile(file.name, it.audioUrl ?: error("${file.name}: listening task without audioUrl")) }
+            (lesson.quiz.mapNotNull { it.audioUrl } + lesson.translations.mapNotNull { it.audioUrl }).forEach { assertFile(file.name, it) }
             lesson.sentences.forEach { task ->
                 val bank = task.wordBank.toMutableList()
                 task.answer.forEach { word -> assertTrue(bank.remove(word), "${file.name}: answer word '$word' is not in the word bank") }

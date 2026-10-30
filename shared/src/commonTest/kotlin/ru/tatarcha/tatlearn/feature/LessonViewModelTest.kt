@@ -87,6 +87,7 @@ private class FakeProgress : ProgressRepository {
 private class SilentPlayer : AudioPlayer {
     override val state: StateFlow<AudioPlayerState> = MutableStateFlow(AudioPlayerState.Idle)
     override fun play(url: String, rate: Float) = Unit
+    override fun play(bytes: ByteArray, rate: Float) = Unit
     override fun stop() = Unit
     override fun release() = Unit
 }

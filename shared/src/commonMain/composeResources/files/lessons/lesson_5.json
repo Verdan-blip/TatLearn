@@ -79,7 +79,7 @@
   ],
   "listening": [
     {
-      "audioUrl": null,
+      "audioUrl": "audio/ike.m4a",
       "options": [
         "бер",
         "ике",
@@ -88,7 +88,7 @@
       "correctIndex": 1
     },
     {
-      "audioUrl": null,
+      "audioUrl": "audio/tugyz.m4a",
       "options": [
         "тугыз",
         "сигез",

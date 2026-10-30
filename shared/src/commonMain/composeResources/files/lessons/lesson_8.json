@@ -79,7 +79,7 @@
   ],
   "listening": [
     {
-      "audioUrl": null,
+      "audioUrl": "audio/kysh.m4a",
       "options": [
         "яз",
         "көз",
@@ -88,7 +88,7 @@
       "correctIndex": 2
     },
     {
-      "audioUrl": null,
+      "audioUrl": "audio/yangyr.m4a",
       "options": [
         "кояш",
         "яңгыр",

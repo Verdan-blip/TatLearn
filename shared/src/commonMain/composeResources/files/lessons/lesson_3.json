@@ -79,7 +79,7 @@
   ],
   "listening": [
     {
-      "audioUrl": null,
+      "audioUrl": "audio/it.m4a",
       "options": [
         "сөт",
         "чәй",
@@ -88,7 +88,7 @@
       "correctIndex": 2
     },
     {
-      "audioUrl": null,
+      "audioUrl": "audio/alma.m4a",
       "options": [
         "алма",
         "балык",

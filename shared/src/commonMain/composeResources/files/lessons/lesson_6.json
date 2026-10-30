@@ -79,7 +79,7 @@
   ],
   "listening": [
     {
-      "audioUrl": null,
+      "audioUrl": "audio/egerme.m4a",
       "options": [
         "егерме",
         "утыз",
@@ -88,7 +88,7 @@
       "correctIndex": 0
     },
     {
-      "audioUrl": null,
+      "audioUrl": "audio/yoz.m4a",
       "options": [
         "илле",
         "йөз",

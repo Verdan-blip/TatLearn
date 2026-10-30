@@ -79,7 +79,7 @@
   ],
   "listening": [
     {
-      "audioUrl": null,
+      "audioUrl": "audio/pesi.m4a",
       "options": [
         "песи",
         "эт",
@@ -88,7 +88,7 @@
       "correctIndex": 0
     },
     {
-      "audioUrl": null,
+      "audioUrl": "audio/syer.m4a",
       "options": [
         "куян",
         "сыер",
