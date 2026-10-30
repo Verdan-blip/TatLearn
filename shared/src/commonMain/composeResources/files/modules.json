@@ -1,5 +1,19 @@
 [
   {
+    "id": "meeting",
+    "titleTt": "Таныштыру",
+    "titleRu": "Знакомство",
+    "icon": "meeting",
+    "lessons": [
+      {
+        "id": "lesson_9",
+        "number": 1,
+        "titleTt": "Таныштыру",
+        "titleRu": "Приветствия и знакомство"
+      }
+    ]
+  },
+  {
     "id": "alphabet",
     "titleTt": "Алфавит",
     "titleRu": "Алфавит",
@@ -7,13 +21,13 @@
     "lessons": [
       {
         "id": "lesson_1",
-        "number": 1,
+        "number": 2,
         "titleTt": "Алфавит",
         "titleRu": "Алфавит, часть 1"
       },
       {
         "id": "lesson_2",
-        "number": 2,
+        "number": 3,
         "titleTt": "Алфавит",
         "titleRu": "Алфавит, часть 2"
       }
@@ -27,13 +41,13 @@
     "lessons": [
       {
         "id": "lesson_3",
-        "number": 3,
+        "number": 4,
         "titleTt": "Ашлар",
         "titleRu": "Еда, часть 1"
       },
       {
         "id": "lesson_4",
-        "number": 4,
+        "number": 5,
         "titleTt": "Туганнар",
         "titleRu": "Семья"
       }
@@ -47,13 +61,13 @@
     "lessons": [
       {
         "id": "lesson_5",
-        "number": 5,
+        "number": 6,
         "titleTt": "Саннар",
         "titleRu": "Числа, часть 1"
       },
       {
         "id": "lesson_6",
-        "number": 6,
+        "number": 7,
         "titleTt": "Саннар",
         "titleRu": "Числа, часть 2"
       }
@@ -69,13 +83,13 @@
     "lessons": [
       {
         "id": "lesson_7",
-        "number": 7,
+        "number": 8,
         "titleTt": "Табигать",
         "titleRu": "Природа, часть 1"
       },
       {
         "id": "lesson_8",
-        "number": 8,
+        "number": 9,
         "titleTt": "Табигать",
         "titleRu": "Природа, часть 2"
       }

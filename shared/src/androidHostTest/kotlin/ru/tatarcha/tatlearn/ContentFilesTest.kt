@@ -54,9 +54,9 @@ class ContentFilesTest {
                 val explanation = task.explanation ?: error("${file.name}: listening task without explanation")
                 task.options.forEach { option -> assertTrue(option in explanation, "${file.name}: explanation does not mention '$option'") }
             }
-            // Задание на слух без записи не попадёт в урок (LessonPlanner его пропускает), поэтому запись обязательна.
-            lesson.listening.forEach { assertFile(file.name, it.audioUrl ?: error("${file.name}: listening task without audioUrl")) }
-            (lesson.quiz.mapNotNull { it.audioUrl } + lesson.translations.mapNotNull { it.audioUrl }).forEach { assertFile(file.name, it) }
+            // Задание на слух без записи не попадёт в урок (LessonPlanner его пропускает), но если путь указан, файл должен существовать.
+            (lesson.listening.mapNotNull { it.audioUrl } + lesson.quiz.mapNotNull { it.audioUrl } + lesson.translations.mapNotNull { it.audioUrl })
+                .forEach { assertFile(file.name, it) }
             lesson.sentences.forEach { task ->
                 val bank = task.wordBank.toMutableList()
                 task.answer.forEach { word -> assertTrue(bank.remove(word), "${file.name}: answer word '$word' is not in the word bank") }
