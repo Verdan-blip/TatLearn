@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import ru.tatarcha.tatlearn.core.audio.AudioPlayerState
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrCard
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrTagKind
 import ru.tatarcha.tatlearn.core.designsystem.component.exercise.AnswerOption
@@ -19,12 +20,19 @@ import ru.tatarcha.tatlearn.core.designsystem.component.exercise.PlayButton
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import ru.tatarcha.tatlearn.domain.exercise.ExerciseStep
 import tatlearn.shared.generated.resources.Res
+import tatlearn.shared.generated.resources.listening_play_description
 import tatlearn.shared.generated.resources.quiz_tag_new_word
 import tatlearn.shared.generated.resources.quiz_title
 
 /** Экран 05. */
 @Composable
-fun QuizContent(step: ExerciseStep.Quiz, input: StepInput.Choice, feedback: StepFeedback?, onEvent: (LessonUiEvent) -> Unit) {
+fun QuizContent(
+    step: ExerciseStep.Quiz,
+    input: StepInput.Choice,
+    feedback: StepFeedback?,
+    audio: AudioPlayerState,
+    onEvent: (LessonUiEvent) -> Unit,
+) {
     val q = step.question
     val spacing = TamyrTheme.spacing
     ExerciseTitle(
@@ -36,7 +44,13 @@ fun QuizContent(step: ExerciseStep.Quiz, input: StepInput.Choice, feedback: Step
         TamyrCard(Modifier.fillMaxWidth(), contentPadding = 22.dp) {
             Row(horizontalArrangement = Arrangement.spacedBy(spacing.l), verticalAlignment = Alignment.CenterVertically) {
                 // Кнопка звука только когда у слова есть запись: без озвучки она бы ничего не играла (TODO(audio)).
-                if (q.audioUrl != null) PlayButton(onClick = { onEvent(LessonUiEvent.PlayAudioClicked()) })
+                if (q.audioUrl != null) {
+                    PlayButton(
+                        onClick = { onEvent(LessonUiEvent.PlayAudioClicked()) },
+                        playing = audio == AudioPlayerState.Playing,
+                        contentDescription = stringResource(Res.string.listening_play_description),
+                    )
+                }
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(q.word, style = TamyrTheme.typography.display30, color = TamyrTheme.colors.textPrimary)
                     q.transcription?.let { Text(it, style = TamyrTheme.typography.transcription.copy(fontSize = TamyrTheme.typography.body14.fontSize), color = TamyrTheme.colors.textSecondary) }

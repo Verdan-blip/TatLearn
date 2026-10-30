@@ -29,6 +29,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import ru.tatarcha.tatlearn.core.audio.AudioPlayerState
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrCard
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrTagKind
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrTextField
@@ -38,6 +39,7 @@ import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrSizes
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import ru.tatarcha.tatlearn.domain.exercise.ExerciseStep
 import tatlearn.shared.generated.resources.Res
+import tatlearn.shared.generated.resources.listening_play_description
 import tatlearn.shared.generated.resources.sentence_prompt_format
 import tatlearn.shared.generated.resources.translation_caption
 import tatlearn.shared.generated.resources.translation_letter_description
@@ -54,7 +56,13 @@ private val PlayButtonSize = 40.dp
  * через AnswerNormalizer, поэтому ә/ө/ү/җ/ң/һ, набранные как а/о/у/ж/н/х на русской клавиатуре, всё равно принимаются.
  */
 @Composable
-fun TranslationContent(step: ExerciseStep.Translation, input: StepInput.Translation, feedback: StepFeedback?, onEvent: (LessonUiEvent) -> Unit) {
+fun TranslationContent(
+    step: ExerciseStep.Translation,
+    input: StepInput.Translation,
+    feedback: StepFeedback?,
+    audio: AudioPlayerState,
+    onEvent: (LessonUiEvent) -> Unit,
+) {
     val spacing = TamyrTheme.spacing
     val colors = TamyrTheme.colors
     val letters = stringResource(Res.string.translation_letters).split(' ').filter { it.isNotEmpty() }
@@ -71,7 +79,14 @@ fun TranslationContent(step: ExerciseStep.Translation, input: StepInput.Translat
         TamyrCard(Modifier.fillMaxWidth(), contentPadding = 18.dp) {
             Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
                 // Кнопка звука только когда у задания есть запись (TODO(audio)).
-                if (step.task.audioUrl != null) PlayButton(onClick = { onEvent(LessonUiEvent.PlayAudioClicked()) }, diameter = PlayButtonSize)
+                if (step.task.audioUrl != null) {
+                    PlayButton(
+                        onClick = { onEvent(LessonUiEvent.PlayAudioClicked()) },
+                        diameter = PlayButtonSize,
+                        playing = audio == AudioPlayerState.Playing,
+                        contentDescription = stringResource(Res.string.listening_play_description),
+                    )
+                }
                 Text(stringResource(Res.string.sentence_prompt_format, step.task.promptRu), style = TamyrTheme.typography.title19, color = colors.textPrimary)
             }
         }

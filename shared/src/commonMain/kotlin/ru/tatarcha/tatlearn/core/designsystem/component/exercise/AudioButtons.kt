@@ -41,22 +41,40 @@ private val SlowIconSize = 14.dp
 private const val WaveMinScale = 0.45f
 private const val WavePhaseStep = 0.18f
 
-/** Зелёная кнопка «треугольник в круге» рядом со словом или фразой. */
+/** Зелёная кнопка «треугольник в круге» рядом со словом или фразой; пока звучит запись ([playing]), вместо треугольника колеблются столбики. */
 @Composable
-fun PlayButton(onClick: () -> Unit, modifier: Modifier = Modifier, diameter: Dp = 46.dp) {
-    val colors = TamyrTheme.colors
+fun PlayButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    diameter: Dp = 46.dp,
+    playing: Boolean = false,
+    contentDescription: String? = null,
+) {
     Box(
-        modifier.size(diameter).clip(TamyrTheme.shapes.circle).background(colors.primary).clickable(role = Role.Button, onClick = onClick),
+        modifier
+            .size(diameter)
+            .clip(TamyrTheme.shapes.circle)
+            .background(TamyrTheme.colors.primary)
+            .semantics { contentDescription?.let { this.contentDescription = it } }
+            .clickable(role = Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Canvas(Modifier.size(diameter * 0.4f)) {
-            val path = Path().apply {
-                moveTo(size.width * 0.15f, 0f)
-                lineTo(size.width, size.height / 2)
-                lineTo(size.width * 0.15f, size.height)
-                close()
+        if (playing) {
+            WaveBars(
+                playing = true,
+                scale = diameter / BigPlaySize,
+            )
+        } else {
+            val triangleColor = TamyrTheme.colors.onPrimary
+            Canvas(Modifier.size(diameter * 0.4f)) {
+                val path = Path().apply {
+                    moveTo(size.width * 0.15f, 0f)
+                    lineTo(size.width, size.height / 2)
+                    lineTo(size.width * 0.15f, size.height)
+                    close()
+                }
+                drawPath(path, triangleColor)
             }
-            drawPath(path, colors.onPrimary)
         }
     }
 }
@@ -69,7 +87,6 @@ fun WavePlayButton(
     modifier: Modifier = Modifier,
     playing: Boolean = false,
 ) {
-    val phase = rememberWavePhase(playing = playing)
     Box(
         modifier
             .size(BigPlaySize)
@@ -80,16 +97,31 @@ fun WavePlayButton(
             .clickable(role = Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(3.dp), verticalAlignment = Alignment.CenterVertically) {
-            WaveHeights.forEachIndexed { index, height ->
-                Box(
-                    Modifier
-                        .width(WaveBarWidth)
-                        .height(if (playing) height * waveScale(phase + index * WavePhaseStep) else height)
-                        .clip(RoundedCornerShape(2.dp))
-                        .background(TamyrTheme.colors.onPrimary),
-                )
-            }
+        WaveBars(
+            playing = playing,
+            scale = 1f,
+        )
+    }
+}
+
+@Composable
+private fun WaveBars(
+    playing: Boolean,
+    scale: Float,
+) {
+    val phase = rememberWavePhase(playing = playing)
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(3.dp * scale),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        WaveHeights.forEachIndexed { index, height ->
+            Box(
+                Modifier
+                    .width(WaveBarWidth * scale)
+                    .height((if (playing) height * waveScale(phase + index * WavePhaseStep) else height) * scale)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(TamyrTheme.colors.onPrimary),
+            )
         }
     }
 }

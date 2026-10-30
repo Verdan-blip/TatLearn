@@ -133,10 +133,10 @@ private fun ExerciseFrame(state: LessonUiState, onEvent: (LessonUiEvent) -> Unit
             ) {
                 when (step) {
                     is ExerciseStep.Matching -> MatchingContent(step, state.input as StepInput.Matching, onEvent)
-                    is ExerciseStep.Quiz -> QuizContent(step, state.input as StepInput.Choice, feedback, onEvent)
+                    is ExerciseStep.Quiz -> QuizContent(step, state.input as StepInput.Choice, feedback, state.audio, onEvent)
                     is ExerciseStep.Listening -> ListeningContent(step, state.input as StepInput.Choice, feedback, state.audio, onEvent)
                     is ExerciseStep.SentenceBuilder -> SentenceContent(step, state.input as StepInput.Sentence, feedback, onEvent)
-                    is ExerciseStep.Translation -> TranslationContent(step, state.input as StepInput.Translation, feedback, onEvent)
+                    is ExerciseStep.Translation -> TranslationContent(step, state.input as StepInput.Translation, feedback, state.audio, onEvent)
                 }
             }
         }
@@ -248,6 +248,16 @@ private fun MatchingDonePreview() = LessonPreview(
 @Preview(name = "Quiz · new word", group = Group, widthDp = 390, heightDp = 844)
 @Composable
 private fun QuizNewWordPreview() = LessonPreview(LessonPreviewData.state(LessonPreviewData.quiz, StepInput.Choice()))
+
+@Preview(name = "Quiz · audio playing", group = Group, widthDp = 390, heightDp = 844)
+@Composable
+private fun QuizAudioPlayingPreview() = LessonPreview(
+    LessonPreviewData.state(
+        LessonPreviewData.quiz.copy(question = LessonPreviewData.quiz.question.copy(audioUrl = "audio/rahmat.m4a")),
+        StepInput.Choice(),
+        audio = AudioPlayerState.Playing,
+    ),
+)
 
 @Preview(name = "Quiz · option selected", group = Group, widthDp = 390, heightDp = 844)
 @Composable
