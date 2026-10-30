@@ -273,4 +273,17 @@
     <string name="toast_icon_info">i</string>
     <string name="toast_icon_error">!</string>
     <string name="toast_icon_success">✓</string>
+
+    <!-- Напоминание об уроке -->
+    <string name="reminder_notification_title">Время для татарского</string>
+    <string name="reminder_notification_body">Один короткий урок сохранит серию. Мыраужан ждёт тебя.</string>
+    <string name="reminder_channel_name">Напоминания об уроке</string>
+    <string name="reminder_sheet_title">Напомнить об уроке?</string>
+    <string name="reminder_sheet_message">Выбери время, и Мыраужан раз в день напомнит позаниматься. Выключить можно в профиле.</string>
+    <string name="reminder_sheet_enable">Включить напоминание</string>
+    <string name="reminder_sheet_later">Не сейчас</string>
+    <string name="reminder_time">%1$s:00</string>
+    <string name="reminder_row_title">Напоминание об уроке</string>
+    <string name="reminder_row_subtitle">Раз в день, в выбранное время</string>
+    <string name="reminder_permission_denied">Разрешите уведомления в настройках телефона</string>
 </resources>

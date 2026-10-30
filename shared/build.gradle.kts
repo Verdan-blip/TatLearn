@@ -87,6 +87,7 @@ kotlin {
         commonMain { kotlin.srcDir(generateBuildConfig) }
         androidMain.dependencies {
             implementation(libs.koin.android)
+            implementation(libs.androidx.work.runtime)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.sqldelight.androidDriver)
             implementation(libs.compose.uiToolingPreview)

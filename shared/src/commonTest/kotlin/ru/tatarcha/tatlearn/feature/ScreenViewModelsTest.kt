@@ -338,7 +338,7 @@ class ScreenViewModelsTest {
     private val resultKey = ResultKey("lesson_4", xpEarned = 24, accuracyPercent = 75, durationSeconds = 130, mistakeStepIds = listOf("quiz-1", "sentence-0"))
 
     @Test fun resultStateComesFromKey() = runTest {
-        val vm = ResultViewModel(resultKey, FakeAuth(UserSession("Алия", "a@b.ru")), StatsProgress(UserStats(50, 4)), FakeProfile(), RecordingHaptics())
+        val vm = ResultViewModel(resultKey, FakeAuth(UserSession("Алия", "a@b.ru")), StatsProgress(UserStats(50, 4)), FakeProfile(), RecordingHaptics(), testReminders())
         val state = vm.state.value
         assertEquals("Алия", state.userName)
         assertEquals(24, state.xpEarned)
@@ -349,7 +349,7 @@ class ScreenViewModelsTest {
 
     @Test fun resultBelowThresholdIsNotPassed() = runTest {
         val key = resultKey.copy(accuracyPercent = 70, correctAnswers = 7, totalAnswers = 10, mistakeStepIds = listOf("a", "b", "c"))
-        val state = ResultViewModel(key, FakeAuth(), StatsProgress(), FakeProfile(), RecordingHaptics()).state.value
+        val state = ResultViewModel(key, FakeAuth(), StatsProgress(), FakeProfile(), RecordingHaptics(), testReminders()).state.value
         assertEquals(false, state.passed)
         assertEquals(1, state.missingAnswers)
         assertEquals(false, state.isMistakesRun)
@@ -357,19 +357,19 @@ class ScreenViewModelsTest {
 
     @Test fun resultAtThresholdIsPassed() = runTest {
         val key = resultKey.copy(accuracyPercent = 80, correctAnswers = 8, totalAnswers = 10)
-        assertTrue(ResultViewModel(key, FakeAuth(), StatsProgress(), FakeProfile(), RecordingHaptics()).state.value.passed)
+        assertTrue(ResultViewModel(key, FakeAuth(), StatsProgress(), FakeProfile(), RecordingHaptics(), testReminders()).state.value.passed)
     }
 
     @Test fun mistakesRunShowsUnfixedMistakes() = runTest {
         val key = resultKey.copy(accuracyPercent = 50, isMistakesRun = true, mistakeStepIds = listOf("quiz-1"))
-        val state = ResultViewModel(key, FakeAuth(), StatsProgress(), FakeProfile(), RecordingHaptics()).state.value
+        val state = ResultViewModel(key, FakeAuth(), StatsProgress(), FakeProfile(), RecordingHaptics(), testReminders()).state.value
         assertEquals(false, state.passed)
         assertEquals(1, state.missingAnswers)
         assertTrue(state.isMistakesRun)
     }
 
     @Test fun resultEffects() = runTest {
-        val vm = ResultViewModel(resultKey, FakeAuth(), StatsProgress(), FakeProfile(), RecordingHaptics())
+        val vm = ResultViewModel(resultKey, FakeAuth(), StatsProgress(), FakeProfile(), RecordingHaptics(), testReminders())
         vm.onEvent(ResultUiEvent.RetryMistakesClicked)
         assertEquals(ResultUiEffect.NavigateToMistakes("lesson_4", listOf("quiz-1", "sentence-0")), vm.effects.first())
         vm.onEvent(ResultUiEvent.ContinueClicked)
@@ -425,10 +425,10 @@ class ScreenViewModelsTest {
 
     @Test fun passedResultCelebratesOnceAndFailedResultStaysSilent() = runTest {
         val passed = RecordingHaptics()
-        ResultViewModel(resultKey.copy(accuracyPercent = 90, mistakeStepIds = emptyList()), FakeAuth(), StatsProgress(), FakeProfile(), passed)
+        ResultViewModel(resultKey.copy(accuracyPercent = 90, mistakeStepIds = emptyList()), FakeAuth(), StatsProgress(), FakeProfile(), passed, testReminders())
         assertEquals(listOf("celebrate"), passed.events)
         val failed = RecordingHaptics()
-        ResultViewModel(resultKey.copy(accuracyPercent = 40, correctAnswers = 4, totalAnswers = 10), FakeAuth(), StatsProgress(), FakeProfile(), failed)
+        ResultViewModel(resultKey.copy(accuracyPercent = 40, correctAnswers = 4, totalAnswers = 10), FakeAuth(), StatsProgress(), FakeProfile(), failed, testReminders())
         assertTrue(failed.events.isEmpty())
     }
 

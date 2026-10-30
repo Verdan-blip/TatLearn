@@ -11,13 +11,16 @@ import platform.Foundation.NSUserDefaults
 import ru.tatarcha.tatlearn.core.database.TamyrDatabase
 import ru.tatarcha.tatlearn.core.haptics.IosHaptics
 import ru.tatarcha.tatlearn.core.haptics.PlatformHaptics
+import ru.tatarcha.tatlearn.core.notifications.IosReminders
+import ru.tatarcha.tatlearn.core.notifications.PlatformReminders
 
 // expect/actual (сторона iOS): SQLite через NativeSqliteDriver (файл в песочнице приложения),
-// NSUserDefaults для настроек, движок Darwin на основе URLSession для Ktor, вибро через Taptic Engine (UIFeedbackGenerator).
+// NSUserDefaults для настроек, движок Darwin на основе URLSession для Ktor, вибро через Taptic Engine (UIFeedbackGenerator), напоминания через UNUserNotificationCenter.
 // Проверка: запустить приложение в симуляторе, записать прогресс в UI kit, перезапустить — значения сохраняются.
 actual val platformModule = module {
     single<SqlDriver> { NativeSqliteDriver(TamyrDatabase.Schema, "tamyr.db") }
     single<Settings> { NSUserDefaultsSettings(NSUserDefaults.standardUserDefaults) }
     single<HttpClientEngine> { Darwin.create() }
     single<PlatformHaptics> { IosHaptics() }
+    single<PlatformReminders> { IosReminders() }
 }

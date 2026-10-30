@@ -3,9 +3,11 @@ package ru.tatarcha.tatlearn.feature.profile
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import ru.tatarcha.tatlearn.core.common.AutoDismiss
 import ru.tatarcha.tatlearn.core.common.MviViewModel
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
+import ru.tatarcha.tatlearn.core.notifications.Reminders
 import ru.tatarcha.tatlearn.data.local.HapticsSettings
 import ru.tatarcha.tatlearn.domain.model.Avatar
 import ru.tatarcha.tatlearn.domain.repository.AuthRepository
@@ -17,6 +19,7 @@ class ProfileViewModel(
     progress: ProgressRepository,
     auth: AuthRepository,
     private val haptics: HapticsSettings,
+    private val reminders: Reminders,
 ) : MviViewModel<ProfileUiState, ProfileUiEvent, ProfileUiEffect>(ProfileUiState()) {
 
     private val toastTimer = AutoDismiss(viewModelScope, TamyrMotion.TOAST_VISIBLE_MS)
@@ -28,6 +31,8 @@ class ProfileViewModel(
         }.launchIn(viewModelScope)
         progress.observeStats().onEach { stats -> setState { copy(stats = stats) } }.launchIn(viewModelScope)
         haptics.enabled.onEach { enabled -> setState { copy(hapticsEnabled = enabled) } }.launchIn(viewModelScope)
+        reminders.enabled.onEach { enabled -> setState { copy(reminderEnabled = enabled) } }.launchIn(viewModelScope)
+        reminders.hour.onEach { hour -> setState { copy(reminderHour = hour) } }.launchIn(viewModelScope)
         profile.saved.onEach {
             setState { copy(savedToast = true) }
             toastTimer.start { setState { copy(savedToast = false) } }
@@ -38,9 +43,24 @@ class ProfileViewModel(
         when (event) {
             ProfileUiEvent.EditClicked -> sendEffect(ProfileUiEffect.NavigateToEdit)
             is ProfileUiEvent.HapticsToggled -> haptics.setEnabled(event.enabled)
+            is ProfileUiEvent.ReminderToggled -> toggleReminder(event.enabled)
+            is ProfileUiEvent.ReminderHourSelected -> viewModelScope.launch { reminders.changeHour(event.hour) }
             ProfileUiEvent.ToastDismissed -> {
                 toastTimer.cancel()
-                setState { copy(savedToast = false) }
+                setState { copy(savedToast = false, reminderDeniedToast = false) }
+            }
+        }
+    }
+
+    private fun toggleReminder(enabled: Boolean) {
+        if (!enabled) {
+            reminders.disable()
+            return
+        }
+        viewModelScope.launch {
+            if (!reminders.enable(state.value.reminderHour)) {
+                setState { copy(reminderDeniedToast = true) }
+                toastTimer.start { setState { copy(reminderDeniedToast = false) } }
             }
         }
     }

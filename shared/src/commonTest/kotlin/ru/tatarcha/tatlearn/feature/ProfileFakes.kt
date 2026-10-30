@@ -6,6 +6,11 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.tatarcha.tatlearn.core.haptics.Haptics
 import ru.tatarcha.tatlearn.core.haptics.PlatformHaptics
+import ru.tatarcha.tatlearn.core.notifications.PlatformReminders
+import ru.tatarcha.tatlearn.core.notifications.ReminderTexts
+import ru.tatarcha.tatlearn.core.notifications.Reminders
+import ru.tatarcha.tatlearn.data.local.ReminderSettings
+import com.russhwolf.settings.MapSettings
 import ru.tatarcha.tatlearn.domain.model.Avatar
 import ru.tatarcha.tatlearn.domain.model.UserProfile
 import ru.tatarcha.tatlearn.domain.model.UserSession
@@ -52,3 +57,16 @@ internal class RecordingPlatformHaptics : PlatformHaptics {
     override fun tickMedium() { events += "medium" }
     override fun success() { events += "success" }
 }
+
+internal class FakePlatformReminders(var granted: Boolean = true) : PlatformReminders {
+    val scheduledHours = mutableListOf<Int>()
+    var cancels = 0
+    override suspend fun requestPermission() = granted
+    override fun schedule(hour: Int, texts: ReminderTexts) { scheduledHours += hour }
+    override fun cancel() { cancels++ }
+}
+
+internal fun testReminders(
+    platform: PlatformReminders = FakePlatformReminders(),
+    settings: ReminderSettings = ReminderSettings(MapSettings()),
+) = Reminders(platform, settings) { ReminderTexts("title", "body", "channel") }

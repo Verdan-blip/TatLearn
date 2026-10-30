@@ -29,12 +29,15 @@ import ru.tatarcha.tatlearn.core.designsystem.component.PreviewFrame
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrButton
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrButtonStyle
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrCard
+import ru.tatarcha.tatlearn.core.designsystem.component.TamyrChoiceChips
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrProgressBar
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrToastData
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrToastHost
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrToastKind
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrSizes
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
+import ru.tatarcha.tatlearn.core.notifications.Reminders
+import ru.tatarcha.tatlearn.core.notifications.reminderHourLabels
 import ru.tatarcha.tatlearn.domain.model.Avatar
 import ru.tatarcha.tatlearn.domain.model.AvatarPose
 import ru.tatarcha.tatlearn.domain.model.UserStats
@@ -42,6 +45,9 @@ import tatlearn.shared.generated.resources.Res
 import tatlearn.shared.generated.resources.debug_tools_open
 import tatlearn.shared.generated.resources.profile_edit
 import tatlearn.shared.generated.resources.profile_haptics_subtitle
+import tatlearn.shared.generated.resources.reminder_permission_denied
+import tatlearn.shared.generated.resources.reminder_row_subtitle
+import tatlearn.shared.generated.resources.reminder_row_title
 import tatlearn.shared.generated.resources.profile_haptics_title
 import tatlearn.shared.generated.resources.profile_level
 import tatlearn.shared.generated.resources.profile_level_value
@@ -92,6 +98,12 @@ fun ProfileContent(
                 NextLevel(state.stats)
             }
             HapticsRow(enabled = state.hapticsEnabled, onToggle = { onEvent(ProfileUiEvent.HapticsToggled(it)) })
+            ReminderRow(
+                enabled = state.reminderEnabled,
+                hour = state.reminderHour,
+                onToggle = { onEvent(ProfileUiEvent.ReminderToggled(it)) },
+                onHourSelected = { onEvent(ProfileUiEvent.ReminderHourSelected(it)) },
+            )
             TamyrButton(stringResource(Res.string.profile_edit), onClick = { onEvent(ProfileUiEvent.EditClicked) }, style = TamyrButtonStyle.Secondary)
             Text(
                 stringResource(Res.string.profile_local_note),
@@ -105,7 +117,11 @@ fun ProfileContent(
             }
         }
         TamyrToastHost(
-            toast = if (state.savedToast) TamyrToastData(stringResource(Res.string.profile_saved), TamyrToastKind.Success) else null,
+            toast = when {
+                state.savedToast -> TamyrToastData(stringResource(Res.string.profile_saved), TamyrToastKind.Success)
+                state.reminderDeniedToast -> TamyrToastData(stringResource(Res.string.reminder_permission_denied), TamyrToastKind.Error)
+                else -> null
+            },
             onDismiss = { onEvent(ProfileUiEvent.ToastDismissed) },
             modifier = Modifier.align(Alignment.TopCenter),
         )
@@ -143,6 +159,66 @@ private fun HapticsRow(enabled: Boolean, onToggle: (Boolean) -> Unit) {
 }
 
 private val HapticsRowMinHeight = 64.dp
+
+// TODO(design): строка «Напоминание об уроке» не нарисована в макете, собрана по образцу строки «Вибро-отклик».
+@Composable
+private fun ReminderRow(
+    enabled: Boolean,
+    hour: Int,
+    onToggle: (Boolean) -> Unit,
+    onHourSelected: (Int) -> Unit,
+) {
+    TamyrCard(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = TamyrTheme.spacing.m,
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.m)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = HapticsRowMinHeight)
+                    .toggleable(value = enabled, role = Role.Switch, onValueChange = onToggle),
+                horizontalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.blockGap),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.xxs),
+                ) {
+                    Text(
+                        text = stringResource(Res.string.reminder_row_title),
+                        style = TamyrTheme.typography.body16Bold,
+                        color = TamyrTheme.colors.textPrimary,
+                    )
+                    Text(
+                        text = stringResource(Res.string.reminder_row_subtitle),
+                        style = TamyrTheme.typography.caption13,
+                        color = TamyrTheme.colors.textSecondary,
+                    )
+                }
+                Switch(
+                    checked = enabled,
+                    onCheckedChange = null,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = TamyrTheme.colors.onPrimary,
+                        checkedTrackColor = TamyrTheme.colors.primary,
+                        checkedBorderColor = TamyrTheme.colors.primary,
+                        uncheckedThumbColor = TamyrTheme.colors.textSecondary,
+                        uncheckedTrackColor = TamyrTheme.colors.surfaceMuted,
+                        uncheckedBorderColor = TamyrTheme.colors.textSecondary,
+                    ),
+                )
+            }
+            if (enabled) {
+                TamyrChoiceChips(
+                    options = reminderHourLabels(Reminders.AvailableHours),
+                    selectedIndex = Reminders.AvailableHours.indexOf(hour),
+                    onSelect = { index -> onHourSelected(Reminders.AvailableHours[index]) },
+                )
+            }
+        }
+    }
+}
 
 /** Плоская плитка статистики: без нижней тени, чтобы не выглядела как кнопка. */
 @Composable
@@ -190,6 +266,15 @@ private fun ProfilePosePreview() = PreviewFrame {
 @Composable
 private fun ProfileHapticsOffPreview() = PreviewFrame {
     ProfileContent(ProfileUiState("Алия", Avatar.Color(0), UserStats(xp = 340, streak = 12), hapticsEnabled = false), onEvent = {})
+}
+
+@Preview(name = "Profile · reminder on", widthDp = 390, heightDp = 844)
+@Composable
+private fun ProfileReminderOnPreview() = PreviewFrame {
+    ProfileContent(
+        ProfileUiState("Алия", Avatar.Color(0), UserStats(xp = 340, streak = 12), reminderEnabled = true, reminderHour = 19),
+        onEvent = {},
+    )
 }
 
 @Preview(name = "Profile · new user", widthDp = 390, heightDp = 844)

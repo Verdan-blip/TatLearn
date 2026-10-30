@@ -33,9 +33,14 @@ import ru.tatarcha.tatlearn.core.designsystem.component.StreakBadge
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrButton
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrButtonStyle
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrCard
+import ru.tatarcha.tatlearn.core.designsystem.component.TamyrChoiceChips
+import ru.tatarcha.tatlearn.core.designsystem.component.TamyrConfirmSheet
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrMascot
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrTextButton
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrSizes
+import ru.tatarcha.tatlearn.core.notifications.Reminders
+import ru.tatarcha.tatlearn.core.notifications.reminderHourLabels
+import ru.tatarcha.tatlearn.data.local.ReminderSettings
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import ru.tatarcha.tatlearn.domain.exercise.XpRules
 import tatlearn.shared.generated.resources.Res
@@ -60,6 +65,10 @@ import tatlearn.shared.generated.resources.result_time_value
 import tatlearn.shared.generated.resources.result_title
 import tatlearn.shared.generated.resources.result_xp
 import tatlearn.shared.generated.resources.result_xp_value
+import tatlearn.shared.generated.resources.reminder_sheet_enable
+import tatlearn.shared.generated.resources.reminder_sheet_later
+import tatlearn.shared.generated.resources.reminder_sheet_message
+import tatlearn.shared.generated.resources.reminder_sheet_title
 
 private val StatTilePadding = 8.dp
 private val StreakBadgeSize = 48.dp
@@ -67,6 +76,50 @@ private const val PERCENT = 100f
 
 @Composable
 fun ResultContent(
+    state: ResultUiState,
+    onEvent: (ResultUiEvent) -> Unit,
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        ResultBody(
+            state = state,
+            onEvent = onEvent,
+        )
+        ReminderSheet(
+            prompt = state.reminderPrompt,
+            onEvent = onEvent,
+        )
+    }
+}
+
+// TODO(design): окно «Напомнить об уроке?» не нарисовано в макете, собрано из шторки подтверждения и кнопок-таблеток.
+@Composable
+private fun ReminderSheet(
+    prompt: ReminderPrompt?,
+    onEvent: (ResultUiEvent) -> Unit,
+) {
+    // Время держим отдельно от prompt, чтобы при закрытии шторка не схлопывала подписи кнопок во время анимации.
+    val hour = prompt?.hour ?: ReminderSettings.DEFAULT_HOUR
+    TamyrConfirmSheet(
+        visible = prompt != null,
+        title = stringResource(Res.string.reminder_sheet_title),
+        message = stringResource(Res.string.reminder_sheet_message),
+        confirmText = stringResource(Res.string.reminder_sheet_later),
+        dismissText = stringResource(Res.string.reminder_sheet_enable),
+        onConfirm = { onEvent(ResultUiEvent.ReminderLaterClicked) },
+        onDismiss = { onEvent(ResultUiEvent.ReminderEnableClicked) },
+        onScrimClick = { onEvent(ResultUiEvent.ReminderLaterClicked) },
+        content = {
+            TamyrChoiceChips(
+                options = reminderHourLabels(Reminders.AvailableHours),
+                selectedIndex = Reminders.AvailableHours.indexOf(hour),
+                onSelect = { index -> onEvent(ResultUiEvent.ReminderHourSelected(Reminders.AvailableHours[index])) },
+            )
+        },
+    )
+}
+
+@Composable
+private fun ResultBody(
     state: ResultUiState,
     onEvent: (ResultUiEvent) -> Unit,
 ) {
@@ -385,6 +438,12 @@ private fun ResultPreview(state: ResultUiState) = PreviewFrame {
 @Composable
 private fun ResultMistakesPreview() = ResultPreview(
     ResultUiState("Алия", xpEarned = 24, accuracyPercent = 90, durationSeconds = 272, mistakes = 1, mistakeStepIds = listOf("quiz-1"), streak = 13, streakExtended = true),
+)
+
+@Preview(name = "Reminder offer", group = PREVIEW_GROUP)
+@Composable
+private fun ResultReminderPreview() = ResultPreview(
+    ResultUiState("Алия", xpEarned = 36, accuracyPercent = 100, durationSeconds = 305, mistakes = 0, streak = 1, streakExtended = true, reminderPrompt = ReminderPrompt(hour = 19)),
 )
 
 @Preview(name = "Perfect lesson", group = PREVIEW_GROUP)

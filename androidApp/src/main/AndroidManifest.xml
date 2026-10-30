@@ -4,6 +4,9 @@
     <!-- Вибро-отклик на ответах (обычное разрешение, без запроса у пользователя) -->
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <!-- Ежедневное напоминание об уроке; на Android 13+ разрешение запрашивается после первого пройденного урока -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:name=".TatLearnApplication"
         android:allowBackup="true"

@@ -13,6 +13,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -32,6 +33,8 @@ import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 /**
  * Лист подтверждения снизу экрана: затемнение, заголовок, пояснение, главное действие «остаться» и тихое «выйти».
  * Занимает весь экран, поэтому кладётся поверх содержимого в общем `Box`.
+ * Главная (зелёная) кнопка — [dismissText] с действием [onDismiss]; тихая — [confirmText] с [onConfirm].
+ * Нажатие на затемнение вызывает [onScrimClick] (по умолчанию [onDismiss]); [content] — необязательный блок под пояснением.
  */
 @Composable
 fun TamyrConfirmSheet(
@@ -43,6 +46,8 @@ fun TamyrConfirmSheet(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    onScrimClick: () -> Unit = onDismiss,
+    content: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         AnimatedVisibility(
@@ -57,7 +62,7 @@ fun TamyrConfirmSheet(
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
-                        onClick = onDismiss,
+                        onClick = onScrimClick,
                     ),
             )
         }
@@ -100,6 +105,7 @@ fun TamyrConfirmSheet(
                     style = TamyrTheme.typography.body15,
                     color = TamyrTheme.colors.textSecondary,
                 )
+                content?.invoke(this)
                 TamyrButton(
                     text = dismissText,
                     onClick = onDismiss,
@@ -126,5 +132,26 @@ private fun TamyrConfirmSheetPreview() = PreviewFrame {
         dismissText = "Остаться",
         onConfirm = {},
         onDismiss = {},
+    )
+}
+
+@Preview(name = "With content")
+@Composable
+private fun TamyrConfirmSheetContentPreview() = PreviewFrame {
+    TamyrConfirmSheet(
+        visible = true,
+        title = "Напомнить об уроке?",
+        message = "Выбери время, и Мыраужан раз в день напомнит позаниматься.",
+        confirmText = "Не сейчас",
+        dismissText = "Включить",
+        onConfirm = {},
+        onDismiss = {},
+        content = {
+            TamyrChoiceChips(
+                options = listOf("08:00", "13:00", "19:00", "21:00"),
+                selectedIndex = 2,
+                onSelect = {},
+            )
+        },
     )
 }

@@ -162,7 +162,7 @@ class ProfileViewModelsTest {
 
     @Test fun profileTabShowsProfileAndSavedToastAndOpensEdit() = runTest {
         val profile = FakeProfile(UserProfile("id", "Алия", Avatar.Pose(AvatarPose.Searching)))
-        val vm = ProfileViewModel(profile, StatsProgress(UserStats(xp = 340, streak = 12)), SessionOnlyAuth(), HapticsSettings(MapSettings()))
+        val vm = ProfileViewModel(profile, StatsProgress(UserStats(xp = 340, streak = 12)), SessionOnlyAuth(), HapticsSettings(MapSettings()), testReminders())
         assertEquals("Алия", vm.state.value.name)
         assertEquals(Avatar.Pose(AvatarPose.Searching), vm.state.value.avatar)
         assertEquals(4, vm.state.value.stats.level)
@@ -178,7 +178,7 @@ class ProfileViewModelsTest {
     }
 
     @Test fun profileTabFallsBackToSessionNameWithoutProfile() = runTest {
-        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(UserSession("Тимур", "t@b.ru")), HapticsSettings(MapSettings()))
+        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(UserSession("Тимур", "t@b.ru")), HapticsSettings(MapSettings()), testReminders())
         assertEquals("Тимур", vm.state.value.name)
         assertEquals(Avatar.Default, vm.state.value.avatar)
     }
@@ -188,7 +188,7 @@ class ProfileViewModelsTest {
     @Test fun hapticsSettingDefaultsToOnAndPersists() = runTest {
         val settings = MapSettings()
         assertTrue(HapticsSettings(settings).enabled.value)
-        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(), HapticsSettings(settings))
+        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(), HapticsSettings(settings), testReminders())
         assertTrue(vm.state.value.hapticsEnabled)
         vm.onEvent(ProfileUiEvent.HapticsToggled(false))
         assertFalse(vm.state.value.hapticsEnabled)

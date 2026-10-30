@@ -21,11 +21,18 @@ data class ResultUiState(
     val streak: Int = 0,
     /** Показывать ли «Стрик продлён»: серию продлили именно этим уроком. */
     val streakExtended: Boolean = false,
+    /** Не null, пока показано окно с предложением включить напоминания (после первого пройденного урока). */
+    val reminderPrompt: ReminderPrompt? = null,
 ) : UiState
+
+data class ReminderPrompt(val hour: Int)
 
 sealed interface ResultUiEvent : UiEvent {
     data object ContinueClicked : ResultUiEvent
     data object RetryMistakesClicked : ResultUiEvent
+    data class ReminderHourSelected(val hour: Int) : ResultUiEvent
+    data object ReminderEnableClicked : ResultUiEvent
+    data object ReminderLaterClicked : ResultUiEvent
 }
 
 sealed interface ResultUiEffect : UiEffect {
