@@ -114,7 +114,6 @@ private val foodModule = CourseModule(
 private val natureModule = CourseModule(
     "nature", "Табигать", "Природа", "nature",
     lessons = listOf(Lesson("lesson_7", 7, "Табигать", "Природа, часть 1")),
-    lockHint = "Откроется после «Еды»",
 )
 
 private fun catalog() = listOf(foodModule, natureModule)

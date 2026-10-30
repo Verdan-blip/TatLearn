@@ -79,7 +79,6 @@
     "titleRu": "Природа",
     "icon": "nature",
     "requires": "food",
-    "lockHint": "Откроется после «Еды»",
     "lessons": [
       {
         "id": "lesson_7",

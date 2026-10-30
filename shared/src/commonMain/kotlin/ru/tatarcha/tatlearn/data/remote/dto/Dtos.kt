@@ -18,8 +18,6 @@ data class ModuleDto(
     val lessons: List<LessonDto>,
     /** id модуля, который нужно пройти сначала; без него — предыдущий в списке. */
     val requires: String? = null,
-    /** Текст от сервера, например «Откроется после «Еды»» (грамматику на клиенте не вывести). */
-    val lockHint: String? = null,
 )
 
 @Serializable

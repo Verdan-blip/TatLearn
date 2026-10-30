@@ -138,7 +138,7 @@
     <string name="module_progress_label">Пройдено уроков</string>
     <string name="module_progress_value">%1$d из %2$d</string>
     <string name="module_locked_title">Модуль пока закрыт</string>
-    <string name="module_locked_hint">Откроется после «%1$s»</string>
+    <string name="module_locked_hint">Откроется после модуля «%1$s»</string>
     <string name="module_done_title">Модуль пройден</string>
     <string name="module_done_subtitle">Пройдено %1$d из %2$d уроков</string>
     <string name="module_continue">Продолжить · Урок %1$d</string>

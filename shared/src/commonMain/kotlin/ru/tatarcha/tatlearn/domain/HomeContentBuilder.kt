@@ -21,7 +21,7 @@ object HomeContentBuilder {
         val completed = completedIds(progress)
 
         val learning = modules.mapIndexed { index, module ->
-            val lockedBy = requiredModule(modules, index)?.takeIf { !isDone(it, completed) }?.id
+            val required = requiredModule(modules, index)?.takeIf { !isDone(it, completed) }
             val done = module.lessons.count { it.id in completed }
             LearningModule(
                 id = module.id,
@@ -29,8 +29,9 @@ object HomeContentBuilder {
                 titleRu = module.titleRu,
                 icon = module.icon,
                 progressPercent = if (module.lessons.isEmpty()) 0 else done * PERCENT / module.lessons.size,
-                lockedBy = lockedBy,
-                lockHint = if (lockedBy != null) module.lockHint else null,
+                lockedBy = required?.id,
+                lockedByTitleTt = required?.titleTt,
+                lockedByTitleRu = required?.titleRu,
             )
         }
 

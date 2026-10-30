@@ -17,7 +17,7 @@ import ru.tatarcha.tatlearn.domain.model.WordPair
 
 fun LessonDto.toDomain() = Lesson(id, number, titleTt, titleRu)
 
-fun ModuleDto.toDomain() = CourseModule(id, titleTt, titleRu, icon, lessons.map { it.toDomain() }, requires, lockHint)
+fun ModuleDto.toDomain() = CourseModule(id, titleTt, titleRu, icon, lessons.map { it.toDomain() }, requires)
 
 fun LessonContentDto.toDomain() = LessonContent(
     lesson = lesson.toDomain(),

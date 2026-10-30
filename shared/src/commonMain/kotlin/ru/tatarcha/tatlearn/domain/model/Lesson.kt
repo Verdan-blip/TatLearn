@@ -5,7 +5,6 @@ data class Lesson(val id: String, val number: Int, val titleTt: String, val titl
 /**
  * Модуль курса из каталога (то, что приходит с сервера): уроки по порядку, без прогресса пользователя.
  * [requires] — id модуля, который нужно пройти сначала; null — предыдущий модуль в списке (у первого условий нет).
- * [lockHint] — текст от сервера для закрытого модуля, например «Откроется после «Еды»» (грамматику на клиенте не вывести).
  */
 data class CourseModule(
     val id: String,
@@ -14,8 +13,11 @@ data class CourseModule(
     val icon: String,
     val lessons: List<Lesson>,
     val requires: String? = null,
-    val lockHint: String? = null,
 )
+
+/** Название модуля так, как оно показывается на плитке: «Ашлар · Еда» (если названия совпадают, одно). */
+fun moduleTitle(titleTt: String, titleRu: String): String = if (titleTt == titleRu) titleTt else "$titleTt · $titleRu"
+
 
 /** Что показывает главная карточка: старт (новичок), продолжение, начало нового модуля или «всё пройдено». */
 enum class HomeCardKind { Start, Continue, NewModule, AllDone }
@@ -37,7 +39,10 @@ data class CurrentLesson(
     val progress: Float get() = if (totalLessons == 0) 0f else completedLessons.toFloat() / totalLessons
 }
 
-/** Модуль на главной с прогрессом пользователя. [lockedBy] — id модуля, который нужно пройти сначала; null, если модуль открыт. */
+/**
+ * Модуль на главной с прогрессом пользователя. [lockedBy] — id модуля, который нужно пройти сначала; null, если модуль открыт.
+ * [lockedByTitleTt] и [lockedByTitleRu] — его названия для подсказки «Откроется после модуля …».
+ */
 data class LearningModule(
     val id: String,
     val titleTt: String,
@@ -45,7 +50,8 @@ data class LearningModule(
     val icon: String,
     val progressPercent: Int,
     val lockedBy: String?,
-    val lockHint: String?,
+    val lockedByTitleTt: String?,
+    val lockedByTitleRu: String?,
 ) {
     val isLocked: Boolean get() = lockedBy != null
 }

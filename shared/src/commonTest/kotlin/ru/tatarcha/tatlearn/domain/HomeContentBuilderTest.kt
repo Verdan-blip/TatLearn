@@ -13,9 +13,9 @@ class HomeContentBuilderTest {
     private fun lesson(n: Int) = Lesson("lesson_$n", n, "T$n", "Р$n")
 
     private val alphabet = CourseModule("alphabet", "Алфавит", "Алфавит", "alphabet", listOf(lesson(1), lesson(2)))
-    private val food = CourseModule("food", "Ашлар", "Еда", "food", listOf(lesson(3), lesson(4)), lockHint = "после алфавита")
+    private val food = CourseModule("food", "Ашлар", "Еда", "food", listOf(lesson(3), lesson(4)))
     private val numbers = CourseModule("numbers", "Саннар", "Числа", "numbers", listOf(lesson(5)))
-    private val nature = CourseModule("nature", "Табигать", "Природа", "nature", listOf(lesson(6)), requires = "food", lockHint = "после еды")
+    private val nature = CourseModule("nature", "Табигать", "Природа", "nature", listOf(lesson(6)), requires = "food")
     private val catalog = listOf(alphabet, food, numbers, nature)
 
     private fun done(vararg numbers: Int) = numbers.map { LessonProgress("lesson_$it", LessonStatus.Completed, 90) }
@@ -25,7 +25,13 @@ class HomeContentBuilderTest {
         assertEquals("lesson_1", home.currentLesson.lesson.id)
         assertEquals(0, home.currentLesson.completedLessons)
         assertEquals(listOf(false, true, true, true), home.modules.map { it.isLocked })
-        assertEquals("после алфавита", home.modules[1].lockHint)
+        assertEquals("Алфавит", home.modules[1].lockedByTitleTt)
+    }
+
+    @Test fun everyLockedModuleNamesTheModuleItWaitsFor() {
+        val home = HomeContentBuilder.build(catalog, emptyList())!!
+        assertEquals(listOf(null, "Алфавит", "Ашлар", "Ашлар"), home.modules.map { it.lockedByTitleTt })
+        assertEquals(listOf(null, "Алфавит", "Еда", "Еда"), home.modules.map { it.lockedByTitleRu })
     }
 
     @Test fun startedButNotCompletedLessonDoesNotCountAsPassed() {
@@ -39,7 +45,7 @@ class HomeContentBuilderTest {
         val home = HomeContentBuilder.build(catalog, done(1, 2))!!
         assertEquals(100, home.modules[0].progressPercent)
         assertEquals(false, home.modules[1].isLocked)
-        assertNull(home.modules[1].lockHint)
+        assertNull(home.modules[1].lockedByTitleTt)
         assertEquals("lesson_3", home.currentLesson.lesson.id)
         assertEquals("Ашлар", home.currentLesson.topicTt)
     }

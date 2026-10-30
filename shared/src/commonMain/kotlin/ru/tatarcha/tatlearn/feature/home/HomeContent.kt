@@ -64,6 +64,7 @@ import ru.tatarcha.tatlearn.domain.model.CurrentLesson
 import ru.tatarcha.tatlearn.feature.profile.ProfileAvatar
 import ru.tatarcha.tatlearn.domain.model.HomeContent
 import ru.tatarcha.tatlearn.domain.model.LearningModule
+import ru.tatarcha.tatlearn.domain.model.moduleTitle
 import ru.tatarcha.tatlearn.domain.model.Lesson
 import ru.tatarcha.tatlearn.domain.model.UserStats
 import tatlearn.shared.generated.resources.Res
@@ -80,6 +81,7 @@ import tatlearn.shared.generated.resources.home_lesson_button
 import tatlearn.shared.generated.resources.home_lesson_progress
 import tatlearn.shared.generated.resources.home_level_xp
 import tatlearn.shared.generated.resources.home_module_done
+import tatlearn.shared.generated.resources.module_locked_hint
 import tatlearn.shared.generated.resources.home_modules
 import tatlearn.shared.generated.resources.home_modules_all
 import tatlearn.shared.generated.resources.home_nav_contest
@@ -512,20 +514,21 @@ private fun ModuleTile(
         ) {
             ModuleChip(module = module)
             // В макете на закрытых плитках показано только татарское название.
-            val title = if (module.isLocked || module.titleTt == module.titleRu) module.titleTt else "${module.titleTt} · ${module.titleRu}"
+            val title = if (module.isLocked) module.titleTt else moduleTitle(module.titleTt, module.titleRu)
             Text(
                 text = title,
                 style = TamyrTheme.typography.body15Bold,
                 color = if (module.isLocked) TamyrTheme.colors.textSecondary else TamyrTheme.colors.textPrimary,
             )
             when {
-                module.isLocked -> module.lockHint?.let { hint ->
-                    Text(
-                        text = hint,
-                        style = TamyrTheme.typography.label12,
-                        color = TamyrTheme.colors.textSecondary,
-                    )
-                }
+                module.isLocked -> Text(
+                    text = stringResource(
+                        Res.string.module_locked_hint,
+                        moduleTitle(module.lockedByTitleTt.orEmpty(), module.lockedByTitleRu.orEmpty()),
+                    ),
+                    style = TamyrTheme.typography.label12,
+                    color = TamyrTheme.colors.textSecondary,
+                )
                 module.progressPercent >= 100 -> Text(
                     text = stringResource(Res.string.home_module_done, module.progressPercent),
                     style = TamyrTheme.typography.label12Bold,
@@ -586,10 +589,10 @@ private fun HomeBottomBar(selected: HomeNavItem, onItemClick: (HomeNavItem) -> U
 private const val PREVIEW_GROUP = "Home"
 
 private val previewModules = listOf(
-    LearningModule("alphabet", "Алфавит", "Алфавит", "alphabet", progressPercent = 100, lockedBy = null, lockHint = null),
-    LearningModule("food", "Ашлар", "Еда", "food", progressPercent = 35, lockedBy = null, lockHint = null),
-    LearningModule("numbers", "Саннар", "Числа", "numbers", progressPercent = 10, lockedBy = null, lockHint = null),
-    LearningModule("nature", "Табигать", "Природа", "nature", progressPercent = 0, lockedBy = "food", lockHint = "Откроется после «Еды»"),
+    LearningModule("alphabet", "Алфавит", "Алфавит", "alphabet", progressPercent = 100, lockedBy = null, lockedByTitleTt = null, lockedByTitleRu = null),
+    LearningModule("food", "Ашлар", "Еда", "food", progressPercent = 35, lockedBy = null, lockedByTitleTt = null, lockedByTitleRu = null),
+    LearningModule("numbers", "Саннар", "Числа", "numbers", progressPercent = 10, lockedBy = null, lockedByTitleTt = null, lockedByTitleRu = null),
+    LearningModule("nature", "Табигать", "Природа", "nature", progressPercent = 0, lockedBy = "food", lockedByTitleTt = "Ашлар", lockedByTitleRu = "Еда"),
 )
 
 private fun previewContent(
@@ -663,7 +666,7 @@ private fun HomeAllDonePreview() = HomePreview(
     HomeUiState(
         "Алия",
         UserStats(xp = 1990, streak = 100),
-        LoadState.Content(previewContent(previewModules.map { it.copy(progressPercent = 100, lockedBy = null, lockHint = null) }, completed = 5)),
+        LoadState.Content(previewContent(previewModules.map { it.copy(progressPercent = 100, lockedBy = null, lockedByTitleTt = null, lockedByTitleRu = null) }, completed = 5)),
     ),
 )
 
@@ -685,7 +688,7 @@ private fun HomeAllDoneCardPreview() = HomePreview(
     HomeUiState(
         "Алия",
         UserStats(xp = 1990, streak = 100),
-        LoadState.Content(previewContent(previewModules.map { it.copy(progressPercent = 100, lockedBy = null, lockHint = null) }, completed = 5, kind = HomeCardKind.AllDone)),
+        LoadState.Content(previewContent(previewModules.map { it.copy(progressPercent = 100, lockedBy = null, lockedByTitleTt = null, lockedByTitleRu = null) }, completed = 5, kind = HomeCardKind.AllDone)),
     ),
 )
 
@@ -704,8 +707,8 @@ private fun HomeLongTextPreview() = HomePreview(
         LoadState.Content(
             previewContent(
                 listOf(
-                    LearningModule("a", "Бик озын исемле модуль", "Очень длинное название модуля", "alphabet", 50, null, null),
-                    LearningModule("b", "Табигать һәм һава торышы", "Природа и погода", "nature", 0, "a", "Откроется после «Очень длинное название модуля»"),
+                    LearningModule("a", "Бик озын исемле модуль", "Очень длинное название модуля", "alphabet", 50, null, null, null),
+                    LearningModule("b", "Табигать һәм һава торышы", "Природа и погода", "nature", 0, "a", "Бик озын исемле модуль", "Очень длинное название модуля"),
                 ),
             ),
         ),

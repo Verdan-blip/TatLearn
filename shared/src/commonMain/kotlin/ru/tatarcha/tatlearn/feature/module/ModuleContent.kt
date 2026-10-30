@@ -52,6 +52,7 @@ import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import ru.tatarcha.tatlearn.domain.model.CourseModule
 import ru.tatarcha.tatlearn.domain.model.Lesson
 import ru.tatarcha.tatlearn.domain.model.LessonRowState
+import ru.tatarcha.tatlearn.domain.model.moduleTitle
 import ru.tatarcha.tatlearn.domain.model.ModuleDetails
 import ru.tatarcha.tatlearn.domain.model.ModuleLessonRow
 import ru.tatarcha.tatlearn.domain.model.RequiredModule
@@ -205,7 +206,7 @@ private fun LockedBanner(details: ModuleDetails) {
             Column(verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.xxs)) {
                 Text(stringResource(Res.string.module_locked_title), style = TamyrTheme.typography.body16Bold, color = colors.goldText)
                 Text(
-                    details.module.lockHint ?: stringResource(Res.string.module_locked_hint, required.titleRu),
+                    stringResource(Res.string.module_locked_hint, moduleTitle(required.titleTt, required.titleRu)),
                     style = TamyrTheme.typography.body14,
                     color = colors.textSecondary,
                 )
@@ -377,7 +378,6 @@ private fun lesson(n: Int, tt: String, ru: String) = Lesson("lesson_$n", n, tt, 
 private val previewModule = CourseModule(
     "food", "Ашлар", "Еда", "food",
     lessons = listOf(lesson(1, "Ашлар", "Еда, часть 1"), lesson(2, "Туганнар", "Семья"), lesson(3, "Саннар", "Числа"), lesson(4, "Табигать", "Природа")),
-    lockHint = "Откроется после «Алфавита»",
 )
 
 private fun previewRows(vararg states: LessonRowState) =

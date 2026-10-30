@@ -14,7 +14,7 @@ class ModuleDetailsBuilderTest {
 
     private val alphabet = CourseModule("alphabet", "Алфавит", "Алфавит", "alphabet", listOf(lesson(1), lesson(2)))
     private val food = CourseModule("food", "Ашлар", "Еда", "food", listOf(lesson(3), lesson(4), lesson(5)))
-    private val nature = CourseModule("nature", "Табигать", "Природа", "nature", listOf(lesson(6)), requires = "food", lockHint = "после еды")
+    private val nature = CourseModule("nature", "Табигать", "Природа", "nature", listOf(lesson(6)), requires = "food")
     private val catalog = listOf(alphabet, food, nature)
 
     private fun done(vararg numbers: Int, score: Int = 90) = numbers.map { LessonProgress("lesson_$it", LessonStatus.Completed, score) }
