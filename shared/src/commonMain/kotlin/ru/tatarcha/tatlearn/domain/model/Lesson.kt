@@ -35,6 +35,8 @@ data class CurrentLesson(
     val totalLessons: Int,
     val kind: HomeCardKind = HomeCardKind.Continue,
     val restartsLesson: Boolean = false,
+    /** Модуль, о котором карточка; по нему видно, относится ли прирост прогресса к карточке. */
+    val moduleId: String = "",
 ) {
     val progress: Float get() = if (totalLessons == 0) 0f else completedLessons.toFloat() / totalLessons
 }

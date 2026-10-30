@@ -4,7 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import ru.tatarcha.tatlearn.core.common.ReduceMotion
 import ru.tatarcha.tatlearn.feature.profile.ProfileScene
 
 @Composable
@@ -25,9 +28,11 @@ fun HomeScene(
         }
     }
     val state by viewModel.state.collectAsState()
+    val reduceMotion = koinInject<ReduceMotion>()
     HomeContent(
         state = state,
         onEvent = viewModel::onEvent,
+        reduceMotion = remember { reduceMotion.isEnabled() },
         profileTab = { modifier ->
             ProfileScene(
                 onEdit = onEditProfile,

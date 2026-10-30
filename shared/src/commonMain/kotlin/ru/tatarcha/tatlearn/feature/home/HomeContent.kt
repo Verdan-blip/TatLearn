@@ -63,7 +63,9 @@ import ru.tatarcha.tatlearn.domain.model.Avatar
 import ru.tatarcha.tatlearn.domain.model.CurrentLesson
 import ru.tatarcha.tatlearn.feature.profile.ProfileAvatar
 import ru.tatarcha.tatlearn.domain.model.HomeContent
+import ru.tatarcha.tatlearn.domain.model.CardGain
 import ru.tatarcha.tatlearn.domain.model.LearningModule
+import ru.tatarcha.tatlearn.domain.model.ProgressGain
 import ru.tatarcha.tatlearn.domain.model.moduleTitle
 import ru.tatarcha.tatlearn.domain.model.Lesson
 import ru.tatarcha.tatlearn.domain.model.UserStats
@@ -102,6 +104,8 @@ fun HomeContent(
     onEvent: (HomeUiEvent) -> Unit,
     /** Содержимое вкладки «Профиль»; нижнее меню рисует главная. */
     profileTab: @Composable (Modifier) -> Unit = {},
+    /** Включена системная настройка «уменьшить анимацию»: «доезд» прогресса сразу показывает итог. */
+    reduceMotion: Boolean = false,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         if (state.tab == HomeNavItem.Home) {
@@ -118,6 +122,8 @@ fun HomeContent(
                     avatar = state.avatar,
                     stats = state.stats,
                     content = content,
+                    progressGain = state.progressGain,
+                    reduceMotion = reduceMotion,
                     onEvent = onEvent,
                 )
             }
@@ -164,8 +170,16 @@ private fun HomeLoaded(
     avatar: Avatar,
     stats: UserStats,
     content: HomeContent,
+    progressGain: ProgressGain?,
+    reduceMotion: Boolean,
     onEvent: (HomeUiEvent) -> Unit,
 ) {
+    val gainAnimation = rememberGainAnimation(
+        gain = progressGain,
+        reduceMotion = reduceMotion,
+        onStarted = { onEvent(HomeUiEvent.ProgressGainStarted) },
+        onFinished = { onEvent(HomeUiEvent.ProgressGainFinished) },
+    )
     Column(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -186,6 +200,7 @@ private fun HomeLoaded(
             )
             CurrentLessonCard(
                 current = content.currentLesson,
+                animation = gainAnimation,
                 onStart = { onEvent(HomeUiEvent.StartLessonClicked) },
             )
             if (content.currentLesson.kind == HomeCardKind.Start) StreakInviteCard(stats = stats) else StreakCard(stats = stats)
@@ -209,6 +224,7 @@ private fun HomeLoaded(
             ModulesGrid(
                 modules = content.modules,
                 highlightedId = content.modules.firstOrNull { !it.isLocked }?.id.takeIf { content.currentLesson.kind == HomeCardKind.Start },
+                animation = gainAnimation,
                 onClick = { moduleId -> onEvent(HomeUiEvent.ModuleClicked(moduleId)) },
             )
         }
@@ -351,12 +367,43 @@ private fun StreakCard(stats: UserStats) {
     }
 }
 
+/** Карточка «Продолжить» и поверх неё подпись «+1 урок», когда после урока прибавился ровно один урок этого модуля. */
 @Composable
 private fun CurrentLessonCard(
     current: CurrentLesson,
+    animation: GainAnimation,
+    onStart: () -> Unit,
+) {
+    val cardGain = animation.gain?.takeIf { it.moduleId == current.moduleId }?.card
+    Box {
+        CurrentLessonCardBody(
+            current = current,
+            cardGain = cardGain,
+            animation = animation,
+            onStart = onStart,
+        )
+        if (cardGain?.showsChip == true) {
+            GainChip(
+                animation = animation,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = TamyrTheme.spacing.l + TamyrSizes.gainChipTop, end = TamyrTheme.spacing.l),
+            )
+        }
+    }
+}
+
+@Composable
+private fun CurrentLessonCardBody(
+    current: CurrentLesson,
+    cardGain: CardGain?,
+    animation: GainAnimation,
     onStart: () -> Unit,
 ) {
     val colors = TamyrTheme.colors
+    // До конца «доезда» карточка показывает старые значения прироста, затем настоящие.
+    val barCompleted = if (cardGain != null && !animation.barsReached) cardGain.fromCompleted else current.completedLessons
+    val counterCompleted = if (cardGain != null && !animation.counterReached) cardGain.fromCompleted else current.completedLessons
     val allDone = current.kind == HomeCardKind.AllDone
     val tag = when (current.kind) {
         HomeCardKind.Start -> Res.string.home_start_tag
@@ -365,7 +412,9 @@ private fun CurrentLessonCard(
         HomeCardKind.AllDone -> Res.string.home_done_tag
     }
     TamyrCard(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(if (cardGain != null) Modifier.gainRing(animation, TamyrTheme.shapes.card) else Modifier),
         containerColor = colors.successContainer,
         contentPadding = TamyrTheme.spacing.l,
     ) {
@@ -381,7 +430,7 @@ private fun CurrentLessonCard(
                     color = colors.primary,
                 )
                 val counter = when (current.kind) {
-                    HomeCardKind.Continue -> stringResource(Res.string.home_lesson_progress, current.completedLessons, current.totalLessons)
+                    HomeCardKind.Continue -> stringResource(Res.string.home_lesson_progress, counterCompleted, current.totalLessons)
                     HomeCardKind.Start, HomeCardKind.NewModule -> pluralStringResource(Res.plurals.home_lessons_count, current.totalLessons, current.totalLessons)
                     HomeCardKind.AllDone -> null
                 }
@@ -419,9 +468,10 @@ private fun CurrentLessonCard(
             // Полосу показываем только при продолжении: пустая полоса у новичка выглядит упрёком.
             if (current.kind == HomeCardKind.Continue) {
                 TamyrProgressBar(
-                    progress = current.progress,
+                    progress = if (current.totalLessons == 0) 0f else barCompleted.toFloat() / current.totalLessons,
                     height = TamyrSizes.lessonProgress,
                     trackColor = colors.surface,
+                    animationMillis = animation.barMillis,
                 )
             }
             LessonButton(
@@ -465,6 +515,7 @@ private fun LessonButton(
 private fun ModulesGrid(
     modules: List<LearningModule>,
     highlightedId: String?,
+    animation: GainAnimation,
     onClick: (moduleId: String) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.m)) {
@@ -479,6 +530,7 @@ private fun ModulesGrid(
                     ModuleTile(
                         module = module,
                         highlighted = module.id == highlightedId,
+                        animation = animation,
                         onClick = { onClick(module.id) },
                         modifier = Modifier
                             .weight(1f)
@@ -495,11 +547,14 @@ private fun ModulesGrid(
 private fun ModuleTile(
     module: LearningModule,
     highlighted: Boolean,
+    animation: GainAnimation,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val gain = animation.gain?.takeIf { it.moduleId == module.id }
+    val shownPercent = if (gain != null && !animation.barsReached) gain.fromPercent else module.progressPercent
     TamyrCard(
-        modifier = modifier,
+        modifier = if (gain != null) modifier.gainRing(animation, TamyrTheme.shapes.tile) else modifier,
         onClick = onClick,
         shape = TamyrTheme.shapes.tile,
         containerColor = if (module.isLocked) TamyrTheme.colors.surfaceMuted else TamyrTheme.colors.surface,
@@ -535,9 +590,10 @@ private fun ModuleTile(
                     color = TamyrTheme.colors.primary,
                 )
                 else -> TamyrProgressBar(
-                    progress = module.progressPercent / 100f,
+                    progress = shownPercent / 100f,
                     height = TamyrSizes.moduleProgress,
                     color = if (module.icon == ICON_FOOD) TamyrTheme.colors.accent else TamyrTheme.colors.primary,
+                    animationMillis = animation.barMillis,
                 )
             }
         }
@@ -626,6 +682,17 @@ private fun HomeErrorPreview() = HomePreview(HomeUiState(userName = "Алия", 
 @Composable
 private fun HomeContentPreview() = HomePreview(
     HomeUiState("Алия", UserStats(xp = 340, streak = 12), LoadState.Content(previewContent())),
+)
+
+@Preview(name = "Progress gain (before animation)", group = PREVIEW_GROUP)
+@Composable
+private fun HomeProgressGainPreview() = HomePreview(
+    HomeUiState(
+        userName = "Алия",
+        stats = UserStats(xp = 340, streak = 12),
+        content = LoadState.Content(previewContent(completed = 3)),
+        progressGain = ProgressGain(moduleId = "food", fromPercent = 40, toPercent = 60, card = CardGain(fromCompleted = 2, toCompleted = 3, total = 5)),
+    ),
 )
 
 @Preview(name = "Stub toast", group = PREVIEW_GROUP)

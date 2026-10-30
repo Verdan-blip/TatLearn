@@ -40,6 +40,7 @@ import kotlinx.coroutines.SupervisorJob
 import ru.tatarcha.tatlearn.core.haptics.Haptics
 import ru.tatarcha.tatlearn.core.haptics.PatternHaptics
 import ru.tatarcha.tatlearn.core.notifications.ReminderTexts
+import ru.tatarcha.tatlearn.domain.HomeProgressTracker
 import ru.tatarcha.tatlearn.core.notifications.Reminders
 import ru.tatarcha.tatlearn.data.local.HapticsSettings
 import ru.tatarcha.tatlearn.data.local.ReminderSettings
@@ -102,6 +103,7 @@ val dataModule = module {
     single { SessionStorage(get()) }
     single { OnboardingStorage(get()) }
     single { HapticsSettings(get()) }
+    single { HomeProgressTracker() }
     single { ReminderSettings(get()) }
     single {
         Reminders(

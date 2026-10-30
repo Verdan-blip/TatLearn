@@ -6,6 +6,7 @@ import ru.tatarcha.tatlearn.core.common.UiEvent
 import ru.tatarcha.tatlearn.core.common.UiState
 import ru.tatarcha.tatlearn.domain.model.Avatar
 import ru.tatarcha.tatlearn.domain.model.HomeContent
+import ru.tatarcha.tatlearn.domain.model.ProgressGain
 import ru.tatarcha.tatlearn.domain.model.UserStats
 
 data class HomeUiState(
@@ -18,6 +19,8 @@ data class HomeUiState(
     val tab: HomeNavItem = HomeNavItem.Home,
     /** Аватар из профиля (цвет с буквой имени или поза Мыраужана). */
     val avatar: Avatar = Avatar.Default,
+    /** Прирост прогресса после урока: экран проигрывает «доезд» один раз и сообщает об этом событиями. */
+    val progressGain: ProgressGain? = null,
 ) : UiState
 
 sealed interface HomeUiEvent : UiEvent {
@@ -27,6 +30,10 @@ sealed interface HomeUiEvent : UiEvent {
     data object AllModulesClicked : HomeUiEvent
     data class NavItemClicked(val item: HomeNavItem) : HomeUiEvent
     data object ToastDismissed : HomeUiEvent
+
+    /** Анимация прироста началась на экране: показанный прогресс запоминается, повторно она не сыграет. */
+    data object ProgressGainStarted : HomeUiEvent
+    data object ProgressGainFinished : HomeUiEvent
 }
 
 sealed interface HomeUiEffect : UiEffect {

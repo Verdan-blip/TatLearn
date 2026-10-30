@@ -65,6 +65,9 @@ object TamyrSizes {
     val toastClose = 32.dp
     val toastCloseIcon = 24.dp
     val toastSwipeThreshold = 24.dp
+    val gainRing = 3.dp
+    /** Отступ подписи «+1 урок» от верха содержимого карточки: она стоит на строке названия. */
+    val gainChipTop = 28.dp
 }
 
 /** Тайминги анимаций; макет статичный, поэтому они наши собственные (короткие и спокойные). */
@@ -80,4 +83,14 @@ object TamyrMotion {
     const val WAVE_MS = 600
     /** Пауза после появления экрана результата, прежде чем выехать шторке с предложением напоминаний. */
     const val REMINDER_PROMPT_DELAY_MS = 800L
+    /** «Доезд» прогресса на главной после урока: пауза, рост полосы, золотое кольцо, подпись «+1 урок». */
+    const val GAIN_DELAY_MS = 300
+    const val GAIN_GROW_MS = 700
+    const val GAIN_RING_IN_MS = 200
+    const val GAIN_RING_OUT_MS = 400
+    const val GAIN_CHIP_IN_MS = 200
+    const val GAIN_CHIP_HOLD_MS = 800
+    const val GAIN_CHIP_OUT_MS = 300
+    /** При «уменьшить анимацию» итог показывается сразу, а подсветка просто держится это время. */
+    const val GAIN_REDUCED_HOLD_MS = 1_000
 }

@@ -12,6 +12,7 @@ import ru.tatarcha.tatlearn.core.common.MviViewModel
 import ru.tatarcha.tatlearn.core.common.errorCode
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
 import ru.tatarcha.tatlearn.domain.HomeContentBuilder
+import ru.tatarcha.tatlearn.domain.HomeProgressTracker
 import ru.tatarcha.tatlearn.domain.model.CourseModule
 import ru.tatarcha.tatlearn.domain.model.LessonProgress
 import ru.tatarcha.tatlearn.domain.repository.AuthRepository
@@ -25,6 +26,7 @@ class HomeViewModel(
     progress: ProgressRepository,
     auth: AuthRepository,
     profile: ProfileRepository,
+    private val tracker: HomeProgressTracker,
 ) : MviViewModel<HomeUiState, HomeUiEvent, HomeUiEffect>(
     HomeUiState(
         userName = profile.profile.value?.name ?: auth.session.value?.name.orEmpty(),
@@ -38,10 +40,14 @@ class HomeViewModel(
     private var catalog: List<CourseModule>? = null
     private var lessonProgress: List<LessonProgress> = emptyList()
 
+    /** Собирать главную можно только после первого ответа базы: пустой прогресс до него дал бы ложный «прирост». */
+    private var progressReady = false
+
     init {
         progress.observeStats().onEach { stats -> setState { copy(stats = stats) } }.launchIn(viewModelScope)
         progress.observeLessonProgress().onEach { items ->
             lessonProgress = items
+            progressReady = true
             publish()
         }.launchIn(viewModelScope)
         // Имя и аватар из профиля; пока профиля нет (поток с входом), имя берётся из сессии.
@@ -65,6 +71,8 @@ class HomeViewModel(
             HomeUiEvent.AllModulesClicked -> showToast(HomeToast.AllModulesUnavailable)
             is HomeUiEvent.NavItemClicked -> setState { copy(tab = event.item, toast = null) }
             HomeUiEvent.ToastDismissed -> hideToast()
+            HomeUiEvent.ProgressGainStarted -> (state.value.content as? LoadState.Content)?.let { tracker.commit(it.data) }
+            HomeUiEvent.ProgressGainFinished -> setState { copy(progressGain = null) }
         }
     }
 
@@ -94,7 +102,16 @@ class HomeViewModel(
 
     private fun publish() {
         val modules = catalog ?: return
+        if (!progressReady) return
         val home = HomeContentBuilder.build(modules, lessonProgress)
-        setState { copy(content = if (home != null) LoadState.Content(home) else LoadState.Error(ErrorCodes.NOT_FOUND)) }
+        // Прирост запоминаем (commit) только когда экран его показал: старая главная под уроком тоже получает новый прогресс.
+        val gain = home?.let(tracker::gainFor)
+        if (home != null && gain == null) tracker.commit(home)
+        setState {
+            copy(
+                content = if (home != null) LoadState.Content(home) else LoadState.Error(ErrorCodes.NOT_FOUND),
+                progressGain = gain ?: progressGain,
+            )
+        }
     }
 }

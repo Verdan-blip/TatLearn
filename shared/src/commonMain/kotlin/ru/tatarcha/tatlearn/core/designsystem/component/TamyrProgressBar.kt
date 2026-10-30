@@ -24,8 +24,9 @@ fun TamyrProgressBar(
     height: Dp = TamyrSizes.progressHeight,
     color: Color = TamyrTheme.colors.primary,
     trackColor: Color = TamyrTheme.colors.surfaceMuted,
+    animationMillis: Int = TamyrMotion.PROGRESS_MS,
 ) {
-    val animated by animateFloatAsState(progress.coerceIn(0f, 1f), tween(TamyrMotion.PROGRESS_MS))
+    val animated by animateFloatAsState(progress.coerceIn(0f, 1f), tween(animationMillis))
     val shape = TamyrTheme.shapes.progress
     Box(modifier.fillMaxWidth().height(height).clip(shape).background(trackColor)) {
         Box(Modifier.fillMaxHeight().fillMaxWidth(animated).clip(shape).background(color))

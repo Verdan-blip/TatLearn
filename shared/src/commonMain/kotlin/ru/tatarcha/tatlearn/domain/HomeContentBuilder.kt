@@ -63,6 +63,7 @@ object HomeContentBuilder {
                 totalLessons = module.lessons.size,
                 kind = kind,
                 restartsLesson = started && kind == HomeCardKind.Continue,
+                moduleId = module.id,
             ),
         )
     }

@@ -125,6 +125,7 @@
     <string name="home_continue_tag">Дәвам ит · Продолжить</string>
     <string name="home_lesson_progress">%1$d / %2$d</string>
     <string name="home_lesson_button">Урок %1$d · %2$s</string>
+    <string name="home_gain_chip">+1 урок</string>
     <string name="home_modules">Модули</string>
     <string name="home_modules_all">Все</string>
     <string name="home_chip_alphabet">Аа</string>
