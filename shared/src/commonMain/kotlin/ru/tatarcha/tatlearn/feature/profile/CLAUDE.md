@@ -6,7 +6,7 @@
 - `ProfileScene` (содержимое вкладки внутри главной; нижнее меню рисует `HomeContent`, слот `profileTab`) -> `ProfileContent` <- `ProfileViewModel(ProfileRepository, ProgressRepository, AuthRepository)`. «Изменить профиль» открывает `ProfileEditKey`.
 - `ProfileEditScene` -> `ProfileEditContent` <- `ProfileEditViewModel`. Сохранение кнопкой; несохранённые изменения подтверждаются листом `TamyrConfirmSheet`, системный «назад» идёт через `NavigationBackHandler`.
 - `ProfileRepository` (domain) и `SettingsProfileRepository` (data/local, multiplatform-settings): имя, аватар, локальный UUID; `saved` — событие для уведомления «Сохранено».
-- `ProfileAvatar` (цвет с буквой или кадр головы позы Мыраужана, кадры подобраны под макеты) и `AvatarPicker` (цвета и позы на одной сетке из 6 колонок, радиогруппа) используются и на знакомстве, и в шапке главной.
+- `ProfileAvatar` (цвет с буквой или кадр головы позы Мыраужана; кадры `PoseCrop` заданы в сетке 400×400 поверх PNG маскота и подобраны 02.11.2026 под рыжего кота из Nano Banana, при смене картинок их надо пересматривать, макеты 32 и 33 показывают старого кота) и `AvatarPicker` (цвета и позы на одной сетке из 6 колонок, радиогруппа) используются и на знакомстве, и в шапке главной.
 
 ## Решения (25.10.2026)
 - Правила имени в `ProfileRules` (domain): обрезка и схлопывание пробелов, 1-20 символов, счётчик с 15-го; имя по умолчанию «Друг».

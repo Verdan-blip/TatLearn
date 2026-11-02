@@ -44,7 +44,10 @@ internal fun avatarPalette(index: Int): AvatarPalette {
     }
 }
 
-/** Кадр головы позы в системе координат 400×400 исходного SVG (как на макетах 32 и 33). */
+/**
+ * Кадр головы позы в системе координат 400×400: PNG маскота (768×768, кот обрезан по контуру) растягивается на эту сетку.
+ * Отрицательные значения допустимы: кадр может выходить за край картинки (это прозрачное поле).
+ */
 internal data class PoseCrop(val x: Float, val y: Float, val size: Float)
 
 internal val AvatarPose.mascot: MascotPose
@@ -59,10 +62,13 @@ internal val AvatarPose.mascot: MascotPose
 
 internal val AvatarPose.crop: PoseCrop
     get() = when (this) {
-        AvatarPose.Greeting, AvatarPose.Searching, AvatarPose.Timer -> PoseCrop(70f, 55f, 260f)
-        AvatarPose.Cheer -> PoseCrop(70f, 50f, 260f)
-        AvatarPose.Sleeping -> PoseCrop(10f, 130f, 280f)
-        AvatarPose.Correct -> PoseCrop(0f, 0f, 400f)
+        // Кадры подобраны под рыжего кота из Nano Banana (02.11.2026): голова целиком, уши внутри круга.
+        AvatarPose.Greeting -> PoseCrop(46f, -16f, 268f)
+        AvatarPose.Cheer -> PoseCrop(99f, 40f, 200f)
+        AvatarPose.Searching -> PoseCrop(53f, -10f, 250f)
+        AvatarPose.Sleeping -> PoseCrop(-16f, 94f, 262f)
+        AvatarPose.Correct -> PoseCrop(48f, -8f, 280f)
+        AvatarPose.Timer -> PoseCrop(65f, -9f, 232f)
     }
 
 private const val SOURCE_SIZE = 400f
