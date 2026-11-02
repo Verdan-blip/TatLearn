@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Синтез черновиков звуковых эффектов Тамыр (без внешних зависимостей).
 
-Запуск: python3 design/sounds/generate_sounds.py
+Запуск: python3 design/sounds/generate_sounds.py [префикс имени ...], например `correct`
 Результат: design/sounds/drafts/<событие>_<вариант>.wav и .m4a (m4a через afconvert, macOS).
 Все звуки строятся кодом (синусы с обертонами и затуханием), чужих сэмплов нет.
 """
@@ -14,6 +14,7 @@ import wave
 SR = 44100
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "drafts")
 PEAK = 0.35  # тихо: эффекты не должны перебивать слова
+PEAKS = {"correct": 0.25}  # «правильно» звучит чаще всего, поэтому ещё тише
 
 
 def hz(name):
@@ -53,10 +54,10 @@ def mix(parts, total):
     return buf
 
 
-def finish(buf):
+def finish(buf, peak=PEAK):
     """Нормализация до PEAK и плавное затухание краёв (без щелчков)."""
     m = max(abs(v) for v in buf) or 1.0
-    k = PEAK / m
+    k = peak / m
     fade = int(SR * 0.02)
     for i in range(fade):
         buf[-1 - i] *= i / fade
@@ -66,14 +67,39 @@ def finish(buf):
 BELL = [(1, 1.0), (2.0, 0.35), (3.0, 0.15), (5.4, 0.08)]
 MARIMBA = [(1, 1.0), (4.0, 0.3), (9.2, 0.05)]
 SOFT = [(1, 1.0), (2, 0.12)]
+PURE = [(1, 1.0), (2, 0.04)]
 
 SOUNDS = {}
 
-# Правильно: только высокая нота, разные ноты и тембры
-SOUNDS["correct_a"] = lambda: mix([(0, tone(hz("B5"), 0.6, BELL, 7))], 0.6)
-SOUNDS["correct_b"] = lambda: mix([(0, tone(hz("E6"), 0.55, BELL, 8))], 0.55)
-SOUNDS["correct_c"] = lambda: mix([(0, tone(hz("G6"), 0.5, BELL, 9))], 0.5)
-SOUNDS["correct_d"] = lambda: mix([(0, tone(hz("B5"), 0.4, MARIMBA, 14))], 0.4)
+# Правильно: чёткая атака, два тона вверх, короткий хвост (приёмы «живых» звуков отклика, без копирования чьих-либо записей)
+GLOCK = [(1, 1.0), (2.76, 0.22), (5.4, 0.08)]
+PLUCK = [(1, 1.0), (2, 0.25), (3, 0.1), (4, 0.05)]
+MALLET = [(1, 1.0), (3.9, 0.35), (9.0, 0.06)]
+
+
+def gain(samples, g):
+    return [v * g for v in samples]
+
+
+def pluck_glock(note, dur, decay):
+    """Тело щипка плюс стеклянный верх: деревянно и чуть искристо."""
+    body = tone(hz(note), dur, PLUCK, decay, attack=0.002)
+    top = tone(hz(note) * 2, dur, GLOCK, decay * 1.3, attack=0.002)
+    return [b + 0.3 * t for b, t in zip(body, top)]
+
+
+SOUNDS["correct_1"] = lambda: mix(
+    [(0, pluck_glock("E5", 0.25, 14)), (0.085, gain(pluck_glock("A5", 0.3, 12), 1.1))], 0.4)
+SOUNDS["correct_2"] = lambda: mix(
+    [(0, tone(hz("C5"), 0.22, MALLET, 18, attack=0.002)), (0.09, gain(tone(hz("G5"), 0.3, MALLET, 15, attack=0.002), 1.1))], 0.4)
+SOUNDS["correct_3"] = lambda: mix(
+    [(i * 0.045, pluck_glock(n, 0.22, 16)) for i, n in enumerate(["C5", "E5", "G5"])], 0.4)
+SOUNDS["correct_4"] = lambda: mix(
+    [(0, gain(pluck_glock("D5", 0.2, 16), 0.8)), (0.08, gain(pluck_glock("B5", 0.35, 11), 1.15))], 0.45)
+SOUNDS["correct_5"] = lambda: mix(
+    [(0, tone(hz("G5"), 0.12, PURE, 25, glide=0.25, attack=0.002)), (0.07, pluck_glock("D6", 0.3, 13))], 0.4)
+SOUNDS["correct_6"] = lambda: mix(
+    [(0, pluck_glock("F5", 0.2, 17)), (0.075, pluck_glock("C6", 0.32, 12))], 0.4)
 
 # Неправильно: мягкий низкий, без диссонанса и резкой атаки (выбран вариант a)
 SOUNDS["wrong_a"] = lambda: mix([(0, tone(hz("D4"), 0.35, SOFT, 9, glide=-0.12, attack=0.015))], 0.4)
@@ -116,8 +142,12 @@ def report(name, buf):
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
+    import sys
+    prefixes = sys.argv[1:]  # например: python3 generate_sounds.py correct
     for name, make in SOUNDS.items():
-        buf = finish(make())
+        if prefixes and not any(name.startswith(x) for x in prefixes):
+            continue
+        buf = finish(make(), PEAKS.get(name.split("_")[0], PEAK))
         wav = os.path.join(OUT, name + ".wav")
         write_wav(wav, buf)
         subprocess.run(["afconvert", "-f", "m4af", "-d", "aac", "-b", "64000", wav,
