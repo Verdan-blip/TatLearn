@@ -214,10 +214,12 @@ class LessonViewModel(
         checkedSteps++
         if (correct) correctSteps++ else mistakeIds += step.id
         player.stop()
-        // Вибро-отклик на итог шага (в сопоставлении это итог всего шага, на отдельные пары вибро нет).
-        if (correct) haptics.correct() else haptics.wrong()
-        // Звук после player.stop(): запись слова уже оборвана, наложения нет. На тапы и пары звуков нет.
-        if (correct) sounds.correct() else sounds.wrong()
+        // Вибро и звук следуют за панелью ответа (feedback.isCorrect), а не за учётом точности (correct): в сопоставлении
+        // шаг с ошибкой портит точность, но панель показывает успех, и отклик не должен ей противоречить.
+        // Вибро на итог шага (на отдельные пары его нет). Звук после player.stop(): запись слова уже оборвана,
+        // наложения нет. На тапы и пары звуков нет.
+        if (feedback.isCorrect) haptics.correct() else haptics.wrong()
+        if (feedback.isCorrect) sounds.correct() else sounds.wrong()
         viewModelScope.launch {
             val outcome = progress.recordExerciseResult(ExerciseResult(key.lessonId, step.type, if (correct) 1 else 0, 1))
             xpEarned += outcome.xpEarned

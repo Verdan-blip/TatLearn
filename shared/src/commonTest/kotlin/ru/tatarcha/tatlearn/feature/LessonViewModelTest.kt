@@ -227,6 +227,9 @@ class LessonViewModelTest {
         }
         assertTrue(vm.state.value.feedback!!.isCorrect)
         assertEquals(0, progress.recorded.single().correct) // была ошибка, значит шаг не «чистый»
+        // Отклик следует за панелью (успех), а не за учётом точности: ни «wrong» звука, ни «wrong» вибро.
+        assertEquals(listOf("correct"), sounds.events)
+        assertEquals(listOf("correct"), haptics.events)
     }
 
     @Test fun sentenceNeedsWholeAnswerInOrder() = runTest {
