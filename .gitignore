@@ -17,3 +17,6 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
+
+# Черновики иконки (пересоздаются скриптом design/icon/generate_icon_drafts.py)
+design/icon/drafts/

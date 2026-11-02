@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Сгенерировано design/icon/export_app_icon.py, правьте скрипт, а не этот файл. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+<group android:pivotX="512" android:pivotY="512" android:rotation="-5" android:scaleX="1.0" android:scaleY="1.0">
+<path android:fillColor="#FFFFFF" android:fillType="evenOdd" android:fillAlpha="0.55" android:pathData="M246 430 Q214 300 246 236 Q262 218 286 232 L440 330 Z M778 430 Q810 300 778 236 Q762 218 738 232 L584 330 Z M268 392 Q248 300 262 262 L368 330 Z M756 392 Q776 300 762 262 L656 330 Z"/>
+<path android:fillColor="#FFFFFF" android:fillType="evenOdd" android:fillAlpha="0.55" android:pathData="M202.0,560.0 a310.0,260.0 0 1,0 620.0,0 a310.0,260.0 0 1,0 -620.0,0 Z M312.0,652.0 a200.0,110.0 0 1,0 400.0,0 a200.0,110.0 0 1,0 -400.0,0 Z"/>
+<path android:fillColor="#FFFFFF" android:fillType="evenOdd" android:pathData="M272 400 Q268 205 512 188 Q756 205 752 400 Q512 360 272 400 Z M512 222 L552 262 L512 302 L472 262 Z"/>
+<path android:fillColor="#FFFFFF" android:pathData="M486 592 Q512 580 538 592 Q530 622 512 630 Q494 622 486 592 Z"/>
+<path android:strokeColor="#FFFFFF" android:strokeWidth="13" android:strokeLineCap="round" android:pathData="M390 548 Q420 506 454 548"/>
+<path android:strokeColor="#FFFFFF" android:strokeWidth="13" android:strokeLineCap="round" android:pathData="M570 548 Q604 506 634 548"/>
+<path android:strokeColor="#FFFFFF" android:strokeWidth="10" android:strokeLineCap="round" android:pathData="M512 630 V648 M512 648 Q488 680 456 654 M512 648 Q536 680 568 654"/>
+</group>
+</vector>
