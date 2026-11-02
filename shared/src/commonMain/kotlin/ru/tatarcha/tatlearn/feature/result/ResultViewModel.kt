@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import ru.tatarcha.tatlearn.core.common.MviViewModel
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
 import ru.tatarcha.tatlearn.core.haptics.Haptics
+import ru.tatarcha.tatlearn.core.sound.SoundEffects
 import ru.tatarcha.tatlearn.core.notifications.Reminders
 import ru.tatarcha.tatlearn.domain.exercise.PassRules
 import ru.tatarcha.tatlearn.domain.repository.AuthRepository
@@ -21,6 +22,7 @@ class ResultViewModel(
     progress: ProgressRepository,
     profile: ProfileRepository,
     haptics: Haptics,
+    sounds: SoundEffects,
     private val reminders: Reminders,
 ) : MviViewModel<ResultUiState, ResultUiEvent, ResultUiEffect>(
     ResultUiState(
@@ -38,7 +40,10 @@ class ResultViewModel(
 ) {
     init {
         // Праздничный отклик один раз при показе пройденного урока; «не засчитан» без вибро (тон «хорошая попытка»).
-        if (state.value.passed) haptics.celebrate()
+        if (state.value.passed) {
+            haptics.celebrate()
+            sounds.complete()
+        }
         // Предложение напоминаний только один раз и только после засчитанного урока: к этому моменту у человека уже есть польза.
         // Шторка выезжает уже на показанном экране, а не вместе с переходом на него. Если человек успел уйти, предложение не тратится.
         if (state.value.passed && reminders.shouldOfferPrompt) {

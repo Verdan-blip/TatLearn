@@ -368,7 +368,7 @@ class ScreenViewModelsTest {
     private val resultKey = ResultKey("lesson_4", xpEarned = 24, accuracyPercent = 75, durationSeconds = 130, mistakeStepIds = listOf("quiz-1", "sentence-0"))
 
     @Test fun resultStateComesFromKey() = runTest {
-        val vm = ResultViewModel(resultKey, FakeAuth(UserSession("Алия", "a@b.ru")), StatsProgress(UserStats(50, 4)), FakeProfile(), RecordingHaptics(), testReminders())
+        val vm = ResultViewModel(resultKey, FakeAuth(UserSession("Алия", "a@b.ru")), StatsProgress(UserStats(50, 4)), FakeProfile(), RecordingHaptics(), RecordingSounds(), testReminders())
         val state = vm.state.value
         assertEquals("Алия", state.userName)
         assertEquals(24, state.xpEarned)
@@ -380,7 +380,7 @@ class ScreenViewModelsTest {
 
     @Test fun resultBelowThresholdIsNotPassed() = runTest {
         val key = resultKey.copy(accuracyPercent = 70, correctAnswers = 7, totalAnswers = 10, mistakeStepIds = listOf("a", "b", "c"))
-        val state = ResultViewModel(key, FakeAuth(), StatsProgress(), FakeProfile(), RecordingHaptics(), testReminders()).state.value
+        val state = ResultViewModel(key, FakeAuth(), StatsProgress(), FakeProfile(), RecordingHaptics(), RecordingSounds(), testReminders()).state.value
         assertEquals(false, state.passed)
         assertEquals(1, state.missingAnswers)
         assertEquals(false, state.isMistakesRun)
@@ -388,19 +388,19 @@ class ScreenViewModelsTest {
 
     @Test fun resultAtThresholdIsPassed() = runTest {
         val key = resultKey.copy(accuracyPercent = 80, correctAnswers = 8, totalAnswers = 10)
-        assertTrue(ResultViewModel(key, FakeAuth(), StatsProgress(), FakeProfile(), RecordingHaptics(), testReminders()).state.value.passed)
+        assertTrue(ResultViewModel(key, FakeAuth(), StatsProgress(), FakeProfile(), RecordingHaptics(), RecordingSounds(), testReminders()).state.value.passed)
     }
 
     @Test fun mistakesRunShowsUnfixedMistakes() = runTest {
         val key = resultKey.copy(accuracyPercent = 50, isMistakesRun = true, mistakeStepIds = listOf("quiz-1"))
-        val state = ResultViewModel(key, FakeAuth(), StatsProgress(), FakeProfile(), RecordingHaptics(), testReminders()).state.value
+        val state = ResultViewModel(key, FakeAuth(), StatsProgress(), FakeProfile(), RecordingHaptics(), RecordingSounds(), testReminders()).state.value
         assertEquals(false, state.passed)
         assertEquals(1, state.missingAnswers)
         assertTrue(state.isMistakesRun)
     }
 
     @Test fun resultEffects() = runTest {
-        val vm = ResultViewModel(resultKey, FakeAuth(), StatsProgress(), FakeProfile(), RecordingHaptics(), testReminders())
+        val vm = ResultViewModel(resultKey, FakeAuth(), StatsProgress(), FakeProfile(), RecordingHaptics(), RecordingSounds(), testReminders())
         vm.onEvent(ResultUiEvent.RetryMistakesClicked)
         assertEquals(ResultUiEffect.NavigateToMistakes("lesson_4", listOf("quiz-1", "sentence-0")), vm.effects.first())
         vm.onEvent(ResultUiEvent.ContinueClicked)
@@ -456,27 +456,35 @@ class ScreenViewModelsTest {
 
     @Test fun passedResultCelebratesOnceAndFailedResultStaysSilent() = runTest {
         val passed = RecordingHaptics()
-        ResultViewModel(resultKey.copy(accuracyPercent = 90, mistakeStepIds = emptyList()), FakeAuth(), StatsProgress(), FakeProfile(), passed, testReminders())
+        val sounds = RecordingSounds()
+        ResultViewModel(resultKey.copy(accuracyPercent = 90, mistakeStepIds = emptyList()), FakeAuth(), StatsProgress(), FakeProfile(), passed, sounds, testReminders())
         assertEquals(listOf("celebrate"), passed.events)
+        assertEquals(listOf("complete"), sounds.events)
         val failed = RecordingHaptics()
-        ResultViewModel(resultKey.copy(accuracyPercent = 40, correctAnswers = 4, totalAnswers = 10), FakeAuth(), StatsProgress(), FakeProfile(), failed, testReminders())
+        val failedSounds = RecordingSounds()
+        ResultViewModel(resultKey.copy(accuracyPercent = 40, correctAnswers = 4, totalAnswers = 10), FakeAuth(), StatsProgress(), FakeProfile(), failed, failedSounds, testReminders())
         assertTrue(failed.events.isEmpty())
+        assertTrue(failedSounds.events.isEmpty())
     }
 
     @Test fun showcasePlaysRequestedHaptics() = runTest {
         val haptics = RecordingHaptics()
-        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeBackendConfig(), FakeAuth(), OnboardingStorage(MapSettings()), FakeProfile(), haptics, testReminders())
+        val sounds = RecordingSounds()
+        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeBackendConfig(), FakeAuth(), OnboardingStorage(MapSettings()), FakeProfile(), haptics, sounds, testReminders())
         vm.onEvent(ShowcaseUiEvent.PlayHaptic(HapticKind.Wrong))
         vm.onEvent(ShowcaseUiEvent.PlayHaptic(HapticKind.Correct))
         vm.onEvent(ShowcaseUiEvent.PlayHaptic(HapticKind.Celebrate))
         assertEquals(listOf("wrong", "correct", "celebrate"), haptics.events)
+        vm.onEvent(ShowcaseUiEvent.PlaySound(HapticKind.Wrong))
+        vm.onEvent(ShowcaseUiEvent.PlaySound(HapticKind.Celebrate))
+        assertEquals(listOf("wrong", "complete"), sounds.events)
     }
 
     // --- Отладочные действия ---
 
     @Test fun debugActionsNeedConfirmationAndResetOnlyWhatTheyName() = runTest {
         val progress = StatsProgress()
-        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), progress, FakeBackendConfig(), FakeAuth(), OnboardingStorage(MapSettings()), FakeProfile(), RecordingHaptics(), testReminders())
+        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), progress, FakeBackendConfig(), FakeAuth(), OnboardingStorage(MapSettings()), FakeProfile(), RecordingHaptics(), RecordingSounds(), testReminders())
         vm.onEvent(ShowcaseUiEvent.ActionRequested(DebugAction.ResetLessons))
         assertEquals(DebugAction.ResetLessons, vm.state.value.pendingAction)
         assertEquals(0, progress.lessonResets)
@@ -496,7 +504,7 @@ class ScreenViewModelsTest {
     @Test fun signOutAndOnboardingResetClearSessionAndNavigate() = runTest {
         val auth = FakeAuth(UserSession("Алия", "a@b.ru"))
         val onboarding = OnboardingStorage(MapSettings()).apply { markSeen() }
-        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeBackendConfig(), auth, onboarding, FakeProfile(), RecordingHaptics(), testReminders())
+        val vm = ShowcaseViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeBackendConfig(), auth, onboarding, FakeProfile(), RecordingHaptics(), RecordingSounds(), testReminders())
         vm.onEvent(ShowcaseUiEvent.ActionRequested(DebugAction.SignOut))
         vm.onEvent(ShowcaseUiEvent.ActionConfirmed)
         assertNull(auth.session.value)

@@ -10,6 +10,10 @@ import tatlearn.shared.generated.resources.showcase_section_actions
 import tatlearn.shared.generated.resources.showcase_reminder_reset
 import tatlearn.shared.generated.resources.showcase_reminder_send
 import tatlearn.shared.generated.resources.showcase_section_haptics
+import tatlearn.shared.generated.resources.showcase_section_sounds
+import tatlearn.shared.generated.resources.showcase_sound_celebrate
+import tatlearn.shared.generated.resources.showcase_sound_correct
+import tatlearn.shared.generated.resources.showcase_sound_wrong
 import tatlearn.shared.generated.resources.showcase_section_reminders
 import tatlearn.shared.generated.resources.showcase_confirm_yes
 import tatlearn.shared.generated.resources.showcase_confirm_title
@@ -153,6 +157,11 @@ fun ShowcaseScreen(
                 TamyrButton(stringResource(Res.string.showcase_haptic_correct), { viewModel.onEvent(ShowcaseUiEvent.PlayHaptic(HapticKind.Correct)) }, style = TamyrButtonStyle.Secondary)
                 TamyrButton(stringResource(Res.string.showcase_haptic_wrong), { viewModel.onEvent(ShowcaseUiEvent.PlayHaptic(HapticKind.Wrong)) }, style = TamyrButtonStyle.Secondary)
                 TamyrButton(stringResource(Res.string.showcase_haptic_celebrate), { viewModel.onEvent(ShowcaseUiEvent.PlayHaptic(HapticKind.Celebrate)) }, style = TamyrButtonStyle.Secondary)
+            }
+            Section(Res.string.showcase_section_sounds) {
+                TamyrButton(stringResource(Res.string.showcase_sound_correct), { viewModel.onEvent(ShowcaseUiEvent.PlaySound(HapticKind.Correct)) }, style = TamyrButtonStyle.Secondary)
+                TamyrButton(stringResource(Res.string.showcase_sound_wrong), { viewModel.onEvent(ShowcaseUiEvent.PlaySound(HapticKind.Wrong)) }, style = TamyrButtonStyle.Secondary)
+                TamyrButton(stringResource(Res.string.showcase_sound_celebrate), { viewModel.onEvent(ShowcaseUiEvent.PlaySound(HapticKind.Celebrate)) }, style = TamyrButtonStyle.Secondary)
             }
             Section(Res.string.showcase_section_reminders) {
                 TamyrButton(stringResource(Res.string.showcase_reminder_send), { viewModel.onEvent(ShowcaseUiEvent.SendTestReminder) }, style = TamyrButtonStyle.Secondary)

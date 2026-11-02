@@ -11,6 +11,7 @@ import ru.tatarcha.tatlearn.core.common.UiEvent
 import ru.tatarcha.tatlearn.core.common.UiState
 import ru.tatarcha.tatlearn.core.common.errorCode
 import ru.tatarcha.tatlearn.core.haptics.Haptics
+import ru.tatarcha.tatlearn.core.sound.SoundEffects
 import ru.tatarcha.tatlearn.core.notifications.Reminders
 import ru.tatarcha.tatlearn.data.fake.FakeBackendConfig
 import ru.tatarcha.tatlearn.domain.model.ExerciseResult
@@ -25,6 +26,7 @@ import ru.tatarcha.tatlearn.domain.repository.ProgressRepository
 
 /** Только для отладки: прогоняет слой данных из UI kit (фейковый бэкенд, база прогресса). */
 /** Какой вибро-паттерн проиграть кнопкой в инструментах отладки (подбор паттернов на реальном устройстве). */
+/** Три смысловых события; те же и для звуков интерфейса (`PlaySound`). */
 enum class HapticKind { Correct, Wrong, Celebrate }
 
 /** Отладочные действия над данными приложения; необратимые подтверждаются листом. */
@@ -43,6 +45,7 @@ sealed interface ShowcaseUiEvent : UiEvent {
     data object ToggleSimulateErrors : ShowcaseUiEvent
     data object RecordResult : ShowcaseUiEvent
     data class PlayHaptic(val kind: HapticKind) : ShowcaseUiEvent
+    data class PlaySound(val kind: HapticKind) : ShowcaseUiEvent
     data object SendTestReminder : ShowcaseUiEvent
     data object ResetReminderOffer : ShowcaseUiEvent
     data class ActionRequested(val action: DebugAction) : ShowcaseUiEvent
@@ -66,6 +69,7 @@ class ShowcaseViewModel(
     private val onboarding: OnboardingStorage,
     private val profile: ProfileRepository,
     private val haptics: Haptics,
+    private val sounds: SoundEffects,
     private val reminders: Reminders,
 ) : MviViewModel<ShowcaseUiState, ShowcaseUiEvent, ShowcaseUiEffect>(ShowcaseUiState()) {
 
@@ -92,6 +96,11 @@ class ShowcaseViewModel(
                 HapticKind.Correct -> haptics.correct()
                 HapticKind.Wrong -> haptics.wrong()
                 HapticKind.Celebrate -> haptics.celebrate()
+            }
+            is ShowcaseUiEvent.PlaySound -> when (event.kind) {
+                HapticKind.Correct -> sounds.correct()
+                HapticKind.Wrong -> sounds.wrong()
+                HapticKind.Celebrate -> sounds.complete()
             }
             ShowcaseUiEvent.SendTestReminder -> viewModelScope.launch { reminders.sendTest() }
             ShowcaseUiEvent.ResetReminderOffer -> reminders.resetOffer()

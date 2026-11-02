@@ -20,6 +20,10 @@
     <string name="showcase_section_haptics">Вибро (проверка на устройстве; учитывает «Вибро-отклик» в профиле)</string>
     <string name="showcase_haptic_correct">Вибро: верный ответ</string>
     <string name="showcase_haptic_wrong">Вибро: неверный ответ</string>
+    <string name="showcase_section_sounds">Звуки (проверка на устройстве; учитывает «Звуки» в профиле)</string>
+    <string name="showcase_sound_correct">Звук: верный ответ</string>
+    <string name="showcase_sound_wrong">Звук: неверный ответ</string>
+    <string name="showcase_sound_celebrate">Звук: урок пройден</string>
     <string name="showcase_section_reminders">Напоминание (проверка на устройстве)</string>
     <string name="showcase_reminder_send">Показать тестовое уведомление (на iOS через 5 с, сверните приложение)</string>
     <string name="showcase_reminder_reset">Сбросить предложение напоминаний и выключить</string>
@@ -173,6 +177,8 @@
     <string name="profile_xp_to_go">%1$d XP</string>
     <string name="profile_haptics_title">Вибро-отклик</string>
     <string name="profile_haptics_subtitle">Лёгкая вибрация на ответах и в конце урока</string>
+    <string name="profile_sounds_title">Звуки</string>
+    <string name="profile_sounds_subtitle">Тихие сигналы на ответах и в конце урока</string>
     <string name="profile_edit">Изменить профиль</string>
     <string name="profile_local_note">Данные хранятся на этом устройстве</string>
     <string name="profile_saved">Сохранено</string>

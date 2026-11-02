@@ -5,12 +5,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import ru.tatarcha.tatlearn.core.common.TimeProvider
 import ru.tatarcha.tatlearn.core.haptics.PatternHaptics
+import ru.tatarcha.tatlearn.core.sound.PlayerSoundEffects
 import ru.tatarcha.tatlearn.data.local.HapticsSettings
+import ru.tatarcha.tatlearn.data.local.SoundEffectsSettings
 import ru.tatarcha.tatlearn.data.local.OnboardingStorage
 import ru.tatarcha.tatlearn.data.local.SettingsProfileRepository
 import ru.tatarcha.tatlearn.domain.model.Avatar
@@ -162,7 +165,7 @@ class ProfileViewModelsTest {
 
     @Test fun profileTabShowsProfileAndSavedToastAndOpensEdit() = runTest {
         val profile = FakeProfile(UserProfile("id", "Алия", Avatar.Pose(AvatarPose.Searching)))
-        val vm = ProfileViewModel(profile, StatsProgress(UserStats(xp = 340, streak = 12)), SessionOnlyAuth(), HapticsSettings(MapSettings()), testReminders())
+        val vm = ProfileViewModel(profile, StatsProgress(UserStats(xp = 340, streak = 12)), SessionOnlyAuth(), HapticsSettings(MapSettings()), SoundEffectsSettings(MapSettings()), testReminders())
         assertEquals("Алия", vm.state.value.name)
         assertEquals(Avatar.Pose(AvatarPose.Searching), vm.state.value.avatar)
         assertEquals(4, vm.state.value.stats.level)
@@ -178,7 +181,7 @@ class ProfileViewModelsTest {
     }
 
     @Test fun profileTabFallsBackToSessionNameWithoutProfile() = runTest {
-        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(UserSession("Тимур", "t@b.ru")), HapticsSettings(MapSettings()), testReminders())
+        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(UserSession("Тимур", "t@b.ru")), HapticsSettings(MapSettings()), SoundEffectsSettings(MapSettings()), testReminders())
         assertEquals("Тимур", vm.state.value.name)
         assertEquals(Avatar.Default, vm.state.value.avatar)
     }
@@ -188,7 +191,7 @@ class ProfileViewModelsTest {
     @Test fun hapticsSettingDefaultsToOnAndPersists() = runTest {
         val settings = MapSettings()
         assertTrue(HapticsSettings(settings).enabled.value)
-        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(), HapticsSettings(settings), testReminders())
+        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(), HapticsSettings(settings), SoundEffectsSettings(settings), testReminders())
         assertTrue(vm.state.value.hapticsEnabled)
         vm.onEvent(ProfileUiEvent.HapticsToggled(false))
         assertFalse(vm.state.value.hapticsEnabled)
@@ -197,6 +200,43 @@ class ProfileViewModelsTest {
 
     private class FakeClock(var now: Long = 1_000L) : TimeProvider {
         override fun nowMillis() = now
+    }
+
+    @Test fun soundsSettingDefaultsToOnAndPersistsIndependentlyOfHaptics() = runTest {
+        val settings = MapSettings()
+        assertTrue(SoundEffectsSettings(settings).enabled.value)
+        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(), HapticsSettings(settings), SoundEffectsSettings(settings), testReminders())
+        assertTrue(vm.state.value.soundsEnabled)
+        vm.onEvent(ProfileUiEvent.SoundsToggled(false))
+        assertFalse(vm.state.value.soundsEnabled)
+        assertTrue(vm.state.value.hapticsEnabled)
+        assertFalse(SoundEffectsSettings(settings).enabled.value)
+    }
+
+    @Test fun soundEffectsPlayRequestedFileOnceCacheItAndRespectSetting() = runTest {
+        val player = RecordingSoundPlayer()
+        val settings = SoundEffectsSettings(MapSettings())
+        val reads = mutableListOf<String>()
+        val sounds = PlayerSoundEffects(player, settings, this) { path -> reads += path; path.encodeToByteArray() }
+        sounds.correct()
+        sounds.correct()
+        sounds.wrong()
+        sounds.complete()
+        advanceUntilIdle()
+        assertEquals(listOf("correct.m4a", "correct.m4a", "wrong.m4a", "complete.m4a"), player.played.map { it.decodeToString().substringAfterLast('/') })
+        assertEquals(3, reads.size) // повторный звук берётся из кэша
+        settings.setEnabled(false)
+        sounds.correct()
+        advanceUntilIdle()
+        assertEquals(4, player.played.size)
+    }
+
+    @Test fun missingSoundFileDoesNotCrashOrPlay() = runTest {
+        val player = RecordingSoundPlayer()
+        val sounds = PlayerSoundEffects(player, SoundEffectsSettings(MapSettings()), this) { error("no file") }
+        sounds.correct()
+        advanceUntilIdle()
+        assertTrue(player.played.isEmpty())
     }
 
     @Test fun hapticPatternsUseSoftTicksAndRespectSettingAndDebounce() = runTest {

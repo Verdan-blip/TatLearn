@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.setMain
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
 import ru.tatarcha.tatlearn.core.notifications.Reminders
 import ru.tatarcha.tatlearn.data.local.HapticsSettings
+import ru.tatarcha.tatlearn.data.local.SoundEffectsSettings
 import ru.tatarcha.tatlearn.data.local.ReminderSettings
 import ru.tatarcha.tatlearn.domain.model.UserStats
 import ru.tatarcha.tatlearn.feature.profile.ProfileUiEvent
@@ -39,7 +40,7 @@ class RemindersTest {
     @AfterTest fun tearDown() = Dispatchers.resetMain()
 
     private fun result(key: ResultKey, reminders: Reminders) =
-        ResultViewModel(key, SessionOnlyAuth(), StatsProgress(UserStats.Empty), FakeProfile(), RecordingHaptics(), reminders)
+        ResultViewModel(key, SessionOnlyAuth(), StatsProgress(UserStats.Empty), FakeProfile(), RecordingHaptics(), RecordingSounds(), reminders)
 
     @Test fun enableNeedsPermissionAndLeavesSettingsUntouchedWhenDenied() = runTest {
         val platform = FakePlatformReminders(granted = false)
@@ -158,7 +159,7 @@ class RemindersTest {
     }
 
     private fun profile(reminders: Reminders) =
-        ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(), HapticsSettings(MapSettings()), reminders)
+        ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(), HapticsSettings(MapSettings()), SoundEffectsSettings(MapSettings()), reminders)
 
     @Test fun profileToggleEnablesAndChangesHour() = runTest {
         val platform = FakePlatformReminders()

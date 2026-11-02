@@ -2,6 +2,7 @@ package ru.tatarcha.tatlearn.feature.lesson
 
 import androidx.compose.ui.text.TextRange
 import ru.tatarcha.tatlearn.feature.RecordingHaptics
+import ru.tatarcha.tatlearn.feature.RecordingSounds
 import androidx.compose.ui.text.input.TextFieldValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -101,6 +102,7 @@ private class FixedTime : TimeProvider {
 class LessonViewModelTest {
     private val progress = FakeProgress()
     private val haptics = RecordingHaptics()
+    private val sounds = RecordingSounds()
     private val time = FixedTime()
 
     @BeforeTest fun setUp() = Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -108,7 +110,7 @@ class LessonViewModelTest {
     @AfterTest fun tearDown() = Dispatchers.resetMain()
 
     private fun viewModel(stepIds: List<String> = emptyList(), lessons: LessonsRepository = FakeLessons()) =
-        LessonViewModel(LessonKey("lesson_t", stepIds), lessons, progress, StubbingAudioPlayer(SilentPlayer()), time, haptics)
+        LessonViewModel(LessonKey("lesson_t", stepIds), lessons, progress, StubbingAudioPlayer(SilentPlayer()), time, haptics, sounds)
 
     private fun LessonViewModel.step() = state.value.step
 
@@ -184,6 +186,18 @@ class LessonViewModelTest {
         vm.onEvent(LessonUiEvent.OptionSelected(0))
         vm.onEvent(LessonUiEvent.CheckClicked) // неверно, правильный индекс 1
         assertEquals(listOf("correct", "wrong"), haptics.events)
+    }
+
+    @Test fun checkedStepGivesOneSoundByVerdictAndNothingForOtherEvents() = runTest {
+        val vm = viewModel(listOf("quiz-0", "quiz-1"))
+        vm.onEvent(LessonUiEvent.OptionSelected(0)) // выбор варианта без звука
+        assertTrue(sounds.events.isEmpty())
+        vm.onEvent(LessonUiEvent.CheckClicked) // верно
+        vm.onEvent(LessonUiEvent.ContinueClicked)
+        assertEquals(listOf("correct"), sounds.events)
+        vm.onEvent(LessonUiEvent.OptionSelected(0))
+        vm.onEvent(LessonUiEvent.CheckClicked) // неверно, правильный индекс 1
+        assertEquals(listOf("correct", "wrong"), sounds.events)
     }
 
     @Test fun finishingLessonSendsResultWithMistakes() = runTest {

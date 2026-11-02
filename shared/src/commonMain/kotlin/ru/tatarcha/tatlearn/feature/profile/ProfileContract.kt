@@ -16,6 +16,8 @@ data class ProfileUiState(
     val savedToast: Boolean = false,
     /** Настройка «Вибро-отклик» (по умолчанию включена). */
     val hapticsEnabled: Boolean = true,
+    /** Настройка «Звуки» (по умолчанию включена). */
+    val soundsEnabled: Boolean = true,
     val reminderEnabled: Boolean = false,
     val reminderHour: Int = ReminderSettings.DEFAULT_HOUR,
     /** Показать уведомление «Разрешите уведомления в настройках»: пользователь отказал в системном разрешении. */
@@ -26,6 +28,7 @@ sealed interface ProfileUiEvent : UiEvent {
     data object EditClicked : ProfileUiEvent
     data object ToastDismissed : ProfileUiEvent
     data class HapticsToggled(val enabled: Boolean) : ProfileUiEvent
+    data class SoundsToggled(val enabled: Boolean) : ProfileUiEvent
     data class ReminderToggled(val enabled: Boolean) : ProfileUiEvent
     data class ReminderHourSelected(val hour: Int) : ProfileUiEvent
 }

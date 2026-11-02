@@ -39,6 +39,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import ru.tatarcha.tatlearn.core.haptics.Haptics
 import ru.tatarcha.tatlearn.core.haptics.PatternHaptics
+import ru.tatarcha.tatlearn.core.sound.PlayerSoundEffects
+import ru.tatarcha.tatlearn.core.sound.SoundEffects
+import ru.tatarcha.tatlearn.core.sound.createPlatformSoundPlayer
+import ru.tatarcha.tatlearn.data.local.SoundEffectsSettings
 import ru.tatarcha.tatlearn.core.notifications.ReminderTexts
 import ru.tatarcha.tatlearn.domain.HomeProgressTracker
 import ru.tatarcha.tatlearn.core.notifications.Reminders
@@ -74,8 +78,8 @@ val presentationModule = module {
     viewModelOf(::ProfileViewModel)
     viewModelOf(::ProfileEditViewModel)
     viewModel { (key: ModuleKey) -> ModuleViewModel(key.moduleId, get(), get()) }
-    viewModel { (key: ResultKey) -> ResultViewModel(key, get(), get(), get(), get(), get()) }
-    viewModel { (key: LessonKey) -> LessonViewModel(key, get(), get(), StubbingAudioPlayer(createPlatformAudioPlayer()), get(), get()) }
+    viewModel { (key: ResultKey) -> ResultViewModel(key, get(), get(), get(), get(), get(), get()) }
+    viewModel { (key: LessonKey) -> LessonViewModel(key, get(), get(), StubbingAudioPlayer(createPlatformAudioPlayer()), get(), get(), get()) }
     viewModelOf(::ShowcaseViewModel)
 }
 
@@ -103,6 +107,7 @@ val dataModule = module {
     single { SessionStorage(get()) }
     single { OnboardingStorage(get()) }
     single { HapticsSettings(get()) }
+    single { SoundEffectsSettings(get()) }
     single { HomeProgressTracker() }
     single { ReminderSettings(get()) }
     single {
@@ -120,6 +125,8 @@ val dataModule = module {
     }
     // Паттерны вибро играются на главном потоке (iOS требует UIKit с главного).
     single<Haptics> { PatternHaptics(get(), get(), CoroutineScope(SupervisorJob() + Dispatchers.Main), get()) }
+    // Звуки интерфейса, как и вибро, играются с главного потока.
+    single<SoundEffects> { PlayerSoundEffects(createPlatformSoundPlayer(), get(), CoroutineScope(SupervisorJob() + Dispatchers.Main)) }
     single<ProfileRepository> { SettingsProfileRepository(get()) }
     single { FakeBackendConfig() }
     if (BuildConfig.USE_REMOTE) {

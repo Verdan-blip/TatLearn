@@ -49,6 +49,8 @@ import tatlearn.shared.generated.resources.reminder_permission_denied
 import tatlearn.shared.generated.resources.reminder_row_subtitle
 import tatlearn.shared.generated.resources.reminder_row_title
 import tatlearn.shared.generated.resources.profile_haptics_title
+import tatlearn.shared.generated.resources.profile_sounds_subtitle
+import tatlearn.shared.generated.resources.profile_sounds_title
 import tatlearn.shared.generated.resources.profile_level
 import tatlearn.shared.generated.resources.profile_level_value
 import tatlearn.shared.generated.resources.profile_local_note
@@ -97,7 +99,19 @@ fun ProfileContent(
                 }
                 NextLevel(state.stats)
             }
-            HapticsRow(enabled = state.hapticsEnabled, onToggle = { onEvent(ProfileUiEvent.HapticsToggled(it)) })
+            ToggleRow(
+                title = stringResource(Res.string.profile_haptics_title),
+                subtitle = stringResource(Res.string.profile_haptics_subtitle),
+                enabled = state.hapticsEnabled,
+                onToggle = { onEvent(ProfileUiEvent.HapticsToggled(it)) },
+            )
+            // TODO(design): строка «Звуки» не нарисована в макете, собрана по образцу строки «Вибро-отклик».
+            ToggleRow(
+                title = stringResource(Res.string.profile_sounds_title),
+                subtitle = stringResource(Res.string.profile_sounds_subtitle),
+                enabled = state.soundsEnabled,
+                onToggle = { onEvent(ProfileUiEvent.SoundsToggled(it)) },
+            )
             ReminderRow(
                 enabled = state.reminderEnabled,
                 hour = state.reminderHour,
@@ -128,9 +142,9 @@ fun ProfileContent(
     }
 }
 
-/** Строка настройки «Вибро-отклик» (макеты 26 и 38): вся строка нажимаема как переключатель. */
+/** Строка настройки с переключателем («Вибро-отклик», макеты 26 и 38; «Звуки»): вся строка нажимаема как переключатель. */
 @Composable
-private fun HapticsRow(enabled: Boolean, onToggle: (Boolean) -> Unit) {
+private fun ToggleRow(title: String, subtitle: String, enabled: Boolean, onToggle: (Boolean) -> Unit) {
     val colors = TamyrTheme.colors
     TamyrCard(
         Modifier.fillMaxWidth().heightIn(min = HapticsRowMinHeight).toggleable(value = enabled, role = Role.Switch, onValueChange = onToggle),
@@ -138,8 +152,8 @@ private fun HapticsRow(enabled: Boolean, onToggle: (Boolean) -> Unit) {
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.blockGap), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.xxs)) {
-                Text(stringResource(Res.string.profile_haptics_title), style = TamyrTheme.typography.body16Bold, color = colors.textPrimary)
-                Text(stringResource(Res.string.profile_haptics_subtitle), style = TamyrTheme.typography.caption13, color = colors.textSecondary)
+                Text(title, style = TamyrTheme.typography.body16Bold, color = colors.textPrimary)
+                Text(subtitle, style = TamyrTheme.typography.caption13, color = colors.textSecondary)
             }
             // Сам переключатель без своей реакции: нажатие обрабатывает вся строка (toggleable), так цель нажатия крупнее.
             Switch(

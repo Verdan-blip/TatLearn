@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.StateFlow
 import ru.tatarcha.tatlearn.core.haptics.Haptics
 import ru.tatarcha.tatlearn.core.haptics.PlatformHaptics
 import ru.tatarcha.tatlearn.core.notifications.PlatformReminders
+import ru.tatarcha.tatlearn.core.sound.PlatformSoundPlayer
+import ru.tatarcha.tatlearn.core.sound.SoundEffects
 import ru.tatarcha.tatlearn.core.notifications.ReminderTexts
 import ru.tatarcha.tatlearn.core.notifications.Reminders
 import ru.tatarcha.tatlearn.data.local.ReminderSettings
@@ -48,6 +50,20 @@ internal class RecordingHaptics : Haptics {
     override fun correct() { events += "correct" }
     override fun wrong() { events += "wrong" }
     override fun celebrate() { events += "celebrate" }
+}
+
+/** Записывает смысловые звуки вместо воспроизведения. */
+internal class RecordingSounds : SoundEffects {
+    val events = mutableListOf<String>()
+    override fun correct() { events += "correct" }
+    override fun wrong() { events += "wrong" }
+    override fun complete() { events += "complete" }
+}
+
+/** Запоминает, какие записи пришли на воспроизведение (по размеру), для проверки `PlayerSoundEffects`. */
+internal class RecordingSoundPlayer : PlatformSoundPlayer {
+    val played = mutableListOf<ByteArray>()
+    override fun play(bytes: ByteArray) { played += bytes }
 }
 
 /** Записывает платформенные примитивы, чтобы проверять паттерны `PatternHaptics`. */

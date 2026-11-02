@@ -12,6 +12,7 @@ import ru.tatarcha.tatlearn.core.common.LoadState
 import ru.tatarcha.tatlearn.core.common.MviViewModel
 import ru.tatarcha.tatlearn.core.common.TimeProvider
 import ru.tatarcha.tatlearn.core.haptics.Haptics
+import ru.tatarcha.tatlearn.core.sound.SoundEffects
 import ru.tatarcha.tatlearn.core.common.errorCode
 import ru.tatarcha.tatlearn.domain.exercise.AnswerNormalizer
 import ru.tatarcha.tatlearn.domain.exercise.ExerciseStep
@@ -32,6 +33,7 @@ class LessonViewModel(
     private val player: StubbingAudioPlayer,
     private val time: TimeProvider,
     private val haptics: Haptics,
+    private val sounds: SoundEffects,
 ) : MviViewModel<LessonUiState, LessonUiEvent, LessonUiEffect>(LessonUiState()) {
 
     private var startedAtMillis = 0L
@@ -214,6 +216,8 @@ class LessonViewModel(
         player.stop()
         // Вибро-отклик на итог шага (в сопоставлении это итог всего шага, на отдельные пары вибро нет).
         if (correct) haptics.correct() else haptics.wrong()
+        // Звук после player.stop(): запись слова уже оборвана, наложения нет. На тапы и пары звуков нет.
+        if (correct) sounds.correct() else sounds.wrong()
         viewModelScope.launch {
             val outcome = progress.recordExerciseResult(ExerciseResult(key.lessonId, step.type, if (correct) 1 else 0, 1))
             xpEarned += outcome.xpEarned
