@@ -22,9 +22,9 @@ import tatlearn.shared.generated.resources.mascot_tired
 import tatlearn.shared.generated.resources.mascot_wrong
 
 /**
- * Позы маскота Мыраужана (пухлый коричневый кот в зелёной тюбетейке).
- * Источники: SVG-файлы в design/mascot, сконвертированные в векторные drawable (см. design/mascot-prompt.md).
- * [Correct], [Wrong], [Teacher] и [HeadIcon] упрощены для ~48 dp.
+ * Позы маскота Мыраужана (пухлый рыжий полосатый кот в тёмно-морской тюбетейке).
+ * Источники: картинки Nano Banana в design/mascot/gemini, растровые PNG 768x768 собирает design/mascot/build_mascot_png.py
+ * (см. design/mascot-prompt.md). [Correct] и [Wrong] нарисованы по пояс, [HeadIcon] только голова.
  */
 enum class MascotPose(val drawable: DrawableResource) {
     Greeting(Res.drawable.mascot_greeting),
