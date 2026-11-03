@@ -9,14 +9,14 @@ button.sec{background:#fff;color:#3B6B45} .w{background:#FFFCF3;border:1px solid
 .vs{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;align-items:center} .v{display:flex;align-items:center;gap:5px}
 .v label{display:flex;align-items:center;gap:4px;cursor:pointer;font-weight:600} button.pl{padding:4px 12px;font-size:17px;min-width:44px}
 input[type=text]{flex:1;min-width:150px;font:inherit;padding:5px 8px;border:1px solid #d9cfb2;border-radius:8px;background:#fff}
-.hint{font-size:13px;color:#5A5642;margin:6px 0}
+.ipa{font-weight:400;color:#7A6119;font-size:12px;margin-left:3px}.hint{font-size:13px;color:#5A5642;margin:6px 0}
 </style>
 <header><b>Выбор озвучки</b><span id=prog></span><button id=save>Скачать выбор (JSON)</button><button class=sec id=clear>Сбросить</button></header>
 <p class=hint>Нажимайте ▶ у вариантов 1–5 (повторное нажатие или другой вариант останавливает предыдущий), отметьте лучший кружком или «ни один» (если все ошибочные), при желании напишите, что не так. Выбор запоминается в браузере; кнопка вверху скачивает файл, который нужно прислать обратно.</p>
 <div id=list></div>
 <script>
 const WORDS = __DATA__;
-const KEY = "tatar-tts-choices-v2";
+const KEY = "tatar-tts-choices-v2:" + location.pathname;
 let state = {};
 try { state = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
 const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
@@ -39,7 +39,7 @@ function progress() {
 WORDS.forEach((w, i) => {
   const d = document.createElement("div"); d.className = "w"; d.id = "w_" + w.slug;
   const tags = w.lessons.map(l => `<span class=tag>${l.replace("lesson_", "урок ")}</span>`).join(" ");
-  let vs = w.variants.map(v => `<div class=v><label><input type=radio name="r_${w.slug}" value="${v.n}">${v.n}</label><button class="pl sec" data-src="audio/${w.slug}/${v.n}.wav">▶</button></div>`).join("");
+  let vs = w.variants.map(v => `<div class=v><label><input type=radio name="r_${w.slug}" value="${v.n}">${v.n}${v.ipa ? "<small class=ipa>" + v.ipa + "</small>" : ""}</label><button class="pl sec" data-src="audio/${w.slug}/${v.n}.wav">▶</button></div>`).join("");
   vs += `<div class=v><label><input type=radio name="r_${w.slug}" value="none">ни один</label></div>`;
   d.innerHTML = `<div class=t><span>${i + 1}.</span><span class=tt>${w.text}</span><span class=ru>${w.ru || ""}</span>${tags}</div><div class=vs>${vs}</div><div class=vs><input type=text placeholder="что не так / как должно звучать (необязательно)" id="n_${w.slug}"></div>`;
   list.appendChild(d);

@@ -49,6 +49,12 @@ def main():
     ap.add_argument("--audition", default=os.path.expanduser("~/Downloads/TatarTTS-audition"))
     args = ap.parse_args()
     choices = json.load(open(os.path.expanduser(args.choices), encoding="utf-8"))
+    mpath = f"{args.audition}/manifest.json"
+    manifest = {w["slug"]: w for w in json.load(open(mpath, encoding="utf-8"))["words"]} if os.path.exists(mpath) else {}
+    for sl, c in choices.items():  # какой вариант фонем и профиль шума выбран: пригодится при следующих запусках
+        v = next((x for x in manifest.get(sl, {}).get("variants", []) if str(x["n"]) == str(c["choice"])), None)
+        if v:
+            c["profile"], c["ipa"] = v["profile"], v.get("ipa")
     os.makedirs(f"{HERE}/chosen", exist_ok=True)
     made, skipped = [], []
     for sl, c in choices.items():

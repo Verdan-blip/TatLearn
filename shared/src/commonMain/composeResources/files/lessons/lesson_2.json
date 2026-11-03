@@ -55,7 +55,8 @@
         "песня",
         "зима"
       ],
-      "correctIndex": 0
+      "correctIndex": 0,
+      "audioUrl": "audio/tan.m4a"
     },
     {
       "word": "мең",
@@ -76,7 +77,8 @@
         "где",
         "там"
       ],
-      "correctIndex": 1
+      "correctIndex": 1,
+      "audioUrl": "audio/ham.m4a"
     }
   ],
   "listening": [

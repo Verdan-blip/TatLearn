@@ -95,20 +95,29 @@ def main():
         sl = slug(text)
         ipa = overrides.get(text, {}).get("ipa")
         cands = []
-        for i in range(CANDIDATES):
-            ns, nw = PROFILES[i % len(PROFILES)]
-            _, missing, audio = voice.synth(text, ipa=ipa, noise_scale=ns, noise_w=nw)
-            cands.append({"profile": i % len(PROFILES), "audio": trim(audio), "missing": missing})
-        durs = [len(c["audio"]) / 22050 for c in cands]
-        med = statistics.median(durs)
-        good = sorted((c for c, d in zip(cands, durs) if 0.65 * med <= d <= 1.5 * med), key=lambda c: abs(len(c["audio"]) / 22050 - med))[:SHOWN]
-        good = sorted(good, key=lambda c: c["profile"])
+        if isinstance(ipa, list):
+            # Свои фонемы: каждый вариант записи по два раза (профили шума 0.5/0.6 и 0.4/0.5), показываем все.
+            for ipa_i in ipa:
+                for pi in (1, 2):
+                    ns, nw = PROFILES[pi]
+                    _, missing, audio = voice.synth(text, ipa=ipa_i, noise_scale=ns, noise_w=nw)
+                    cands.append({"profile": pi, "audio": trim(audio), "missing": missing, "ipa": ipa_i})
+            good = cands
+        else:
+            for i in range(CANDIDATES):
+                ns, nw = PROFILES[i % len(PROFILES)]
+                _, missing, audio = voice.synth(text, ipa=ipa, noise_scale=ns, noise_w=nw)
+                cands.append({"profile": i % len(PROFILES), "audio": trim(audio), "missing": missing, "ipa": ipa})
+            durs = [len(c["audio"]) / 22050 for c in cands]
+            med = statistics.median(durs)
+            good = sorted((c for c, d in zip(cands, durs) if 0.65 * med <= d <= 1.5 * med), key=lambda c: abs(len(c["audio"]) / 22050 - med))[:SHOWN]
+            good = sorted(good, key=lambda c: c["profile"])
         os.makedirs(f"{args.out}/audio/{sl}", exist_ok=True)
         variants = []
         for k, c in enumerate(good, 1):
             write_wav(f"{args.out}/audio/{sl}/{k}.wav", c["audio"])
-            variants.append({"n": k, "profile": c["profile"], "dur": round(len(c["audio"]) / 22050, 2)})
-        manifest.append({"slug": sl, "text": text, "ru": e["ru"], "lessons": e["lessons"], "variants": variants, "ipa": ipa})
+            variants.append({"n": k, "profile": c["profile"], "dur": round(len(c["audio"]) / 22050, 2), "ipa": c["ipa"]})
+        manifest.append({"slug": sl, "text": text, "ru": e["ru"], "lessons": e["lessons"], "variants": variants})
         print(f"{n:2d}/{len(words)} {text} -> {sl}: {len(good)} вариантов")
     json.dump({"profiles": PROFILES, "words": manifest}, open(f"{args.out}/manifest.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     open(f"{args.out}/index.html", "w", encoding="utf-8").write(HTML.replace("__DATA__", json.dumps(manifest, ensure_ascii=False)))
