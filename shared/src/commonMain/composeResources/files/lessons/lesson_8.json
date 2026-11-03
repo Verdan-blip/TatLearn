@@ -44,7 +44,8 @@
         "дождь"
       ],
       "correctIndex": 3,
-      "isNewWord": true
+      "isNewWord": true,
+      "audioUrl": "audio/yangyr.m4a"
     },
     {
       "word": "җил",
@@ -54,7 +55,8 @@
         "солнце",
         "туман"
       ],
-      "correctIndex": 1
+      "correctIndex": 1,
+      "audioUrl": "audio/jil.m4a"
     },
     {
       "word": "болыт",
@@ -74,7 +76,8 @@
         "лето",
         "зима"
       ],
-      "correctIndex": 2
+      "correctIndex": 2,
+      "audioUrl": "audio/jay.m4a"
     }
   ],
   "listening": [

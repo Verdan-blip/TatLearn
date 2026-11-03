@@ -44,7 +44,8 @@
         "дом"
       ],
       "correctIndex": 1,
-      "isNewWord": true
+      "isNewWord": true,
+      "audioUrl": "audio/och.m4a"
     },
     {
       "word": "күл",
@@ -54,7 +55,8 @@
         "рука",
         "поле"
       ],
-      "correctIndex": 0
+      "correctIndex": 0,
+      "audioUrl": "audio/kul.m4a"
     },
     {
       "word": "әби",
@@ -64,7 +66,8 @@
         "бабушка",
         "утка"
       ],
-      "correctIndex": 2
+      "correctIndex": 2,
+      "audioUrl": "audio/abi.m4a"
     },
     {
       "word": "үлән",
@@ -74,7 +77,8 @@
         "земля",
         "трава"
       ],
-      "correctIndex": 3
+      "correctIndex": 3,
+      "audioUrl": "audio/ulan.m4a"
     }
   ],
   "listening": [

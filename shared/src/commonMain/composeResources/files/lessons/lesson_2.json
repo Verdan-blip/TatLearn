@@ -44,7 +44,8 @@
         "рыба"
       ],
       "correctIndex": 2,
-      "isNewWord": true
+      "isNewWord": true,
+      "audioUrl": "audio/jimesh.m4a"
     },
     {
       "word": "таң",
@@ -64,7 +65,8 @@
         "миллион",
         "тысяча"
       ],
-      "correctIndex": 3
+      "correctIndex": 3,
+      "audioUrl": "audio/men.m4a"
     },
     {
       "word": "һәм",

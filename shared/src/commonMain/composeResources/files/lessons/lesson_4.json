@@ -44,7 +44,8 @@
         "бабушка"
       ],
       "correctIndex": 1,
-      "isNewWord": true
+      "isNewWord": true,
+      "audioUrl": "audio/apa.m4a"
     },
     {
       "word": "абый",
@@ -54,7 +55,8 @@
         "старший брат",
         "друг"
       ],
-      "correctIndex": 2
+      "correctIndex": 2,
+      "audioUrl": "audio/abyy.m4a"
     },
     {
       "word": "сеңел",
@@ -64,7 +66,8 @@
         "мама",
         "дочь"
       ],
-      "correctIndex": 0
+      "correctIndex": 0,
+      "audioUrl": "audio/senel.m4a"
     },
     {
       "word": "бала",
@@ -74,7 +77,8 @@
         "ребёнок",
         "дедушка"
       ],
-      "correctIndex": 2
+      "correctIndex": 2,
+      "audioUrl": "audio/bala.m4a"
     }
   ],
   "listening": [

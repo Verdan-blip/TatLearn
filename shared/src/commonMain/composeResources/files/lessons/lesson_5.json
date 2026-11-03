@@ -44,7 +44,8 @@
         "восемь"
       ],
       "correctIndex": 2,
-      "isNewWord": true
+      "isNewWord": true,
+      "audioUrl": "audio/alty.m4a"
     },
     {
       "word": "җиде",
@@ -54,7 +55,8 @@
         "девять",
         "десять"
       ],
-      "correctIndex": 0
+      "correctIndex": 0,
+      "audioUrl": "audio/jide.m4a"
     },
     {
       "word": "сигез",
@@ -74,7 +76,8 @@
         "девять",
         "сто"
       ],
-      "correctIndex": 1
+      "correctIndex": 1,
+      "audioUrl": "audio/un.m4a"
     }
   ],
   "listening": [

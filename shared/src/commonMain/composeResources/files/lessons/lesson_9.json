@@ -55,7 +55,8 @@
         "Сколько вам лет?",
         "Где вы живёте?"
       ],
-      "correctIndex": 1
+      "correctIndex": 1,
+      "audioUrl": "audio/hallaregez_nichek.m4a"
     },
     {
       "word": "Сау булыгыз",
@@ -76,7 +77,8 @@
         "Это мой друг Ренат",
         "Мне двадцать лет"
       ],
-      "correctIndex": 0
+      "correctIndex": 0,
+      "audioUrl": "audio/minem_isemem_renat.m4a"
     }
   ],
   "listening": [

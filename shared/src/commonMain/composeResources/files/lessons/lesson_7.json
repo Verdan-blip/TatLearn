@@ -44,7 +44,8 @@
         "трава"
       ],
       "correctIndex": 2,
-      "isNewWord": true
+      "isNewWord": true,
+      "audioUrl": "audio/agach.m4a"
     },
     {
       "word": "чәчәк",
@@ -54,7 +55,8 @@
         "птица",
         "поле"
       ],
-      "correctIndex": 0
+      "correctIndex": 0,
+      "audioUrl": "audio/chachak.m4a"
     },
     {
       "word": "төлке",
@@ -64,7 +66,8 @@
         "медведь",
         "заяц"
       ],
-      "correctIndex": 1
+      "correctIndex": 1,
+      "audioUrl": "audio/tolke.m4a"
     },
     {
       "word": "бүре",
@@ -74,7 +77,8 @@
         "медведь",
         "волк"
       ],
-      "correctIndex": 3
+      "correctIndex": 3,
+      "audioUrl": "audio/bure.m4a"
     }
   ],
   "listening": [

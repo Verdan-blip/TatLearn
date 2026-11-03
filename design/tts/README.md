@@ -1,0 +1,37 @@
+# Озвучка слов синтезом TatarTTS (временная, до записей носителя)
+
+Для слов, у которых нет записи автора, аудио сгенерировано открытыми моделями [TatarTTS](https://github.com/IS2AI/TatarTTS)
+(ISSAI и Институт прикладной семиотики АН Татарстана, Piper VITS, мужской и женский голос; используется мужской).
+Записи автора в `files/audio` синтезом не заменяются. Все файлы синтеза: **нужна проверка носителем**.
+
+## Права (нужна проверка юриста до релиза)
+- Лицензия в репозитории CC-BY-4.0 (нужна атрибуция), а в карточке датасета на HuggingFace указана MIT: противоречие.
+- Не проверено согласие дикторов на синтез их голосов; лицензию самих моделей (лежат на Google Drive) уточнить у авторов.
+- В приложении нужна страница «О приложении» с названием, ссылкой и лицензией (`TODO(design)`); упоминание в карточках магазинов.
+
+## Как это устроено
+1. `build_audition.py` собирает слова уроков без записи автора, генерирует 8 вариантов каждого (4 уровня шума модели), отсеивает
+   выбросы по длительности и делает страницу `index.html` с кнопками ▶: слушаем, выбираем лучший вариант или «ни один»
+   (кнопка «Скачать выбор» выгружает `audition-choices.json`). Синтез случайный: каждый запуск даёт другие варианты.
+2. `finalize_audio.py` по этому файлу собирает итог: громкость как у записей автора, 44,1 кГц, m4a в `files/audio`,
+   исходные wav в `chosen/`, выбор в `choices.json`, `audioUrl` вопросам квиза, у которых есть озвучка.
+3. Слова с систематической ошибкой («ни один» + заметка) чинятся своими фонемами в `overrides.json` (`{"слово": {"ipa": "..."}}`).
+
+## Установка (macOS, Apple Silicon)
+```
+python3 -m venv ~/.venvs/tatartts && ~/.venvs/tatartts/bin/pip install onnxruntime numpy espeakng-loader gdown
+mkdir -p ~/.cache/tatartts/male ~/.cache/tatartts/female
+G=~/.venvs/tatartts/bin/gdown
+$G 14SfzXd5AupN25eq42WD-Dypt_wbsdEur -O ~/.cache/tatartts/male/config.json
+$G 1sMmypZ3_H4lm2dp2lo7HJraKLzmkNXSY -O ~/.cache/tatartts/male/male.onnx
+$G 1RXbUpJ73SRET3u7xIA2w-HwhftK8A9qq -O ~/.cache/tatartts/female/config.json
+$G 1F-XF4iRtgg2KEUXF94IpikLLrd70DgP- -O ~/.cache/tatartts/female/female.onnx
+~/.venvs/tatartts/bin/python design/tts/build_audition.py
+```
+Модели (по 114 МБ) в репозиторий не кладём. Папка Google Drive: https://drive.google.com/drive/folders/1YmtDVYLVogEfw3SE7GUl0LHZaIojAeap
+
+## Что выяснилось
+- Пакет `piper-tts` на macOS падает при загрузке espeak (путь к данным зашит при сборке), поэтому `tts_run.py` запускает модель сам:
+  espeak-ng (голос `tt`) -> id фонем -> onnxruntime. espeak игнорирует путь к данным длиннее ~230 символов: данные копируются в `/tmp/tatartts-espeak`.
+- Синтез слов в изоляции даёт частые ошибки: пропадает конечная согласная («дүрт», «эт», «болыт»), слабые «һ» и «п», неверные «а»/«о»,
+  ударение espeak. Автор слушал варианты вслепую: у мужского голоса ошибок меньше; профили шума: чаще выбирали 0.5/0.6 и 0.4/0.5.

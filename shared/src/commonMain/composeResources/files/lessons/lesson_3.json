@@ -44,7 +44,8 @@
         "лук"
       ],
       "correctIndex": 1,
-      "isNewWord": true
+      "isNewWord": true,
+      "audioUrl": "audio/barange.m4a"
     },
     {
       "word": "тоз",
@@ -64,7 +65,8 @@
         "суп",
         "яйцо"
       ],
-      "correctIndex": 3
+      "correctIndex": 3,
+      "audioUrl": "audio/yomyrka.m4a"
     },
     {
       "word": "шикәр",
@@ -74,7 +76,8 @@
         "сахар",
         "чай"
       ],
-      "correctIndex": 2
+      "correctIndex": 2,
+      "audioUrl": "audio/shikar.m4a"
     }
   ],
   "listening": [

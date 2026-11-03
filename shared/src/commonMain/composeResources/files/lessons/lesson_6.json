@@ -44,7 +44,8 @@
         "шесть"
       ],
       "correctIndex": 1,
-      "isNewWord": true
+      "isNewWord": true,
+      "audioUrl": "audio/altmysh.m4a"
     },
     {
       "word": "житмеш",
@@ -54,7 +55,8 @@
         "семь",
         "шестьдесят"
       ],
-      "correctIndex": 0
+      "correctIndex": 0,
+      "audioUrl": "audio/zhitmesh.m4a"
     },
     {
       "word": "сиксән",
@@ -64,7 +66,8 @@
         "семьдесят",
         "восемьдесят"
       ],
-      "correctIndex": 3
+      "correctIndex": 3,
+      "audioUrl": "audio/siksan.m4a"
     },
     {
       "word": "туксан",
@@ -74,7 +77,8 @@
         "девяносто",
         "сто"
       ],
-      "correctIndex": 2
+      "correctIndex": 2,
+      "audioUrl": "audio/tuksan.m4a"
     }
   ],
   "listening": [

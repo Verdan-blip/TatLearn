@@ -1,0 +1,59 @@
+<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Озвучка: выбор вариантов</title>
+<style>
+body{font:16px -apple-system,Segoe UI,sans-serif;max-width:980px;margin:0 auto;padding:0 12px 80px;color:#2b2a22;background:#F3EEDF}
+header{position:sticky;top:0;background:#F3EEDF;padding:10px 0;border-bottom:1px solid #d9cfb2;z-index:5;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+header b{font-size:18px} button{font:inherit;padding:7px 14px;border-radius:8px;border:1px solid #3B6B45;background:#3B6B45;color:#fff;cursor:pointer}
+button.sec{background:#fff;color:#3B6B45} .w{background:#FFFCF3;border:1px solid #e5dec6;border-radius:12px;padding:10px 14px;margin:10px 0}
+.w.done{border-color:#3B6B45;background:#f2f8f1} .t{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap} .t span.tt{font-size:22px;font-weight:700}
+.ru{color:#5A5642} .tag{font-size:12px;color:#7A6119;background:#EFE6C8;border-radius:6px;padding:1px 6px}
+.vs{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;align-items:center} .v{display:flex;align-items:center;gap:5px}
+.v label{display:flex;align-items:center;gap:4px;cursor:pointer;font-weight:600} button.pl{padding:4px 12px;font-size:17px;min-width:44px}
+input[type=text]{flex:1;min-width:150px;font:inherit;padding:5px 8px;border:1px solid #d9cfb2;border-radius:8px;background:#fff}
+.hint{font-size:13px;color:#5A5642;margin:6px 0}
+</style>
+<header><b>Выбор озвучки</b><span id=prog></span><button id=save>Скачать выбор (JSON)</button><button class=sec id=clear>Сбросить</button></header>
+<p class=hint>Нажимайте ▶ у вариантов 1–5 (повторное нажатие или другой вариант останавливает предыдущий), отметьте лучший кружком или «ни один» (если все ошибочные), при желании напишите, что не так. Выбор запоминается в браузере; кнопка вверху скачивает файл, который нужно прислать обратно.</p>
+<div id=list></div>
+<script>
+const WORDS = __DATA__;
+const KEY = "tatar-tts-choices-v2";
+let state = {};
+try { state = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
+const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+const list = document.getElementById("list");
+const player = new Audio();
+let playing = null;
+player.addEventListener("ended", () => { if (playing) playing.textContent = "▶"; playing = null; });
+function toggle(btn) {
+  if (playing === btn) { player.pause(); btn.textContent = "▶"; playing = null; return; }
+  if (playing) playing.textContent = "▶";
+  player.src = btn.dataset.src; player.currentTime = 0;
+  playing = btn; btn.textContent = "■";
+  player.play().catch(() => { btn.textContent = "▶"; playing = null; });
+}
+function progress() {
+  const n = WORDS.filter(w => state[w.slug] && state[w.slug].choice !== undefined).length;
+  document.getElementById("prog").textContent = `выбрано ${n} из ${WORDS.length}`;
+  WORDS.forEach(w => document.getElementById("w_" + w.slug).classList.toggle("done", !!(state[w.slug] && state[w.slug].choice !== undefined)));
+}
+WORDS.forEach((w, i) => {
+  const d = document.createElement("div"); d.className = "w"; d.id = "w_" + w.slug;
+  const tags = w.lessons.map(l => `<span class=tag>${l.replace("lesson_", "урок ")}</span>`).join(" ");
+  let vs = w.variants.map(v => `<div class=v><label><input type=radio name="r_${w.slug}" value="${v.n}">${v.n}</label><button class="pl sec" data-src="audio/${w.slug}/${v.n}.wav">▶</button></div>`).join("");
+  vs += `<div class=v><label><input type=radio name="r_${w.slug}" value="none">ни один</label></div>`;
+  d.innerHTML = `<div class=t><span>${i + 1}.</span><span class=tt>${w.text}</span><span class=ru>${w.ru || ""}</span>${tags}</div><div class=vs>${vs}</div><div class=vs><input type=text placeholder="что не так / как должно звучать (необязательно)" id="n_${w.slug}"></div>`;
+  list.appendChild(d);
+  const cur = state[w.slug] || {};
+  if (cur.choice !== undefined) { const r = d.querySelector(`input[value="${cur.choice}"]`); if (r) r.checked = true; }
+  d.querySelector("input[type=text]").value = cur.note || "";
+  d.querySelectorAll("input[type=radio]").forEach(r => r.addEventListener("change", () => { state[w.slug] = Object.assign(state[w.slug] || {}, { choice: r.value }); persist(); progress(); }));
+  d.querySelector("input[type=text]").addEventListener("input", e => { state[w.slug] = Object.assign(state[w.slug] || {}, { note: e.target.value }); persist(); });
+  d.querySelectorAll("button.pl").forEach(b => b.addEventListener("click", () => toggle(b)));
+});
+document.getElementById("save").onclick = () => {
+  const out = {}; WORDS.forEach(w => { const s = state[w.slug]; if (s) out[w.slug] = { text: w.text, choice: s.choice === undefined ? null : s.choice, note: s.note || "" }; });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 1)], { type: "application/json" })); a.download = "audition-choices.json"; a.click();
+};
+document.getElementById("clear").onclick = () => { if (confirm("Сбросить весь выбор?")) { state = {}; persist(); location.reload(); } };
+progress();
+</script>

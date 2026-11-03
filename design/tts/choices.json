@@ -1,0 +1,287 @@
+{
+ "hallaregez_nichek": {
+  "text": "Хәлләрегез ничек?",
+  "choice": "2",
+  "note": ""
+ },
+ "minem_isemem_renat": {
+  "text": "Минем исемем Ренат",
+  "choice": "4",
+  "note": ""
+ },
+ "ani": {
+  "text": "әни",
+  "choice": "2",
+  "note": ""
+ },
+ "ton": {
+  "text": "төн",
+  "choice": "5",
+  "note": ""
+ },
+ "urdak": {
+  "text": "үрдәк",
+  "choice": "4",
+  "note": ""
+ },
+ "och": {
+  "text": "өч",
+  "choice": "3",
+  "note": ""
+ },
+ "kul": {
+  "text": "күл",
+  "choice": "1",
+  "note": ""
+ },
+ "abi": {
+  "text": "әби",
+  "choice": "3",
+  "note": ""
+ },
+ "ulan": {
+  "text": "үлән",
+  "choice": "3",
+  "note": ""
+ },
+ "jir": {
+  "text": "җир",
+  "choice": "2",
+  "note": ""
+ },
+ "jay": {
+  "text": "җәй",
+  "choice": "3",
+  "note": ""
+ },
+ "yana": {
+  "text": "яңа",
+  "choice": "3",
+  "note": ""
+ },
+ "hava": {
+  "text": "һава",
+  "choice": "2",
+  "note": ""
+ },
+ "jimesh": {
+  "text": "җимеш",
+  "choice": "2",
+  "note": ""
+ },
+ "tan": {
+  "text": "таң",
+  "choice": "none",
+  "note": "должно звучать так, что буква а похожа на о русскую"
+ },
+ "ham": {
+  "text": "һәм",
+  "choice": "none",
+  "note": "буква х первая вообще не произносится"
+ },
+ "sot": {
+  "text": "сөт",
+  "choice": "2",
+  "note": ""
+ },
+ "chay": {
+  "text": "чәй",
+  "choice": "2",
+  "note": ""
+ },
+ "balyk": {
+  "text": "балык",
+  "choice": "2",
+  "note": ""
+ },
+ "barange": {
+  "text": "бәрәңге",
+  "choice": "2",
+  "note": ""
+ },
+ "toz": {
+  "text": "тоз",
+  "choice": "none",
+  "note": "буква о должна звучать чуть ближе к букве \"ы\""
+ },
+ "yomyrka": {
+  "text": "йомырка",
+  "choice": "2",
+  "note": ""
+ },
+ "shikar": {
+  "text": "шикәр",
+  "choice": "3",
+  "note": ""
+ },
+ "ipi": {
+  "text": "ипи",
+  "choice": "none",
+  "note": "буква \"п\" почти не произносится"
+ },
+ "gaila": {
+  "text": "гаилә",
+  "choice": "2",
+  "note": ""
+ },
+ "apa": {
+  "text": "апа",
+  "choice": "2",
+  "note": ""
+ },
+ "abyy": {
+  "text": "абый",
+  "choice": "1",
+  "note": ""
+ },
+ "senel": {
+  "text": "сеңел",
+  "choice": "2",
+  "note": ""
+ },
+ "bala": {
+  "text": "бала",
+  "choice": "2",
+  "note": ""
+ },
+ "ber": {
+  "text": "бер",
+  "choice": "1",
+  "note": ""
+ },
+ "durt": {
+  "text": "дүрт",
+  "choice": "none",
+  "note": "буква т вообще не произностися в конце, а должна"
+ },
+ "bish": {
+  "text": "биш",
+  "choice": "3",
+  "note": ""
+ },
+ "alty": {
+  "text": "алты",
+  "choice": "2",
+  "note": ""
+ },
+ "jide": {
+  "text": "җиде",
+  "choice": "2",
+  "note": ""
+ },
+ "sigez": {
+  "text": "сигез",
+  "choice": "none",
+  "note": "ударение нужно на последнюю гласную"
+ },
+ "un": {
+  "text": "ун",
+  "choice": "3",
+  "note": ""
+ },
+ "utyz": {
+  "text": "утыз",
+  "choice": "none",
+  "note": "ударение нужно на последнюю гласную"
+ },
+ "kyryk": {
+  "text": "кырык",
+  "choice": "2",
+  "note": ""
+ },
+ "ille": {
+  "text": "илле",
+  "choice": "2",
+  "note": ""
+ },
+ "altmysh": {
+  "text": "алтмыш",
+  "choice": "2",
+  "note": ""
+ },
+ "zhitmesh": {
+  "text": "житмеш",
+  "choice": "2",
+  "note": ""
+ },
+ "siksan": {
+  "text": "сиксән",
+  "choice": "2",
+  "note": ""
+ },
+ "tuksan": {
+  "text": "туксан",
+  "choice": "2",
+  "note": ""
+ },
+ "unber": {
+  "text": "унбер",
+  "choice": "2",
+  "note": ""
+ },
+ "et": {
+  "text": "эт",
+  "choice": "none",
+  "note": "последняя буква опять пропущена"
+ },
+ "at": {
+  "text": "ат",
+  "choice": "3",
+  "note": ""
+ },
+ "kuyan": {
+  "text": "куян",
+  "choice": "4",
+  "note": ""
+ },
+ "agach": {
+  "text": "агач",
+  "choice": "4",
+  "note": ""
+ },
+ "chachak": {
+  "text": "чәчәк",
+  "choice": "2",
+  "note": ""
+ },
+ "tolke": {
+  "text": "төлке",
+  "choice": "2",
+  "note": ""
+ },
+ "bure": {
+  "text": "бүре",
+  "choice": "2",
+  "note": ""
+ },
+ "yaz": {
+  "text": "яз",
+  "choice": "2",
+  "note": ""
+ },
+ "koz": {
+  "text": "көз",
+  "choice": "3",
+  "note": ""
+ },
+ "koyash": {
+  "text": "кояш",
+  "choice": "2",
+  "note": ""
+ },
+ "kar": {
+  "text": "кар",
+  "choice": "none",
+  "note": "буква а должна быть большн похоже на букву о"
+ },
+ "jil": {
+  "text": "җил",
+  "choice": "3",
+  "note": ""
+ },
+ "bolyt": {
+  "text": "болыт",
+  "choice": "none",
+  "note": "опять буква т пропущена"
+ }
+}
