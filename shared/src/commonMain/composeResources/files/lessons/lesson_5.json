@@ -125,8 +125,12 @@
       ],
       "wordAudio": {
         "ике": "audio/ike.m4a",
-        "өч": "audio/och.m4a"
-      }
+        "өч": "audio/och.m4a",
+        "Бу": "audio/bu.m4a",
+        "китап": "audio/kitap.m4a",
+        "китаплар": "audio/kitaplar.m4a"
+      },
+      "audioUrl": "audio/bu_ike_kitap.m4a"
     },
     {
       "promptRu": "Это три яблока",
@@ -145,8 +149,11 @@
       "wordAudio": {
         "өч": "audio/och.m4a",
         "алма": "audio/alma.m4a",
-        "ун": "audio/un.m4a"
-      }
+        "ун": "audio/un.m4a",
+        "Бу": "audio/bu.m4a",
+        "алмалар": "audio/almalar.m4a"
+      },
+      "audioUrl": "audio/bu_och_alma.m4a"
     }
   ],
   "translations": [

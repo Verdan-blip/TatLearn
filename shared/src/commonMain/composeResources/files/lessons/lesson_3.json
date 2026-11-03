@@ -125,8 +125,12 @@
       ],
       "wordAudio": {
         "чәй": "audio/chay.m4a",
-        "сөт": "audio/sot.m4a"
-      }
+        "сөт": "audio/sot.m4a",
+        "Мин": "audio/min.m4a",
+        "эчәм": "audio/echam.m4a",
+        "ашыйм": "audio/ashyym.m4a"
+      },
+      "audioUrl": "audio/min_chay_echam.m4a"
     },
     {
       "promptRu": "Я ем яблоко",
@@ -144,8 +148,12 @@
       ],
       "wordAudio": {
         "алма": "audio/alma.m4a",
-        "чәй": "audio/chay.m4a"
-      }
+        "чәй": "audio/chay.m4a",
+        "Мин": "audio/min.m4a",
+        "ашыйм": "audio/ashyym.m4a",
+        "эчәм": "audio/echam.m4a"
+      },
+      "audioUrl": "audio/min_alma_ashyym.m4a"
     }
   ],
   "translations": [

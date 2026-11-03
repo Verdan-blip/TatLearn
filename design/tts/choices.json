@@ -303,5 +303,229 @@
   "note": "",
   "profile": 1,
   "ipa": "boɫˈʌtʰ"
+ },
+ "minem": {
+  "text": "Минем",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "isemem": {
+  "text": "исемем",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "renat": {
+  "text": "Ренат",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "nichek": {
+  "text": "ничек",
+  "choice": "4",
+  "note": "",
+  "profile": 3,
+  "ipa": null
+ },
+ "yahshy_rahmat": {
+  "text": "Яхшы, рәхмәт",
+  "choice": "2",
+  "note": "",
+  "profile": 2,
+  "ipa": null
+ },
+ "bu": {
+  "text": "Бу",
+  "choice": "1",
+  "note": "",
+  "profile": 1,
+  "ipa": null
+ },
+ "bu_minem_oy": {
+  "text": "Бу минем өй",
+  "choice": "1",
+  "note": "",
+  "profile": 1,
+  "ipa": null
+ },
+ "bu_minem_ani": {
+  "text": "Бу минем әни",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "kitap": {
+  "text": "китап",
+  "choice": "3",
+  "note": "",
+  "profile": 2,
+  "ipa": null
+ },
+ "bu_yana_kitap": {
+  "text": "Бу яңа китап",
+  "choice": "2",
+  "note": "",
+  "profile": 2,
+  "ipa": null
+ },
+ "bu_yana_jyr": {
+  "text": "Бу яңа җыр",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "min": {
+  "text": "Мин",
+  "choice": "2",
+  "note": "",
+  "profile": 1,
+  "ipa": null
+ },
+ "echam": {
+  "text": "эчәм",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "ashyym": {
+  "text": "ашыйм",
+  "choice": "1",
+  "note": "",
+  "profile": 1,
+  "ipa": null
+ },
+ "min_chay_echam": {
+  "text": "Мин чәй эчәм",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "min_alma_ashyym": {
+  "text": "Мин алма ашыйм",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "bu_minem_ati": {
+  "text": "Бу минем әти",
+  "choice": "2",
+  "note": "",
+  "profile": 1,
+  "ipa": null
+ },
+ "bu_minem_babay": {
+  "text": "Бу минем бабай",
+  "choice": "2",
+  "note": "",
+  "profile": 1,
+  "ipa": null
+ },
+ "kitaplar": {
+  "text": "китаплар",
+  "choice": "2",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "bu_ike_kitap": {
+  "text": "Бу ике китап",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "almalar": {
+  "text": "алмалар",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "bu_och_alma": {
+  "text": "Бу өч алма",
+  "choice": "3",
+  "note": "",
+  "profile": 2,
+  "ipa": null
+ },
+ "bu_yoz_kitap": {
+  "text": "Бу йөз китап",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "bu_ille_alma": {
+  "text": "Бу илле алма",
+  "choice": "2",
+  "note": "",
+  "profile": 1,
+  "ipa": null
+ },
+ "zur": {
+  "text": "зур",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "kosh": {
+  "text": "кош",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "kechkena": {
+  "text": "кечкенә",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "bu_zur_agach": {
+  "text": "Бу зур агач",
+  "choice": "1",
+  "note": "",
+  "profile": 1,
+  "ipa": null
+ },
+ "bu_kechkena_pesi": {
+  "text": "Бу кечкенә песи",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "yava": {
+  "text": "ява",
+  "choice": "2",
+  "note": "",
+  "profile": 1,
+  "ipa": null
+ },
+ "yangyr_yava": {
+  "text": "Яңгыр ява",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
+ },
+ "kar_yava": {
+  "text": "Кар ява",
+  "choice": "1",
+  "note": "",
+  "profile": 0,
+  "ipa": null
  }
 }

@@ -126,8 +126,11 @@
       "wordAudio": {
         "яңа": "audio/yana.m4a",
         "җир": "audio/jir.m4a",
-        "җәй": "audio/jay.m4a"
-      }
+        "җәй": "audio/jay.m4a",
+        "Бу": "audio/bu.m4a",
+        "китап": "audio/kitap.m4a"
+      },
+      "audioUrl": "audio/bu_yana_kitap.m4a"
     },
     {
       "promptRu": "Это новая песня",
@@ -147,8 +150,10 @@
         "яңа": "audio/yana.m4a",
         "җыр": "audio/jyr.m4a",
         "җир": "audio/jir.m4a",
-        "мең": "audio/men.m4a"
-      }
+        "мең": "audio/men.m4a",
+        "Бу": "audio/bu.m4a"
+      },
+      "audioUrl": "audio/bu_yana_jyr.m4a"
     }
   ],
   "translations": [

@@ -125,8 +125,12 @@
       ],
       "wordAudio": {
         "йөз": "audio/yoz.m4a",
-        "утыз": "audio/utyz.m4a"
-      }
+        "утыз": "audio/utyz.m4a",
+        "Бу": "audio/bu.m4a",
+        "китап": "audio/kitap.m4a",
+        "китаплар": "audio/kitaplar.m4a"
+      },
+      "audioUrl": "audio/bu_yoz_kitap.m4a"
     },
     {
       "promptRu": "Это пятьдесят яблок",
@@ -145,8 +149,11 @@
       "wordAudio": {
         "илле": "audio/ille.m4a",
         "алма": "audio/alma.m4a",
-        "кырык": "audio/kyryk.m4a"
-      }
+        "кырык": "audio/kyryk.m4a",
+        "Бу": "audio/bu.m4a",
+        "алмалар": "audio/almalar.m4a"
+      },
+      "audioUrl": "audio/bu_ille_alma.m4a"
     }
   ],
   "translations": [

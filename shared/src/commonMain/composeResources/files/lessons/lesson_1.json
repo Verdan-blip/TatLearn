@@ -126,8 +126,11 @@
       "wordAudio": {
         "өй": "audio/oy.m4a",
         "күз": "audio/kuz.m4a",
-        "әни": "audio/ani.m4a"
-      }
+        "әни": "audio/ani.m4a",
+        "Бу": "audio/bu.m4a",
+        "минем": "audio/minem.m4a"
+      },
+      "audioUrl": "audio/bu_minem_oy.m4a"
     },
     {
       "promptRu": "Это моя мама",
@@ -146,8 +149,11 @@
       "wordAudio": {
         "әни": "audio/ani.m4a",
         "өй": "audio/oy.m4a",
-        "төн": "audio/ton.m4a"
-      }
+        "төн": "audio/ton.m4a",
+        "Бу": "audio/bu.m4a",
+        "минем": "audio/minem.m4a"
+      },
+      "audioUrl": "audio/bu_minem_ani.m4a"
     }
   ],
   "translations": [

@@ -126,8 +126,10 @@
         "Яңгыр": "audio/yangyr.m4a",
         "кар": "audio/kar.m4a",
         "кояш": "audio/koyash.m4a",
-        "җил": "audio/jil.m4a"
-      }
+        "җил": "audio/jil.m4a",
+        "ява": "audio/yava.m4a"
+      },
+      "audioUrl": "audio/yangyr_yava.m4a"
     },
     {
       "promptRu": "Идёт снег",
@@ -146,8 +148,10 @@
         "Кар": "audio/kar.m4a",
         "яңгыр": "audio/yangyr.m4a",
         "җил": "audio/jil.m4a",
-        "җәй": "audio/jay.m4a"
-      }
+        "җәй": "audio/jay.m4a",
+        "ява": "audio/yava.m4a"
+      },
+      "audioUrl": "audio/kar_yava.m4a"
     }
   ],
   "translations": [

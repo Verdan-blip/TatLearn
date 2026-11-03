@@ -126,8 +126,11 @@
       "wordAudio": {
         "әти": "audio/ati.m4a",
         "әни": "audio/ani.m4a",
-        "гаилә": "audio/gaila.m4a"
-      }
+        "гаилә": "audio/gaila.m4a",
+        "Бу": "audio/bu.m4a",
+        "минем": "audio/minem.m4a"
+      },
+      "audioUrl": "audio/bu_minem_ati.m4a"
     },
     {
       "promptRu": "Это мой дедушка",
@@ -146,8 +149,11 @@
       "wordAudio": {
         "бабай": "audio/babay.m4a",
         "әби": "audio/abi.m4a",
-        "апа": "audio/apa.m4a"
-      }
+        "апа": "audio/apa.m4a",
+        "Бу": "audio/bu.m4a",
+        "минем": "audio/minem.m4a"
+      },
+      "audioUrl": "audio/bu_minem_babay.m4a"
     }
   ],
   "translations": [

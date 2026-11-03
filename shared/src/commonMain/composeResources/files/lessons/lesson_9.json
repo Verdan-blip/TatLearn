@@ -125,7 +125,10 @@
       ],
       "wordAudio": {
         "Рәхмәт": "audio/rahmat.m4a",
-        "Яхшы": "audio/yahshy.m4a"
+        "Яхшы": "audio/yahshy.m4a",
+        "Минем": "audio/minem.m4a",
+        "исемем": "audio/isemem.m4a",
+        "Ренат": "audio/renat.m4a"
       },
       "audioUrl": "audio/minem_isemem_renat.m4a"
     },
@@ -144,8 +147,10 @@
       "wordAudio": {
         "Яхшы,": "audio/yahshy.m4a",
         "рәхмәт": "audio/rahmat.m4a",
-        "Исәнме": "audio/isenme.m4a"
-      }
+        "Исәнме": "audio/isenme.m4a",
+        "ничек": "audio/nichek.m4a"
+      },
+      "audioUrl": "audio/yahshy_rahmat.m4a"
     }
   ],
   "translations": [

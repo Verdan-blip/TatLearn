@@ -124,8 +124,13 @@
         "агач"
       ],
       "wordAudio": {
-        "агач": "audio/agach.m4a"
-      }
+        "агач": "audio/agach.m4a",
+        "Бу": "audio/bu.m4a",
+        "зур": "audio/zur.m4a",
+        "кош": "audio/kosh.m4a",
+        "кечкенә": "audio/kechkena.m4a"
+      },
+      "audioUrl": "audio/bu_zur_agach.m4a"
     },
     {
       "promptRu": "Это маленькая кошка",
@@ -143,8 +148,12 @@
       ],
       "wordAudio": {
         "песи": "audio/pesi.m4a",
-        "эт": "audio/et.m4a"
-      }
+        "эт": "audio/et.m4a",
+        "Бу": "audio/bu.m4a",
+        "кечкенә": "audio/kechkena.m4a",
+        "зур": "audio/zur.m4a"
+      },
+      "audioUrl": "audio/bu_kechkena_pesi.m4a"
     }
   ],
   "translations": [
