@@ -10,7 +10,6 @@
 import argparse
 import json
 import os
-import re
 import statistics
 import sys
 
@@ -20,50 +19,15 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from tts_run import Voice, write_wav  # noqa: E402
 
-ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
-FILES = f"{ROOT}/shared/src/commonMain/composeResources/files"
+from words import AUTHOR_ALIASES, FILES, lesson_words, slug  # noqa: E402
+
 CANDIDATES, SHOWN = 8, 5
 PROFILES = [(0.667, 0.8), (0.5, 0.6), (0.4, 0.5), (0.3, 0.4)]  # (noise_scale, noise_w): от «живого» к «стабильному»
-# Имена файлов автора, у которых «ә» записана как «e» (остальные совпадают с транслитерацией).
-AUTHOR_ALIASES = {"isanmesez": "isenmesez", "isanme": "isenme"}
-TR = {"а": "a", "ә": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "e", "ё": "yo", "ж": "zh", "җ": "j", "з": "z", "и": "i",
-      "й": "y", "к": "k", "л": "l", "м": "m", "н": "n", "ң": "n", "о": "o", "ө": "o", "п": "p", "р": "r", "с": "s", "т": "t",
-      "у": "u", "ү": "u", "ф": "f", "х": "h", "һ": "h", "ц": "ts", "ч": "ch", "ш": "sh", "щ": "sch", "ъ": "", "ы": "y",
-      "ь": "", "э": "e", "ю": "yu", "я": "ya", " ": "_"}
-
-
-def slug(text):
-    return re.sub(r"_+", "_", "".join(TR.get(c, "") for c in text.lower())).strip("_")
-
-
-def lesson_words():
-    """Все татарские слова и фразы уроков в порядке курса: текст -> {ru, lessons}."""
-    order = ["lesson_9"] + [f"lesson_{i}" for i in range(1, 9)]
-    words = {}
-    for lid in order:
-        d = json.load(open(f"{FILES}/lessons/{lid}.json", encoding="utf-8"))
-
-        def add(t, ru=None):
-            t = t.strip()
-            if t:
-                e = words.setdefault(t, {"ru": None, "lessons": []})
-                e["ru"] = e["ru"] or ru
-                if lid not in e["lessons"]:
-                    e["lessons"].append(lid)
-
-        for pr in d.get("matching", {}).get("pairs", []):
-            add(pr["tatar"], pr["russian"])
-        for q in d.get("quiz", []):
-            add(q["word"], q["options"][q["correctIndex"]])
-        for lt in d.get("listening", []):
-            for o in lt.get("options", []):
-                add(o)
-    return words
 
 
 def has_author_audio(sl):
-    return AUTHOR_ALIASES.get(sl, sl) in {os.path.splitext(f)[0] for f in os.listdir(f"{FILES}/audio")} or \
-        os.path.exists(f"{FILES}/audio/{sl}.m4a")
+    """Есть ли уже файл озвучки (записи автора и прежний синтез не перегенерируем)."""
+    return os.path.exists(f"{FILES}/audio/{AUTHOR_ALIASES.get(sl, sl)}.m4a") or os.path.exists(f"{FILES}/audio/{sl}.m4a")
 
 
 def trim(a):
@@ -83,7 +47,12 @@ def main():
     ap.add_argument("--out", default=os.path.expanduser("~/Downloads/TatarTTS-audition"))
     args = ap.parse_args()
     overrides = json.load(open(f"{HERE}/overrides.json", encoding="utf-8")) if os.path.exists(f"{HERE}/overrides.json") else {}
-    words = {t: e for t, e in lesson_words().items() if not has_author_audio(slug(t))}
+    words, seen = {}, set()
+    for t, e in lesson_words().items():
+        # «Минем» и «минем» (регистр) — одно слово и один файл озвучки: берём первое написание.
+        if not has_author_audio(slug(t)) and slug(t) not in seen:
+            seen.add(slug(t))
+            words[t] = e
     if args.only:
         keep = {w.strip() for w in args.only.split(",")}
         words = {t: e for t, e in words.items() if t in keep}
@@ -95,18 +64,20 @@ def main():
         sl = slug(text)
         ipa = overrides.get(text, {}).get("ipa")
         cands = []
+        # Для фраз из нескольких слов ставим знак конца предложения (точку, а у вопроса «?»): интонация законченная.
+        end = text[-1] if text[-1] in "?!." else ("." if " " in text else None)
         if isinstance(ipa, list):
             # Свои фонемы: каждый вариант записи по два раза (профили шума 0.5/0.6 и 0.4/0.5), показываем все.
             for ipa_i in ipa:
                 for pi in (1, 2):
                     ns, nw = PROFILES[pi]
-                    _, missing, audio = voice.synth(text, ipa=ipa_i, noise_scale=ns, noise_w=nw)
+                    _, missing, audio = voice.synth(text, ipa=ipa_i, noise_scale=ns, noise_w=nw, end=end)
                     cands.append({"profile": pi, "audio": trim(audio), "missing": missing, "ipa": ipa_i})
             good = cands
         else:
             for i in range(CANDIDATES):
                 ns, nw = PROFILES[i % len(PROFILES)]
-                _, missing, audio = voice.synth(text, ipa=ipa, noise_scale=ns, noise_w=nw)
+                _, missing, audio = voice.synth(text, ipa=ipa, noise_scale=ns, noise_w=nw, end=end)
                 cands.append({"profile": i % len(PROFILES), "audio": trim(audio), "missing": missing, "ipa": ipa})
             durs = [len(c["audio"]) / 22050 for c in cands]
             med = statistics.median(durs)

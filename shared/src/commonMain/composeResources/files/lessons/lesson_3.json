@@ -10,23 +10,28 @@
     "pairs": [
       {
         "tatar": "сөт",
-        "russian": "молоко"
+        "russian": "молоко",
+        "audioUrl": "audio/sot.m4a"
       },
       {
         "tatar": "чәй",
-        "russian": "чай"
+        "russian": "чай",
+        "audioUrl": "audio/chay.m4a"
       },
       {
         "tatar": "ит",
-        "russian": "мясо"
+        "russian": "мясо",
+        "audioUrl": "audio/it.m4a"
       },
       {
         "tatar": "алма",
-        "russian": "яблоко"
+        "russian": "яблоко",
+        "audioUrl": "audio/alma.m4a"
       },
       {
         "tatar": "балык",
-        "russian": "рыба"
+        "russian": "рыба",
+        "audioUrl": "audio/balyk.m4a"
       }
     ],
     "notes": {
@@ -117,7 +122,11 @@
         "Мин",
         "чәй",
         "эчәм"
-      ]
+      ],
+      "wordAudio": {
+        "чәй": "audio/chay.m4a",
+        "сөт": "audio/sot.m4a"
+      }
     },
     {
       "promptRu": "Я ем яблоко",
@@ -132,7 +141,11 @@
         "Мин",
         "алма",
         "ашыйм"
-      ]
+      ],
+      "wordAudio": {
+        "алма": "audio/alma.m4a",
+        "чәй": "audio/chay.m4a"
+      }
     }
   ],
   "translations": [

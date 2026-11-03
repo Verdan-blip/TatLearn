@@ -10,23 +10,28 @@
     "pairs": [
       {
         "tatar": "Исәнмесез",
-        "russian": "здравствуйте"
+        "russian": "здравствуйте",
+        "audioUrl": "audio/isenmesez.m4a"
       },
       {
         "tatar": "Исәнме",
-        "russian": "привет"
+        "russian": "привет",
+        "audioUrl": "audio/isenme.m4a"
       },
       {
         "tatar": "Рәхмәт",
-        "russian": "спасибо"
+        "russian": "спасибо",
+        "audioUrl": "audio/rahmat.m4a"
       },
       {
         "tatar": "Яхшы",
-        "russian": "хорошо"
+        "russian": "хорошо",
+        "audioUrl": "audio/yahshy.m4a"
       },
       {
         "tatar": "Сау булыгыз",
-        "russian": "до свидания"
+        "russian": "до свидания",
+        "audioUrl": "audio/sau_bulygyz.m4a"
       }
     ],
     "notes": {
@@ -117,7 +122,12 @@
         "Минем",
         "исемем",
         "Ренат"
-      ]
+      ],
+      "wordAudio": {
+        "Рәхмәт": "audio/rahmat.m4a",
+        "Яхшы": "audio/yahshy.m4a"
+      },
+      "audioUrl": "audio/minem_isemem_renat.m4a"
     },
     {
       "promptRu": "Хорошо, спасибо",
@@ -130,7 +140,12 @@
       "answer": [
         "Яхшы,",
         "рәхмәт"
-      ]
+      ],
+      "wordAudio": {
+        "Яхшы,": "audio/yahshy.m4a",
+        "рәхмәт": "audio/rahmat.m4a",
+        "Исәнме": "audio/isenme.m4a"
+      }
     }
   ],
   "translations": [

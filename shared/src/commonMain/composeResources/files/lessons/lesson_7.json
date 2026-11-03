@@ -10,23 +10,28 @@
     "pairs": [
       {
         "tatar": "песи",
-        "russian": "кошка"
+        "russian": "кошка",
+        "audioUrl": "audio/pesi.m4a"
       },
       {
         "tatar": "эт",
-        "russian": "собака"
+        "russian": "собака",
+        "audioUrl": "audio/et.m4a"
       },
       {
         "tatar": "ат",
-        "russian": "лошадь"
+        "russian": "лошадь",
+        "audioUrl": "audio/at.m4a"
       },
       {
         "tatar": "сыер",
-        "russian": "корова"
+        "russian": "корова",
+        "audioUrl": "audio/syer.m4a"
       },
       {
         "tatar": "куян",
-        "russian": "заяц"
+        "russian": "заяц",
+        "audioUrl": "audio/kuyan.m4a"
       }
     ],
     "notes": {
@@ -117,7 +122,10 @@
         "Бу",
         "зур",
         "агач"
-      ]
+      ],
+      "wordAudio": {
+        "агач": "audio/agach.m4a"
+      }
     },
     {
       "promptRu": "Это маленькая кошка",
@@ -132,7 +140,11 @@
         "Бу",
         "кечкенә",
         "песи"
-      ]
+      ],
+      "wordAudio": {
+        "песи": "audio/pesi.m4a",
+        "эт": "audio/et.m4a"
+      }
     }
   ],
   "translations": [

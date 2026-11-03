@@ -21,7 +21,8 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from build_audition import AUTHOR_ALIASES, FILES, slug  # noqa: E402
+from wire_lessons import wire_lessons  # noqa: E402
+from words import FILES  # noqa: E402
 from tts_run import read_wav, write_wav  # noqa: E402
 
 TARGET_RMS_DB, PEAK_LIMIT_DB = -16.3, -1.0
@@ -74,20 +75,8 @@ def main():
     allc.update(choices)
     json.dump(allc, open(path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
-    have = {os.path.splitext(f)[0] for f in os.listdir(f"{FILES}/audio")}
-    patched = 0
-    for lid in [f"lesson_{i}" for i in range(1, 10)]:
-        p = f"{FILES}/lessons/{lid}.json"
-        d = json.load(open(p, encoding="utf-8"))
-        for q in d.get("quiz", []):
-            if q.get("audioUrl"):
-                continue
-            sl = AUTHOR_ALIASES.get(slug(q["word"]), slug(q["word"]))
-            if sl in have:
-                q["audioUrl"] = f"audio/{sl}.m4a"
-                patched += 1
-        open(p, "w", encoding="utf-8").write(json.dumps(d, ensure_ascii=False, indent=2) + "\n")
-    print(f"озвучено слов: {len(made)}; без выбора («ни один»): {len(skipped)}: {skipped}; вопросам квиза проставлен audioUrl: {patched}")
+    patched = wire_lessons()
+    print(f"озвучено слов: {len(made)}; без выбора («ни один»): {len(skipped)}: {skipped}; проставлен audioUrl: {patched}")
 
 
 if __name__ == "__main__":

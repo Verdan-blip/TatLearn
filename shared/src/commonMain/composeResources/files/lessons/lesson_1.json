@@ -10,23 +10,28 @@
     "pairs": [
       {
         "tatar": "әни",
-        "russian": "мама"
+        "russian": "мама",
+        "audioUrl": "audio/ani.m4a"
       },
       {
         "tatar": "өй",
-        "russian": "дом"
+        "russian": "дом",
+        "audioUrl": "audio/oy.m4a"
       },
       {
         "tatar": "күз",
-        "russian": "глаз"
+        "russian": "глаз",
+        "audioUrl": "audio/kuz.m4a"
       },
       {
         "tatar": "төн",
-        "russian": "ночь"
+        "russian": "ночь",
+        "audioUrl": "audio/ton.m4a"
       },
       {
         "tatar": "үрдәк",
-        "russian": "утка"
+        "russian": "утка",
+        "audioUrl": "audio/urdak.m4a"
       }
     ],
     "notes": {
@@ -117,7 +122,12 @@
         "Бу",
         "минем",
         "өй"
-      ]
+      ],
+      "wordAudio": {
+        "өй": "audio/oy.m4a",
+        "күз": "audio/kuz.m4a",
+        "әни": "audio/ani.m4a"
+      }
     },
     {
       "promptRu": "Это моя мама",
@@ -132,7 +142,12 @@
         "Бу",
         "минем",
         "әни"
-      ]
+      ],
+      "wordAudio": {
+        "әни": "audio/ani.m4a",
+        "өй": "audio/oy.m4a",
+        "төн": "audio/ton.m4a"
+      }
     }
   ],
   "translations": [

@@ -85,9 +85,11 @@ private class FakeProgress : ProgressRepository {
     override suspend fun resetStats() = Unit
 }
 
+/** Платформенный плеер для тестов: ничего не играет, но запоминает адреса (http идут к нему напрямую). */
 private class SilentPlayer : AudioPlayer {
+    val urls = mutableListOf<String>()
     override val state: StateFlow<AudioPlayerState> = MutableStateFlow(AudioPlayerState.Idle)
-    override fun play(url: String, rate: Float) = Unit
+    override fun play(url: String, rate: Float) { urls += url }
     override fun play(bytes: ByteArray, rate: Float) = Unit
     override fun stop() = Unit
     override fun release() = Unit
@@ -103,6 +105,7 @@ class LessonViewModelTest {
     private val progress = FakeProgress()
     private val haptics = RecordingHaptics()
     private val sounds = RecordingSounds()
+    private val audio = SilentPlayer()
     private val time = FixedTime()
 
     @BeforeTest fun setUp() = Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -110,7 +113,7 @@ class LessonViewModelTest {
     @AfterTest fun tearDown() = Dispatchers.resetMain()
 
     private fun viewModel(stepIds: List<String> = emptyList(), lessons: LessonsRepository = FakeLessons()) =
-        LessonViewModel(LessonKey("lesson_t", stepIds), lessons, progress, StubbingAudioPlayer(SilentPlayer()), time, haptics, sounds)
+        LessonViewModel(LessonKey("lesson_t", stepIds), lessons, progress, StubbingAudioPlayer(audio), time, haptics, sounds)
 
     private fun LessonViewModel.step() = state.value.step
 
@@ -186,6 +189,40 @@ class LessonViewModelTest {
         vm.onEvent(LessonUiEvent.OptionSelected(0))
         vm.onEvent(LessonUiEvent.CheckClicked) // неверно, правильный индекс 1
         assertEquals(listOf("correct", "wrong"), haptics.events)
+    }
+
+    private fun voicedContent() = testLessonContent().copy(
+        matching = MatchingExercise(listOf(WordPair("ипи", "хлеб", "https://x/ipi.m4a"), WordPair("су", "вода"), WordPair("дус", "друг", "https://x/dus.m4a"))),
+        sentences = listOf(
+            SentenceTask(
+                "Я иду в школу", listOf("Мин", "барам", "мәктәпкә", "китап"), listOf("Мин", "мәктәпкә", "барам"),
+                wordAudio = mapOf("Мин" to "https://x/min.m4a", "барам" to "https://x/baram.m4a"),
+            ),
+        ),
+    )
+
+    @Test fun matchingPlaysTheWordOnTatarCardTapOnly() = runTest {
+        val vm = viewModel(listOf("matching"), FakeLessons(Result.success(voicedContent())))
+        vm.onEvent(LessonUiEvent.MatchLeftClicked(0)) // выбор карточки с записью: звучит
+        assertEquals(listOf("https://x/ipi.m4a"), audio.urls)
+        vm.onEvent(LessonUiEvent.MatchLeftClicked(0)) // повторный тап снимает выбор: тишина
+        vm.onEvent(LessonUiEvent.MatchLeftClicked(1)) // карточка без записи: тишина, без заглушки
+        assertEquals(listOf("https://x/ipi.m4a"), audio.urls)
+        vm.onEvent(LessonUiEvent.MatchRightClicked(1)) // русская карточка не звучит, пара «су — вода» собрана
+        assertEquals(1, audio.urls.size)
+        vm.onEvent(LessonUiEvent.MatchLeftClicked(2))
+        assertEquals(listOf("https://x/ipi.m4a", "https://x/dus.m4a"), audio.urls)
+    }
+
+    @Test fun sentenceBuilderPlaysBankWordOnTapAndStaysSilentOnReturnOrWithoutAudio() = runTest {
+        val vm = viewModel(listOf("sentence-0"), FakeLessons(Result.success(voicedContent())))
+        vm.onEvent(LessonUiEvent.BankWordClicked(0)) // «Мин»: есть запись
+        assertEquals(listOf("https://x/min.m4a"), audio.urls)
+        vm.onEvent(LessonUiEvent.BankWordClicked(3)) // «китап»: записи нет, тишина
+        vm.onEvent(LessonUiEvent.PlacedWordClicked(0)) // возврат слова из ответа: тишина
+        assertEquals(listOf("https://x/min.m4a"), audio.urls)
+        vm.onEvent(LessonUiEvent.BankWordClicked(1)) // «барам»
+        assertEquals(listOf("https://x/min.m4a", "https://x/baram.m4a"), audio.urls)
     }
 
     @Test fun checkedStepGivesOneSoundByVerdictAndNothingForOtherEvents() = runTest {

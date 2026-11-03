@@ -10,23 +10,28 @@
     "pairs": [
       {
         "tatar": "әни",
-        "russian": "мама"
+        "russian": "мама",
+        "audioUrl": "audio/ani.m4a"
       },
       {
         "tatar": "әти",
-        "russian": "папа"
+        "russian": "папа",
+        "audioUrl": "audio/ati.m4a"
       },
       {
         "tatar": "әби",
-        "russian": "бабушка"
+        "russian": "бабушка",
+        "audioUrl": "audio/abi.m4a"
       },
       {
         "tatar": "бабай",
-        "russian": "дедушка"
+        "russian": "дедушка",
+        "audioUrl": "audio/babay.m4a"
       },
       {
         "tatar": "гаилә",
-        "russian": "семья"
+        "russian": "семья",
+        "audioUrl": "audio/gaila.m4a"
       }
     ],
     "notes": {
@@ -117,7 +122,12 @@
         "Бу",
         "минем",
         "әти"
-      ]
+      ],
+      "wordAudio": {
+        "әти": "audio/ati.m4a",
+        "әни": "audio/ani.m4a",
+        "гаилә": "audio/gaila.m4a"
+      }
     },
     {
       "promptRu": "Это мой дедушка",
@@ -132,7 +142,12 @@
         "Бу",
         "минем",
         "бабай"
-      ]
+      ],
+      "wordAudio": {
+        "бабай": "audio/babay.m4a",
+        "әби": "audio/abi.m4a",
+        "апа": "audio/apa.m4a"
+      }
     }
   ],
   "translations": [

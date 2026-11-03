@@ -10,23 +10,28 @@
     "pairs": [
       {
         "tatar": "бер",
-        "russian": "один"
+        "russian": "один",
+        "audioUrl": "audio/ber.m4a"
       },
       {
         "tatar": "ике",
-        "russian": "два"
+        "russian": "два",
+        "audioUrl": "audio/ike.m4a"
       },
       {
         "tatar": "өч",
-        "russian": "три"
+        "russian": "три",
+        "audioUrl": "audio/och.m4a"
       },
       {
         "tatar": "дүрт",
-        "russian": "четыре"
+        "russian": "четыре",
+        "audioUrl": "audio/durt.m4a"
       },
       {
         "tatar": "биш",
-        "russian": "пять"
+        "russian": "пять",
+        "audioUrl": "audio/bish.m4a"
       }
     ],
     "notes": {
@@ -117,7 +122,11 @@
         "Бу",
         "ике",
         "китап"
-      ]
+      ],
+      "wordAudio": {
+        "ике": "audio/ike.m4a",
+        "өч": "audio/och.m4a"
+      }
     },
     {
       "promptRu": "Это три яблока",
@@ -132,7 +141,12 @@
         "Бу",
         "өч",
         "алма"
-      ]
+      ],
+      "wordAudio": {
+        "өч": "audio/och.m4a",
+        "алма": "audio/alma.m4a",
+        "ун": "audio/un.m4a"
+      }
     }
   ],
   "translations": [

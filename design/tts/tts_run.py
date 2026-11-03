@@ -52,8 +52,11 @@ class Voice:
         inf = self.cfg["inference"]
         self.scales = np.array([inf["noise_scale"], inf["length_scale"], inf["noise_w"]], dtype=np.float32)
 
-    def synth(self, text, ipa=None, noise_scale=None, length_scale=None, noise_w=None):
-        """Возвращает (фонемы, пропущенные символы, int16-аудио). Если задан ipa, он заменяет фонемы espeak."""
+    def synth(self, text, ipa=None, noise_scale=None, length_scale=None, noise_w=None, end=None):
+        """Возвращает (фонемы, пропущенные символы, int16-аудио). Если задан ipa, он заменяет фонемы espeak.
+
+        end: знак конца фразы ('.', '?', '!'): Piper учит интонацию на знаках препинания, без него фраза звучит оборванно.
+        """
         ph = unicodedata.normalize("NFD", ipa if ipa is not None else espeak_ipa(text))
         ids = list(self.ids["^"]) + list(self.ids["_"])
         missing = []
@@ -62,6 +65,8 @@ class Voice:
                 ids += self.ids[p] + self.ids["_"]
             else:
                 missing.append(p)
+        if end and end in self.ids:
+            ids += self.ids[end] + self.ids["_"]
         ids += self.ids["$"]
         scales = self.scales.copy()
         for i, v in enumerate((noise_scale, length_scale, noise_w)):

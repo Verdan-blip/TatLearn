@@ -10,23 +10,28 @@
     "pairs": [
       {
         "tatar": "яз",
-        "russian": "весна"
+        "russian": "весна",
+        "audioUrl": "audio/yaz.m4a"
       },
       {
         "tatar": "көз",
-        "russian": "осень"
+        "russian": "осень",
+        "audioUrl": "audio/koz.m4a"
       },
       {
         "tatar": "кыш",
-        "russian": "зима"
+        "russian": "зима",
+        "audioUrl": "audio/kysh.m4a"
       },
       {
         "tatar": "кояш",
-        "russian": "солнце"
+        "russian": "солнце",
+        "audioUrl": "audio/koyash.m4a"
       },
       {
         "tatar": "кар",
-        "russian": "снег"
+        "russian": "снег",
+        "audioUrl": "audio/kar.m4a"
       }
     ],
     "notes": {
@@ -116,7 +121,13 @@
       "answer": [
         "Яңгыр",
         "ява"
-      ]
+      ],
+      "wordAudio": {
+        "Яңгыр": "audio/yangyr.m4a",
+        "кар": "audio/kar.m4a",
+        "кояш": "audio/koyash.m4a",
+        "җил": "audio/jil.m4a"
+      }
     },
     {
       "promptRu": "Идёт снег",
@@ -130,7 +141,13 @@
       "answer": [
         "Кар",
         "ява"
-      ]
+      ],
+      "wordAudio": {
+        "Кар": "audio/kar.m4a",
+        "яңгыр": "audio/yangyr.m4a",
+        "җил": "audio/jil.m4a",
+        "җәй": "audio/jay.m4a"
+      }
     }
   ],
   "translations": [

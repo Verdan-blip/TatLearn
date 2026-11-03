@@ -111,7 +111,11 @@ class LessonViewModel(
         val current = state.value
         val input = current.input as? StepInput.Matching ?: return
         if (current.feedback != null || pairIndex in input.matched || input.wrongPair != null) return
-        setState { copy(input = input.copy(leftSelected = if (input.leftSelected == pairIndex) null else pairIndex)) }
+        val selecting = input.leftSelected != pairIndex
+        setState { copy(input = input.copy(leftSelected = if (selecting) pairIndex else null)) }
+        // Слово звучит при выборе татарской карточки, чтобы произношение слышали вместе со значением. Снятие выбора и карточка без
+        // записи молчат (заглушку звука не изображаем); новое слово обрывает предыдущее.
+        if (selecting) (current.step as? ExerciseStep.Matching)?.pairs?.getOrNull(pairIndex)?.audioUrl?.let { player.play(it) }
     }
 
     private fun onMatchRight(pairIndex: Int) {
@@ -143,6 +147,10 @@ class LessonViewModel(
         val input = state.value.input as? StepInput.Sentence ?: return
         if (state.value.feedback != null || bankIndex in input.placed) return
         setState { copy(input = input.copy(placed = input.placed + bankIndex)) }
+        // Слово из банка звучит при тапе; возврат слова из ответа молчит, иначе будет шум. Слова без записи молчат.
+        (state.value.step as? ExerciseStep.SentenceBuilder)?.task?.let { task ->
+            task.wordBank.getOrNull(bankIndex)?.let { task.wordAudio[it] }?.let { player.play(it) }
+        }
     }
 
     private fun onPlacedWord(position: Int) {

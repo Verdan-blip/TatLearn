@@ -10,23 +10,28 @@
     "pairs": [
       {
         "tatar": "җир",
-        "russian": "земля"
+        "russian": "земля",
+        "audioUrl": "audio/jir.m4a"
       },
       {
         "tatar": "җәй",
-        "russian": "лето"
+        "russian": "лето",
+        "audioUrl": "audio/jay.m4a"
       },
       {
         "tatar": "җыр",
-        "russian": "песня"
+        "russian": "песня",
+        "audioUrl": "audio/jyr.m4a"
       },
       {
         "tatar": "яңа",
-        "russian": "новый"
+        "russian": "новый",
+        "audioUrl": "audio/yana.m4a"
       },
       {
         "tatar": "һава",
-        "russian": "воздух"
+        "russian": "воздух",
+        "audioUrl": "audio/hava.m4a"
       }
     ],
     "notes": {
@@ -117,7 +122,12 @@
         "Бу",
         "яңа",
         "китап"
-      ]
+      ],
+      "wordAudio": {
+        "яңа": "audio/yana.m4a",
+        "җир": "audio/jir.m4a",
+        "җәй": "audio/jay.m4a"
+      }
     },
     {
       "promptRu": "Это новая песня",
@@ -132,7 +142,13 @@
         "Бу",
         "яңа",
         "җыр"
-      ]
+      ],
+      "wordAudio": {
+        "яңа": "audio/yana.m4a",
+        "җыр": "audio/jyr.m4a",
+        "җир": "audio/jir.m4a",
+        "мең": "audio/men.m4a"
+      }
     }
   ],
   "translations": [

@@ -10,23 +10,28 @@
     "pairs": [
       {
         "tatar": "егерме",
-        "russian": "двадцать"
+        "russian": "двадцать",
+        "audioUrl": "audio/egerme.m4a"
       },
       {
         "tatar": "утыз",
-        "russian": "тридцать"
+        "russian": "тридцать",
+        "audioUrl": "audio/utyz.m4a"
       },
       {
         "tatar": "кырык",
-        "russian": "сорок"
+        "russian": "сорок",
+        "audioUrl": "audio/kyryk.m4a"
       },
       {
         "tatar": "илле",
-        "russian": "пятьдесят"
+        "russian": "пятьдесят",
+        "audioUrl": "audio/ille.m4a"
       },
       {
         "tatar": "йөз",
-        "russian": "сто"
+        "russian": "сто",
+        "audioUrl": "audio/yoz.m4a"
       }
     ],
     "notes": {
@@ -117,7 +122,11 @@
         "Бу",
         "йөз",
         "китап"
-      ]
+      ],
+      "wordAudio": {
+        "йөз": "audio/yoz.m4a",
+        "утыз": "audio/utyz.m4a"
+      }
     },
     {
       "promptRu": "Это пятьдесят яблок",
@@ -132,7 +141,12 @@
         "Бу",
         "илле",
         "алма"
-      ]
+      ],
+      "wordAudio": {
+        "илле": "audio/ille.m4a",
+        "алма": "audio/alma.m4a",
+        "кырык": "audio/kyryk.m4a"
+      }
     }
   ],
   "translations": [

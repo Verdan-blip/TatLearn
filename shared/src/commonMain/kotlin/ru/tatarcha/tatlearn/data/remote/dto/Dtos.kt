@@ -21,7 +21,7 @@ data class ModuleDto(
 )
 
 @Serializable
-data class WordPairDto(val tatar: String, val russian: String)
+data class WordPairDto(val tatar: String, val russian: String, val audioUrl: String? = null)
 
 @Serializable
 data class MatchingDto(val pairs: List<WordPairDto>, val notes: Map<String, String> = emptyMap())
@@ -51,6 +51,8 @@ data class SentenceTaskDto(
     val wordBank: List<String>,
     val answer: List<String>,
     val explanation: String? = null,
+    val wordAudio: Map<String, String> = emptyMap(),
+    val audioUrl: String? = null,
 )
 
 @Serializable
