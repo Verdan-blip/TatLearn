@@ -55,7 +55,8 @@
         "масло",
         "сыр"
       ],
-      "correctIndex": 0
+      "correctIndex": 0,
+      "audioUrl": "audio/toz.m4a"
     },
     {
       "word": "йомырка",
