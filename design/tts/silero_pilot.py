@@ -19,7 +19,7 @@ import torch
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
-AUTHOR = f"{ROOT}/shared/src/commonMain/composeResources/files/audio"
+AUTHOR = f"{HERE}/author"  # оригиналы записей автора (в приложении заменены синтезом)
 TATARTTS = os.path.expanduser("~/Downloads/TatarTTS-pilot/male")  # мужской голос TatarTTS из первого пилота (может не быть)
 OUT = os.path.expanduser("~/Downloads/Silero-pilot")
 MODEL = os.path.expanduser("~/.cache/silero/v5_cis_base_nostress.pt")

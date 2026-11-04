@@ -7,7 +7,8 @@
 - Модель `v5_cis_base_nostress` (лицензия MIT, файл `LICENSE_CIS` репозитория snakers4/silero-models; остальные модели Silero
   некоммерческие). Скачать: `curl -L -o ~/.cache/silero/v5_cis_base_nostress.pt https://models.silero.ai/models/tts/ru/v5_cis_base_nostress.pt`.
 - Нужны Python с `torch` и `numpy` и macOS `afconvert`. Запуск из корня проекта: `<python> design/tts/silero_build.py`
-  (мужской набор 89 слов в `files/audio`, женский 110 слов в `files/audio/female`; записи автора не трогаются).
+  (мужской набор в `files/audio`, женский в `files/audio/female`, по 110 слов и фраз). Записи автора (21 слово) заменены синтезом ради единого голоса
+  курса 04.11.2026; оригиналы в `design/tts/author`.
 - Модель — пакет PyTorch: при загрузке выполняется код из файла. Файл просмотрен без исполнения (TorchScript и один обычный
   python-файл без сети и запуска процессов); запускать только осознанно.
 - MIT требует сохранить уведомление «Copyright (c) 2025-present Silero Team» и текст лицензии (экран «О приложении»).
