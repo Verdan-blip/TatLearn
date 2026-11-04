@@ -30,26 +30,25 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.tatarcha.tatlearn.core.designsystem.component.MascotPose
 import ru.tatarcha.tatlearn.core.designsystem.component.PreviewFrame
-import ru.tatarcha.tatlearn.core.designsystem.component.TamyrCard
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrMascot
 import ru.tatarcha.tatlearn.core.designsystem.component.icon.ChevronBackIcon
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrSizes
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import tatlearn.shared.generated.resources.Res
 import tatlearn.shared.generated.resources.about_back_description
-import tatlearn.shared.generated.resources.about_license_text
-import tatlearn.shared.generated.resources.about_license_title
 import tatlearn.shared.generated.resources.about_tagline
 import tatlearn.shared.generated.resources.about_title
-import tatlearn.shared.generated.resources.about_voice_text
-import tatlearn.shared.generated.resources.about_voice_title
 import tatlearn.shared.generated.resources.app_name
 
 private val MascotSize = 120.dp
 
-// TODO(design): экран «О приложении» не нарисован в макете, собран из компонентов дизайн-системы.
+// TODO(design): тёмная тема и версия приложения в макете 43/44 не нарисованы.
 @Composable
-fun AboutContent(onBack: () -> Unit) {
+fun AboutContent(
+    licenseExpanded: Boolean,
+    onLicenseToggle: () -> Unit,
+    onBack: () -> Unit,
+) {
     val backDescription = stringResource(Res.string.about_back_description)
     Column(
         modifier = Modifier
@@ -118,37 +117,10 @@ fun AboutContent(onBack: () -> Unit) {
                     textAlign = TextAlign.Center,
                 )
             }
-            AboutCard(
-                title = stringResource(Res.string.about_voice_title),
-                text = stringResource(Res.string.about_voice_text),
-            )
-            AboutCard(
-                title = stringResource(Res.string.about_license_title),
-                text = stringResource(Res.string.about_license_text),
-            )
-        }
-    }
-}
-
-@Composable
-private fun AboutCard(
-    title: String,
-    text: String,
-) {
-    TamyrCard(
-        modifier = Modifier.fillMaxWidth(),
-        contentPadding = TamyrTheme.spacing.m,
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.s)) {
-            Text(
-                text = title,
-                style = TamyrTheme.typography.body16Bold,
-                color = TamyrTheme.colors.textPrimary,
-            )
-            Text(
-                text = text,
-                style = TamyrTheme.typography.caption13,
-                color = TamyrTheme.colors.textSecondary,
+            AboutVoiceCard()
+            AboutLicenseCard(
+                expanded = licenseExpanded,
+                onToggle = onLicenseToggle,
             )
         }
     }
@@ -157,5 +129,19 @@ private fun AboutCard(
 @Preview(name = "About")
 @Composable
 private fun AboutContentPreview() = PreviewFrame {
-    AboutContent(onBack = {})
+    AboutContent(
+        licenseExpanded = false,
+        onLicenseToggle = {},
+        onBack = {},
+    )
+}
+
+@Preview(name = "About · licence expanded")
+@Composable
+private fun AboutContentExpandedPreview() = PreviewFrame {
+    AboutContent(
+        licenseExpanded = true,
+        onLicenseToggle = {},
+        onBack = {},
+    )
 }
