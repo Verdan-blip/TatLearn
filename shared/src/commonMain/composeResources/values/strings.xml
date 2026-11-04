@@ -180,9 +180,12 @@
     <string name="profile_sounds_title">Звуки</string>
     <string name="profile_sounds_subtitle">Тихие сигналы на ответах и в конце урока</string>
     <string name="profile_narrator_title">Голос диктора</string>
-    <string name="profile_narrator_subtitle">Нажмите на голос, чтобы услышать его</string>
+    <string name="profile_narrator_subtitle">Нажмите, чтобы услышать и выбрать</string>
     <string name="profile_narrator_male">Мужской</string>
     <string name="profile_narrator_female">Женский</string>
+    <string name="profile_settings_title">Настройки</string>
+    <string name="profile_narrator_male_description">Мужской голос, нажмите, чтобы прослушать и выбрать</string>
+    <string name="profile_narrator_female_description">Женский голос, нажмите, чтобы прослушать и выбрать</string>
     <string name="profile_about">О приложении</string>
     <string name="profile_edit">Изменить профиль</string>
     <string name="profile_local_note">Данные хранятся на этом устройстве</string>

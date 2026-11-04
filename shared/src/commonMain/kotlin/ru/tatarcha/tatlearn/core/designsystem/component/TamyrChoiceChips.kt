@@ -14,18 +14,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrSizes
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 
-/** Ряд равных кнопок-таблеток для выбора одного значения (например, времени напоминания). */
+/** Ряд равных кнопок-таблеток для выбора одного значения (например, времени напоминания или голоса диктора). */
 @Composable
 fun TamyrChoiceChips(
     options: List<String>,
     selectedIndex: Int,
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    descriptions: List<String>? = null,
+    leadingIcon: (@Composable (selected: Boolean) -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
@@ -38,7 +42,7 @@ fun TamyrChoiceChips(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .heightIn(min = TamyrSizes.topBarAction)
+                    .heightIn(min = TamyrSizes.choiceChip)
                     .clip(TamyrTheme.shapes.chip)
                     .background(if (selected) TamyrTheme.colors.primary else TamyrTheme.colors.surface)
                     .border(
@@ -50,14 +54,21 @@ fun TamyrChoiceChips(
                         selected = selected,
                         role = Role.RadioButton,
                         onClick = { onSelect(index) },
-                    ),
+                    )
+                    .semantics { descriptions?.getOrNull(index)?.let { contentDescription = it } },
                 contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    text = option,
-                    style = TamyrTheme.typography.body15Bold,
-                    color = if (selected) TamyrTheme.colors.onPrimary else TamyrTheme.colors.textPrimary,
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.s),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    leadingIcon?.invoke(selected)
+                    Text(
+                        text = option,
+                        style = TamyrTheme.typography.body15Bold,
+                        color = if (selected) TamyrTheme.colors.onPrimary else TamyrTheme.colors.textPrimary,
+                    )
+                }
             }
         }
     }

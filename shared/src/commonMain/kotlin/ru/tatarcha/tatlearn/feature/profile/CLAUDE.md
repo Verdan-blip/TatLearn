@@ -1,6 +1,6 @@
 # feature/profile
 
-Вкладка «Профиль», изменение профиля, аватар. Спека: `.docs/20-profile.md`, макеты `design/screens/26.png`, `27.png`, `30-33.png`.
+Вкладка «Профиль», изменение профиля, аватар. Спека: `.docs/20-profile.md`, макеты `design/screens/26.png`, `27.png`, `30-33.png`, `38.png`, `42.png`.
 
 ## Поток
 - `ProfileScene` (содержимое вкладки внутри главной; нижнее меню рисует `HomeContent`, слот `profileTab`) -> `ProfileContent` <- `ProfileViewModel(ProfileRepository, ProgressRepository, AuthRepository)`. «Изменить профиль» открывает `ProfileEditKey`.
@@ -27,3 +27,5 @@
 - Татарское название вкладки «Профиль» (needs native-speaker review). Формула уровня (`xp / 100 + 1`) временная.
 - Расхождение: на макете 03 при 340 XP был «Ур. 6», по формуле уровень 4.
 - Строка «Вибро-отклик» (`HapticsSettings`, по умолчанию включено; решение владельца: название только по-русски) живёт на вкладке «Профиль». Паттерны и правила вибро: `.docs/00-overview.md` (раздел 6), код `core/haptics` (`PatternHaptics` над платформенными `PlatformHaptics`: Android `Vibrator`, iOS `UIFeedbackGenerator`).
+
+- **Настройки сгруппированы (04.11.2026, макеты 26/33/38/42, совет ux-designer):** заголовок «Настройки» и одна карточка с разделителями: «Вибро-отклик», «Звуки», «Голос диктора» (`ProfileSettingsGroup`, `ProfileToggleRow`, `ProfileNarratorBlock`); «Напоминание» отдельной карточкой (`ProfileReminderCard`). У строк плашка с иконкой (`ProfileIconTile`, штриховые иконки `StrokeIcon` из SVG-путей 24×24). Кнопки голоса 52 dp с иконкой динамика, подпись «Нажмите, чтобы услышать и выбрать», `contentDescription` через `TamyrChoiceChips(descriptions)`. «О приложении» это строка со стрелкой (`ProfileAboutRow`), а не 3D-кнопка; подпись «Данные хранятся на этом устройстве» стоит под ней. Экран «О приложении» в макете 43 (лицензия свёрнута) и 44 (развёрнута): в приложении лицензия пока показана целиком (`TODO(design)`: свернуть по макету, ссылка и версия; тёмная тема не нарисована).

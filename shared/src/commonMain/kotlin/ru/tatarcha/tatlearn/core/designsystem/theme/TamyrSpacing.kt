@@ -66,6 +66,11 @@ object TamyrSizes {
     val toastCloseIcon = 24.dp
     val toastSwipeThreshold = 24.dp
     val gainRing = 3.dp
+    val choiceChip = 52.dp
+    val iconTile = 40.dp
+    val settingsIcon = 22.dp
+    val chipIcon = 18.dp
+    val chevron = 20.dp
     /** Отступ подписи «+1 урок» от верха содержимого карточки: она стоит на строке названия. */
     val gainChipTop = 28.dp
 }
