@@ -17,32 +17,11 @@ import subprocess
 import sys
 import tempfile
 
-import numpy as np
-
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from wire_lessons import wire_lessons  # noqa: E402
 from words import FILES  # noqa: E402
-from tts_run import read_wav, write_wav  # noqa: E402
-
-TARGET_RMS_DB, PEAK_LIMIT_DB = -16.3, -1.0
-
-
-def master(sr, a):
-    """Громкость как у записей автора, мягкие края, 44,1 кГц."""
-    act = a[np.abs(a) > 0.02]
-    gain = 10 ** ((TARGET_RMS_DB - 20 * np.log10(np.sqrt((act ** 2).mean()) + 1e-9)) / 20)
-    peak = np.abs(a).max() * gain
-    if peak > 10 ** (PEAK_LIMIT_DB / 20):
-        gain *= 10 ** (PEAK_LIMIT_DB / 20) / peak
-    a = a * gain
-    fi, fo = int(0.003 * sr), int(0.012 * sr)
-    a[:fi] *= np.linspace(0, 1, fi)
-    a[-fo:] *= np.linspace(1, 0, fo)
-    t = np.arange(len(a) * 2) / 2
-    up = np.interp(t, np.arange(len(a)), a)
-    return (np.clip(up, -1, 1) * 32767).astype(np.int16)
-
+from audio_utils import master, read_wav, write_wav  # noqa: E402
 
 def main():
     ap = argparse.ArgumentParser()
@@ -66,7 +45,7 @@ def main():
         sr, a = read_wav(src)
         shutil.copy(src, f"{HERE}/chosen/{sl}.wav")
         tmp = tempfile.mktemp(suffix=".wav")
-        write_wav(tmp, master(sr, a), rate=sr * 2)
+        write_wav(tmp, master(a, sr, upsample=2), rate=sr * 2)
         subprocess.run(["afconvert", "-f", "m4af", "-d", "aac", "-b", "56000", tmp, f"{FILES}/audio/{sl}.m4a"], check=True)
         os.unlink(tmp)
         made.append(sl)

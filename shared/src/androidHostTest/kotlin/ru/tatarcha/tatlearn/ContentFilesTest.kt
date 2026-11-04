@@ -3,6 +3,7 @@ package ru.tatarcha.tatlearn
 import kotlinx.serialization.json.Json
 import ru.tatarcha.tatlearn.data.remote.dto.LessonContentDto
 import ru.tatarcha.tatlearn.data.remote.dto.ModuleDto
+import ru.tatarcha.tatlearn.domain.model.NarratorVoice
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -18,11 +19,13 @@ class ContentFilesTest {
 
     private fun modules(): List<ModuleDto> = json.decodeFromString(File(root, "modules.json").readText())
 
-    /** Локальный путь (не `http`) должен указывать на непустой файл в composeResources/files. */
+    /** Локальный путь (не `http`) должен указывать на непустой файл в composeResources/files, и у женского голоса диктора тоже. */
     private fun assertFile(lessonFile: String, audioUrl: String) {
         if (audioUrl.startsWith("http")) return
         val audio = File(root, audioUrl)
         assertTrue(audio.exists() && audio.length() > 0, "$lessonFile: audio file is missing or empty: $audioUrl")
+        val female = File(root, NarratorVoice.Female.resolve(audioUrl))
+        assertTrue(female.exists() && female.length() > 0, "$lessonFile: female narrator file is missing or empty: ${NarratorVoice.Female.resolve(audioUrl)}")
     }
 
     @Test fun modulesFileParsesAndHasUniqueIds() {

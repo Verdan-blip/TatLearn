@@ -9,7 +9,6 @@ import json
 import os
 import shutil
 import unicodedata
-import wave
 from pathlib import Path
 
 import espeakng_loader
@@ -81,24 +80,4 @@ class Voice:
         return ph, "".join(missing), audio.astype(np.int16)
 
 
-def write_wav(path, audio, rate=22050):
-    with wave.open(str(path), "wb") as w:
-        w.setnchannels(1)
-        w.setsampwidth(2)
-        w.setframerate(rate)
-        w.writeframes(audio.tobytes())
-
-
-def read_wav(path):
-    """Читает 16-бит моно wav (в том числе WAVE_FORMAT_EXTENSIBLE от afconvert, который стандартный wave не понимает)."""
-    import struct
-    b = open(path, "rb").read()
-    pos, sr = 12, None
-    while pos < len(b):
-        cid, size = b[pos:pos + 4], struct.unpack("<I", b[pos + 4:pos + 8])[0]
-        if cid == b"fmt ":
-            sr = struct.unpack("<I", b[pos + 12:pos + 16])[0]
-        if cid == b"data":
-            return sr, np.frombuffer(b[pos + 8:pos + 8 + size], dtype=np.int16).astype(float) / 32768
-        pos += 8 + size + (size & 1)
-    raise ValueError("нет data")
+from audio_utils import read_wav, write_wav  # noqa: E402,F401  (для обратной совместимости импортов)

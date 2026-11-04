@@ -5,6 +5,7 @@ import ru.tatarcha.tatlearn.core.common.UiEvent
 import ru.tatarcha.tatlearn.core.common.UiState
 import ru.tatarcha.tatlearn.data.local.ReminderSettings
 import ru.tatarcha.tatlearn.domain.model.Avatar
+import ru.tatarcha.tatlearn.domain.model.NarratorVoice
 import ru.tatarcha.tatlearn.domain.model.UserStats
 
 /** Вкладка «Профиль» (макеты 26 и 33): имя, аватар, серия, XP, уровень. */
@@ -18,6 +19,8 @@ data class ProfileUiState(
     val hapticsEnabled: Boolean = true,
     /** Настройка «Звуки» (по умолчанию включена). */
     val soundsEnabled: Boolean = true,
+    /** Голос диктора (по умолчанию мужской). */
+    val narratorVoice: NarratorVoice = NarratorVoice.Male,
     val reminderEnabled: Boolean = false,
     val reminderHour: Int = ReminderSettings.DEFAULT_HOUR,
     /** Показать уведомление «Разрешите уведомления в настройках»: пользователь отказал в системном разрешении. */
@@ -29,6 +32,7 @@ sealed interface ProfileUiEvent : UiEvent {
     data object ToastDismissed : ProfileUiEvent
     data class HapticsToggled(val enabled: Boolean) : ProfileUiEvent
     data class SoundsToggled(val enabled: Boolean) : ProfileUiEvent
+    data class NarratorVoiceSelected(val voice: NarratorVoice) : ProfileUiEvent
     data class ReminderToggled(val enabled: Boolean) : ProfileUiEvent
     data class ReminderHourSelected(val hour: Int) : ProfileUiEvent
 }

@@ -42,6 +42,7 @@ import ru.tatarcha.tatlearn.core.haptics.PatternHaptics
 import ru.tatarcha.tatlearn.core.sound.PlayerSoundEffects
 import ru.tatarcha.tatlearn.core.sound.SoundEffects
 import ru.tatarcha.tatlearn.core.sound.createPlatformSoundPlayer
+import ru.tatarcha.tatlearn.data.local.NarratorSettings
 import ru.tatarcha.tatlearn.data.local.SoundEffectsSettings
 import ru.tatarcha.tatlearn.core.notifications.ReminderTexts
 import ru.tatarcha.tatlearn.domain.HomeProgressTracker
@@ -79,7 +80,7 @@ val presentationModule = module {
     viewModelOf(::ProfileEditViewModel)
     viewModel { (key: ModuleKey) -> ModuleViewModel(key.moduleId, get(), get()) }
     viewModel { (key: ResultKey) -> ResultViewModel(key, get(), get(), get(), get(), get(), get()) }
-    viewModel { (key: LessonKey) -> LessonViewModel(key, get(), get(), StubbingAudioPlayer(createPlatformAudioPlayer()), get(), get(), get()) }
+    viewModel { (key: LessonKey) -> LessonViewModel(key, get(), get(), StubbingAudioPlayer(createPlatformAudioPlayer()), get(), get(), get(), get()) }
     viewModelOf(::ShowcaseViewModel)
 }
 
@@ -108,6 +109,7 @@ val dataModule = module {
     single { OnboardingStorage(get()) }
     single { HapticsSettings(get()) }
     single { SoundEffectsSettings(get()) }
+    single { NarratorSettings(get()) }
     single { HomeProgressTracker() }
     single { ReminderSettings(get()) }
     single {

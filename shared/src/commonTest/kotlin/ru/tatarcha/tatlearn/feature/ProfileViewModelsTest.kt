@@ -13,7 +13,9 @@ import ru.tatarcha.tatlearn.core.common.TimeProvider
 import ru.tatarcha.tatlearn.core.haptics.PatternHaptics
 import ru.tatarcha.tatlearn.core.sound.PlayerSoundEffects
 import ru.tatarcha.tatlearn.data.local.HapticsSettings
+import ru.tatarcha.tatlearn.data.local.NarratorSettings
 import ru.tatarcha.tatlearn.data.local.SoundEffectsSettings
+import ru.tatarcha.tatlearn.domain.model.NarratorVoice
 import ru.tatarcha.tatlearn.data.local.OnboardingStorage
 import ru.tatarcha.tatlearn.data.local.SettingsProfileRepository
 import ru.tatarcha.tatlearn.domain.model.Avatar
@@ -165,7 +167,7 @@ class ProfileViewModelsTest {
 
     @Test fun profileTabShowsProfileAndSavedToastAndOpensEdit() = runTest {
         val profile = FakeProfile(UserProfile("id", "Алия", Avatar.Pose(AvatarPose.Searching)))
-        val vm = ProfileViewModel(profile, StatsProgress(UserStats(xp = 340, streak = 12)), SessionOnlyAuth(), HapticsSettings(MapSettings()), SoundEffectsSettings(MapSettings()), testReminders())
+        val vm = ProfileViewModel(profile, StatsProgress(UserStats(xp = 340, streak = 12)), SessionOnlyAuth(), HapticsSettings(MapSettings()), SoundEffectsSettings(MapSettings()), NarratorSettings(MapSettings()), testReminders())
         assertEquals("Алия", vm.state.value.name)
         assertEquals(Avatar.Pose(AvatarPose.Searching), vm.state.value.avatar)
         assertEquals(4, vm.state.value.stats.level)
@@ -181,7 +183,7 @@ class ProfileViewModelsTest {
     }
 
     @Test fun profileTabFallsBackToSessionNameWithoutProfile() = runTest {
-        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(UserSession("Тимур", "t@b.ru")), HapticsSettings(MapSettings()), SoundEffectsSettings(MapSettings()), testReminders())
+        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(UserSession("Тимур", "t@b.ru")), HapticsSettings(MapSettings()), SoundEffectsSettings(MapSettings()), NarratorSettings(MapSettings()), testReminders())
         assertEquals("Тимур", vm.state.value.name)
         assertEquals(Avatar.Default, vm.state.value.avatar)
     }
@@ -191,7 +193,7 @@ class ProfileViewModelsTest {
     @Test fun hapticsSettingDefaultsToOnAndPersists() = runTest {
         val settings = MapSettings()
         assertTrue(HapticsSettings(settings).enabled.value)
-        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(), HapticsSettings(settings), SoundEffectsSettings(settings), testReminders())
+        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(), HapticsSettings(settings), SoundEffectsSettings(settings), NarratorSettings(MapSettings()), testReminders())
         assertTrue(vm.state.value.hapticsEnabled)
         vm.onEvent(ProfileUiEvent.HapticsToggled(false))
         assertFalse(vm.state.value.hapticsEnabled)
@@ -205,12 +207,28 @@ class ProfileViewModelsTest {
     @Test fun soundsSettingDefaultsToOnAndPersistsIndependentlyOfHaptics() = runTest {
         val settings = MapSettings()
         assertTrue(SoundEffectsSettings(settings).enabled.value)
-        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(), HapticsSettings(settings), SoundEffectsSettings(settings), testReminders())
+        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(), HapticsSettings(settings), SoundEffectsSettings(settings), NarratorSettings(MapSettings()), testReminders())
         assertTrue(vm.state.value.soundsEnabled)
         vm.onEvent(ProfileUiEvent.SoundsToggled(false))
         assertFalse(vm.state.value.soundsEnabled)
         assertTrue(vm.state.value.hapticsEnabled)
         assertFalse(SoundEffectsSettings(settings).enabled.value)
+    }
+
+    @Test fun narratorVoiceDefaultsToMaleAndPersists() = runTest {
+        val settings = MapSettings()
+        assertEquals(NarratorVoice.Male, NarratorSettings(settings).voice.value)
+        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(), HapticsSettings(settings), SoundEffectsSettings(settings), NarratorSettings(settings), testReminders())
+        assertEquals(NarratorVoice.Male, vm.state.value.narratorVoice)
+        vm.onEvent(ProfileUiEvent.NarratorVoiceSelected(NarratorVoice.Female))
+        assertEquals(NarratorVoice.Female, vm.state.value.narratorVoice)
+        assertEquals(NarratorVoice.Female, NarratorSettings(settings).voice.value)
+    }
+
+    @Test fun narratorVoiceResolvesBundledPathsOnlyForFemale() {
+        assertEquals("audio/alma.m4a", NarratorVoice.Male.resolve("audio/alma.m4a"))
+        assertEquals("audio/female/alma.m4a", NarratorVoice.Female.resolve("audio/alma.m4a"))
+        assertEquals("https://x/alma.m4a", NarratorVoice.Female.resolve("https://x/alma.m4a")) // сетевые адреса не меняем
     }
 
     @Test fun soundEffectsPlayRequestedFileOnceCacheItAndRespectSetting() = runTest {

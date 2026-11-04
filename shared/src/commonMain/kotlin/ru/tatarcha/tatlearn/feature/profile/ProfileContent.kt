@@ -40,6 +40,7 @@ import ru.tatarcha.tatlearn.core.notifications.Reminders
 import ru.tatarcha.tatlearn.core.notifications.reminderHourLabels
 import ru.tatarcha.tatlearn.domain.model.Avatar
 import ru.tatarcha.tatlearn.domain.model.AvatarPose
+import ru.tatarcha.tatlearn.domain.model.NarratorVoice
 import ru.tatarcha.tatlearn.domain.model.UserStats
 import tatlearn.shared.generated.resources.Res
 import tatlearn.shared.generated.resources.debug_tools_open
@@ -49,6 +50,10 @@ import tatlearn.shared.generated.resources.reminder_permission_denied
 import tatlearn.shared.generated.resources.reminder_row_subtitle
 import tatlearn.shared.generated.resources.reminder_row_title
 import tatlearn.shared.generated.resources.profile_haptics_title
+import tatlearn.shared.generated.resources.profile_narrator_female
+import tatlearn.shared.generated.resources.profile_narrator_male
+import tatlearn.shared.generated.resources.profile_narrator_subtitle
+import tatlearn.shared.generated.resources.profile_narrator_title
 import tatlearn.shared.generated.resources.profile_sounds_subtitle
 import tatlearn.shared.generated.resources.profile_sounds_title
 import tatlearn.shared.generated.resources.profile_level
@@ -112,6 +117,7 @@ fun ProfileContent(
                 enabled = state.soundsEnabled,
                 onToggle = { onEvent(ProfileUiEvent.SoundsToggled(it)) },
             )
+            NarratorRow(voice = state.narratorVoice, onSelect = { onEvent(ProfileUiEvent.NarratorVoiceSelected(it)) })
             ReminderRow(
                 enabled = state.reminderEnabled,
                 hour = state.reminderHour,
@@ -173,6 +179,25 @@ private fun ToggleRow(title: String, subtitle: String, enabled: Boolean, onToggl
 }
 
 private val HapticsRowMinHeight = 64.dp
+
+// TODO(design): строка «Голос диктора» не нарисована в макете, собрана по образцу строки напоминаний (кнопки выбора).
+@Composable
+private fun NarratorRow(voice: NarratorVoice, onSelect: (NarratorVoice) -> Unit) {
+    TamyrCard(modifier = Modifier.fillMaxWidth(), contentPadding = TamyrTheme.spacing.m) {
+        Column(verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.m)) {
+            Column(verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.xxs)) {
+                Text(stringResource(Res.string.profile_narrator_title), style = TamyrTheme.typography.body16Bold, color = TamyrTheme.colors.textPrimary)
+                Text(stringResource(Res.string.profile_narrator_subtitle), style = TamyrTheme.typography.caption13, color = TamyrTheme.colors.textSecondary)
+            }
+            val voices = NarratorVoice.entries
+            TamyrChoiceChips(
+                options = listOf(stringResource(Res.string.profile_narrator_male), stringResource(Res.string.profile_narrator_female)),
+                selectedIndex = voices.indexOf(voice),
+                onSelect = { index -> onSelect(voices[index]) },
+            )
+        }
+    }
+}
 
 // TODO(design): строка «Напоминание об уроке» не нарисована в макете, собрана по образцу строки «Вибро-отклик».
 @Composable

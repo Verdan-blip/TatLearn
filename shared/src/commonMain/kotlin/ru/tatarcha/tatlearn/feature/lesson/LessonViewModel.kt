@@ -13,6 +13,7 @@ import ru.tatarcha.tatlearn.core.common.MviViewModel
 import ru.tatarcha.tatlearn.core.common.TimeProvider
 import ru.tatarcha.tatlearn.core.haptics.Haptics
 import ru.tatarcha.tatlearn.core.sound.SoundEffects
+import ru.tatarcha.tatlearn.data.local.NarratorSettings
 import ru.tatarcha.tatlearn.core.common.errorCode
 import ru.tatarcha.tatlearn.domain.exercise.AnswerNormalizer
 import ru.tatarcha.tatlearn.domain.exercise.ExerciseStep
@@ -34,6 +35,7 @@ class LessonViewModel(
     private val time: TimeProvider,
     private val haptics: Haptics,
     private val sounds: SoundEffects,
+    private val narrator: NarratorSettings,
 ) : MviViewModel<LessonUiState, LessonUiEvent, LessonUiEffect>(LessonUiState()) {
 
     private var startedAtMillis = 0L
@@ -115,7 +117,7 @@ class LessonViewModel(
         setState { copy(input = input.copy(leftSelected = if (selecting) pairIndex else null)) }
         // Слово звучит при выборе татарской карточки, чтобы произношение слышали вместе со значением. Снятие выбора и карточка без
         // записи молчат (заглушку звука не изображаем); новое слово обрывает предыдущее.
-        if (selecting) (current.step as? ExerciseStep.Matching)?.pairs?.getOrNull(pairIndex)?.audioUrl?.let { player.play(it) }
+        if (selecting) (current.step as? ExerciseStep.Matching)?.pairs?.getOrNull(pairIndex)?.audioUrl?.let { playWord(it) }
     }
 
     private fun onMatchRight(pairIndex: Int) {
@@ -149,7 +151,7 @@ class LessonViewModel(
         setState { copy(input = input.copy(placed = input.placed + bankIndex)) }
         // Слово из банка звучит при тапе; возврат слова из ответа молчит, иначе будет шум. Слова без записи молчат.
         (state.value.step as? ExerciseStep.SentenceBuilder)?.task?.let { task ->
-            task.wordBank.getOrNull(bankIndex)?.let { task.wordAudio[it] }?.let { player.play(it) }
+            task.wordBank.getOrNull(bankIndex)?.let { task.wordAudio[it] }?.let { playWord(it) }
         }
     }
 
@@ -178,8 +180,13 @@ class LessonViewModel(
             is ExerciseStep.Quiz -> step.question.audioUrl
             else -> null
         }
-        player.play(url, if (slow) SLOW_RATE else 1f)
+        player.play(url?.let(::voiced), if (slow) SLOW_RATE else 1f)
     }
+
+    /** Путь озвучки с учётом выбранного в профиле голоса диктора. */
+    private fun voiced(url: String) = narrator.voice.value.resolve(url)
+
+    private fun playWord(url: String) = player.play(voiced(url))
 
     // region проверка
 

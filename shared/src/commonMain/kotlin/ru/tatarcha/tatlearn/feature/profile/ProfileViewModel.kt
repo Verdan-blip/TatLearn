@@ -9,6 +9,7 @@ import ru.tatarcha.tatlearn.core.common.MviViewModel
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
 import ru.tatarcha.tatlearn.core.notifications.Reminders
 import ru.tatarcha.tatlearn.data.local.HapticsSettings
+import ru.tatarcha.tatlearn.data.local.NarratorSettings
 import ru.tatarcha.tatlearn.data.local.SoundEffectsSettings
 import ru.tatarcha.tatlearn.domain.model.Avatar
 import ru.tatarcha.tatlearn.domain.repository.AuthRepository
@@ -21,6 +22,7 @@ class ProfileViewModel(
     auth: AuthRepository,
     private val haptics: HapticsSettings,
     private val sounds: SoundEffectsSettings,
+    private val narrator: NarratorSettings,
     private val reminders: Reminders,
 ) : MviViewModel<ProfileUiState, ProfileUiEvent, ProfileUiEffect>(ProfileUiState()) {
 
@@ -34,6 +36,7 @@ class ProfileViewModel(
         progress.observeStats().onEach { stats -> setState { copy(stats = stats) } }.launchIn(viewModelScope)
         haptics.enabled.onEach { enabled -> setState { copy(hapticsEnabled = enabled) } }.launchIn(viewModelScope)
         sounds.enabled.onEach { enabled -> setState { copy(soundsEnabled = enabled) } }.launchIn(viewModelScope)
+        narrator.voice.onEach { voice -> setState { copy(narratorVoice = voice) } }.launchIn(viewModelScope)
         reminders.enabled.onEach { enabled -> setState { copy(reminderEnabled = enabled) } }.launchIn(viewModelScope)
         reminders.hour.onEach { hour -> setState { copy(reminderHour = hour) } }.launchIn(viewModelScope)
         profile.saved.onEach {
@@ -47,6 +50,7 @@ class ProfileViewModel(
             ProfileUiEvent.EditClicked -> sendEffect(ProfileUiEffect.NavigateToEdit)
             is ProfileUiEvent.HapticsToggled -> haptics.setEnabled(event.enabled)
             is ProfileUiEvent.SoundsToggled -> sounds.setEnabled(event.enabled)
+            is ProfileUiEvent.NarratorVoiceSelected -> narrator.setVoice(event.voice)
             is ProfileUiEvent.ReminderToggled -> toggleReminder(event.enabled)
             is ProfileUiEvent.ReminderHourSelected -> viewModelScope.launch { reminders.changeHour(event.hour) }
             ProfileUiEvent.ToastDismissed -> {

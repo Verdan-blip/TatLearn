@@ -4,6 +4,7 @@ import androidx.compose.ui.text.TextRange
 import ru.tatarcha.tatlearn.feature.RecordingHaptics
 import ru.tatarcha.tatlearn.feature.RecordingSounds
 import androidx.compose.ui.text.input.TextFieldValue
+import com.russhwolf.settings.MapSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +23,7 @@ import ru.tatarcha.tatlearn.core.audio.StubbingAudioPlayer
 import ru.tatarcha.tatlearn.core.common.AppException
 import ru.tatarcha.tatlearn.core.common.LoadState
 import ru.tatarcha.tatlearn.core.common.TimeProvider
+import ru.tatarcha.tatlearn.data.local.NarratorSettings
 import ru.tatarcha.tatlearn.domain.exercise.ExerciseStep
 import ru.tatarcha.tatlearn.domain.exercise.XpRules
 import ru.tatarcha.tatlearn.domain.model.ExerciseOutcome
@@ -113,7 +115,7 @@ class LessonViewModelTest {
     @AfterTest fun tearDown() = Dispatchers.resetMain()
 
     private fun viewModel(stepIds: List<String> = emptyList(), lessons: LessonsRepository = FakeLessons()) =
-        LessonViewModel(LessonKey("lesson_t", stepIds), lessons, progress, StubbingAudioPlayer(audio), time, haptics, sounds)
+        LessonViewModel(LessonKey("lesson_t", stepIds), lessons, progress, StubbingAudioPlayer(audio), time, haptics, sounds, NarratorSettings(MapSettings()))
 
     private fun LessonViewModel.step() = state.value.step
 
