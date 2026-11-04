@@ -57,6 +57,8 @@ import ru.tatarcha.tatlearn.feature.auth.AuthViewModel
 import ru.tatarcha.tatlearn.feature.home.HomeViewModel
 import ru.tatarcha.tatlearn.feature.onboarding.OnboardingViewModel
 import ru.tatarcha.tatlearn.feature.result.ResultViewModel
+import ru.tatarcha.tatlearn.core.audio.NarratorPreview
+import ru.tatarcha.tatlearn.core.audio.PlayerNarratorPreview
 import ru.tatarcha.tatlearn.core.audio.StubbingAudioPlayer
 import ru.tatarcha.tatlearn.core.audio.createPlatformAudioPlayer
 import ru.tatarcha.tatlearn.feature.intro.IntroViewModel
@@ -110,6 +112,7 @@ val dataModule = module {
     single { HapticsSettings(get()) }
     single { SoundEffectsSettings(get()) }
     single { NarratorSettings(get()) }
+    single<NarratorPreview> { PlayerNarratorPreview(StubbingAudioPlayer(createPlatformAudioPlayer())) }
     single { HomeProgressTracker() }
     single { ReminderSettings(get()) }
     single {

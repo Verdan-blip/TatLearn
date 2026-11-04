@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import ru.tatarcha.tatlearn.core.audio.NarratorPreview
 import ru.tatarcha.tatlearn.core.common.AutoDismiss
 import ru.tatarcha.tatlearn.core.common.MviViewModel
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
@@ -24,6 +25,7 @@ class ProfileViewModel(
     private val sounds: SoundEffectsSettings,
     private val narrator: NarratorSettings,
     private val reminders: Reminders,
+    private val preview: NarratorPreview = NarratorPreview.None,
 ) : MviViewModel<ProfileUiState, ProfileUiEvent, ProfileUiEffect>(ProfileUiState()) {
 
     private val toastTimer = AutoDismiss(viewModelScope, TamyrMotion.TOAST_VISIBLE_MS)
@@ -48,9 +50,13 @@ class ProfileViewModel(
     override fun onEvent(event: ProfileUiEvent) {
         when (event) {
             ProfileUiEvent.EditClicked -> sendEffect(ProfileUiEffect.NavigateToEdit)
+            ProfileUiEvent.AboutClicked -> sendEffect(ProfileUiEffect.NavigateToAbout)
             is ProfileUiEvent.HapticsToggled -> haptics.setEnabled(event.enabled)
             is ProfileUiEvent.SoundsToggled -> sounds.setEnabled(event.enabled)
-            is ProfileUiEvent.NarratorVoiceSelected -> narrator.setVoice(event.voice)
+            is ProfileUiEvent.NarratorVoiceSelected -> {
+                narrator.setVoice(event.voice)
+                preview.play(event.voice)
+            }
             is ProfileUiEvent.ReminderToggled -> toggleReminder(event.enabled)
             is ProfileUiEvent.ReminderHourSelected -> viewModelScope.launch { reminders.changeHour(event.hour) }
             ProfileUiEvent.ToastDismissed -> {

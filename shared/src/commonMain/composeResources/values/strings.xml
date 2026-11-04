@@ -180,9 +180,10 @@
     <string name="profile_sounds_title">Звуки</string>
     <string name="profile_sounds_subtitle">Тихие сигналы на ответах и в конце урока</string>
     <string name="profile_narrator_title">Голос диктора</string>
-    <string name="profile_narrator_subtitle">Каким голосом звучат слова в упражнениях</string>
+    <string name="profile_narrator_subtitle">Нажмите на голос, чтобы услышать его</string>
     <string name="profile_narrator_male">Мужской</string>
     <string name="profile_narrator_female">Женский</string>
+    <string name="profile_about">О приложении</string>
     <string name="profile_edit">Изменить профиль</string>
     <string name="profile_local_note">Данные хранятся на этом устройстве</string>
     <string name="profile_saved">Сохранено</string>
@@ -302,4 +303,11 @@
     <string name="reminder_row_title">Напоминание об уроке</string>
     <string name="reminder_row_subtitle">Раз в день, в выбранное время</string>
     <string name="reminder_permission_denied">Разрешите уведомления в настройках телефона</string>
+    <string name="about_title">О приложении</string>
+    <string name="about_back_description">Назад</string>
+    <string name="about_tagline">Приложение для изучения татарского языка</string>
+    <string name="about_voice_title">Озвучка</string>
+    <string name="about_voice_text">Слова и фразы в упражнениях озвучены нейросетью Silero (голоса tat_marat и tat_albina, проект Silero Models, github.com/snakers4/silero-models). Это синтезированная речь, а не запись человека.</string>
+    <string name="about_license_title">Лицензия Silero Models (MIT)</string>
+    <string name="about_license_text">MIT License\n\nCopyright (c) 2025-present Silero Team\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
 </resources>

@@ -11,6 +11,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ProfileScene(
     onEdit: () -> Unit,
+    onOpenAbout: () -> Unit,
     modifier: Modifier = Modifier,
     onOpenDebug: (() -> Unit)? = null,
     viewModel: ProfileViewModel = koinViewModel(),
@@ -19,6 +20,7 @@ fun ProfileScene(
         viewModel.effects.collect { effect ->
             when (effect) {
                 ProfileUiEffect.NavigateToEdit -> onEdit()
+                ProfileUiEffect.NavigateToAbout -> onOpenAbout()
             }
         }
     }

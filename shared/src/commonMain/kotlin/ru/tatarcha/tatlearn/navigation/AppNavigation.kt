@@ -16,6 +16,7 @@ import kotlinx.serialization.modules.subclass
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import ru.tatarcha.tatlearn.core.common.BuildConfig
+import ru.tatarcha.tatlearn.feature.about.AboutScene
 import ru.tatarcha.tatlearn.feature.auth.AuthScene
 import ru.tatarcha.tatlearn.feature.intro.IntroScene
 import ru.tatarcha.tatlearn.feature.home.HomeScene
@@ -38,6 +39,7 @@ private val navSavedStateConfig = SavedStateConfiguration {
             subclass(ModuleKey::class)
             subclass(LessonKey::class)
             subclass(ResultKey::class)
+            subclass(AboutKey::class)
             subclass(ShowcaseKey::class)
         }
     }
@@ -95,6 +97,7 @@ fun AppNavigation(showDebugTools: Boolean = false) {
                         onStartLesson = { lessonId -> backStack.add(LessonKey(lessonId)) },
                         onOpenModule = { moduleId -> backStack.add(ModuleKey(moduleId)) },
                         onEditProfile = { backStack.add(ProfileEditKey) },
+                        onOpenAbout = { backStack.add(AboutKey) },
                     )
                 }
                 entry<ModuleKey> { key ->
@@ -122,6 +125,9 @@ fun AppNavigation(showDebugTools: Boolean = false) {
                         onContinue = { resetTo(HomeKey) },
                         onRetryMistakes = { lessonId, stepIds -> backStack.add(LessonKey(lessonId, stepIds)) },
                     )
+                }
+                entry<AboutKey> {
+                    AboutScene(onBack = ::pop)
                 }
                 entry<ShowcaseKey> {
                     ShowcaseScreen(

@@ -225,6 +225,24 @@ class ProfileViewModelsTest {
         assertEquals(NarratorVoice.Female, NarratorSettings(settings).voice.value)
     }
 
+    @Test fun selectingNarratorVoicePlaysItsPreviewEvenWhenAlreadySelected() = runTest {
+        val played = mutableListOf<NarratorVoice>()
+        val vm = ProfileViewModel(
+            FakeProfile(), StatsProgress(), SessionOnlyAuth(), HapticsSettings(MapSettings()), SoundEffectsSettings(MapSettings()),
+            NarratorSettings(MapSettings()), testReminders(), preview = { played += it },
+        )
+        vm.onEvent(ProfileUiEvent.NarratorVoiceSelected(NarratorVoice.Female))
+        vm.onEvent(ProfileUiEvent.NarratorVoiceSelected(NarratorVoice.Female)) // повторный тап по выбранному голосу слушает его снова
+        vm.onEvent(ProfileUiEvent.NarratorVoiceSelected(NarratorVoice.Male))
+        assertEquals(listOf(NarratorVoice.Female, NarratorVoice.Female, NarratorVoice.Male), played)
+    }
+
+    @Test fun aboutClickedOpensAboutScreen() = runTest {
+        val vm = ProfileViewModel(FakeProfile(), StatsProgress(), SessionOnlyAuth(), HapticsSettings(MapSettings()), SoundEffectsSettings(MapSettings()), NarratorSettings(MapSettings()), testReminders())
+        vm.onEvent(ProfileUiEvent.AboutClicked)
+        assertEquals(ProfileUiEffect.NavigateToAbout, vm.effects.first())
+    }
+
     @Test fun narratorVoiceResolvesBundledPathsOnlyForFemale() {
         assertEquals("audio/alma.m4a", NarratorVoice.Male.resolve("audio/alma.m4a"))
         assertEquals("audio/female/alma.m4a", NarratorVoice.Female.resolve("audio/alma.m4a"))

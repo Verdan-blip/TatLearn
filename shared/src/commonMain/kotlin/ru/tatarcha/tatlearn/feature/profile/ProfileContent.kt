@@ -50,6 +50,7 @@ import tatlearn.shared.generated.resources.reminder_permission_denied
 import tatlearn.shared.generated.resources.reminder_row_subtitle
 import tatlearn.shared.generated.resources.reminder_row_title
 import tatlearn.shared.generated.resources.profile_haptics_title
+import tatlearn.shared.generated.resources.profile_about
 import tatlearn.shared.generated.resources.profile_narrator_female
 import tatlearn.shared.generated.resources.profile_narrator_male
 import tatlearn.shared.generated.resources.profile_narrator_subtitle
@@ -132,6 +133,11 @@ fun ProfileContent(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
             )
+            TamyrButton(
+                text = stringResource(Res.string.profile_about),
+                onClick = { onEvent(ProfileUiEvent.AboutClicked) },
+                style = TamyrButtonStyle.Secondary,
+            )
             if (onOpenDebug != null) {
                 TamyrButton(stringResource(Res.string.debug_tools_open), onClick = onOpenDebug, style = TamyrButtonStyle.SecondaryAccent)
             }
@@ -182,18 +188,34 @@ private val HapticsRowMinHeight = 64.dp
 
 // TODO(design): строка «Голос диктора» не нарисована в макете, собрана по образцу строки напоминаний (кнопки выбора).
 @Composable
-private fun NarratorRow(voice: NarratorVoice, onSelect: (NarratorVoice) -> Unit) {
-    TamyrCard(modifier = Modifier.fillMaxWidth(), contentPadding = TamyrTheme.spacing.m) {
+private fun NarratorRow(
+    voice: NarratorVoice,
+    onSelect: (NarratorVoice) -> Unit,
+) {
+    TamyrCard(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = TamyrTheme.spacing.m,
+    ) {
         Column(verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.m)) {
             Column(verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.xxs)) {
-                Text(stringResource(Res.string.profile_narrator_title), style = TamyrTheme.typography.body16Bold, color = TamyrTheme.colors.textPrimary)
-                Text(stringResource(Res.string.profile_narrator_subtitle), style = TamyrTheme.typography.caption13, color = TamyrTheme.colors.textSecondary)
+                Text(
+                    text = stringResource(Res.string.profile_narrator_title),
+                    style = TamyrTheme.typography.body16Bold,
+                    color = TamyrTheme.colors.textPrimary,
+                )
+                Text(
+                    text = stringResource(Res.string.profile_narrator_subtitle),
+                    style = TamyrTheme.typography.caption13,
+                    color = TamyrTheme.colors.textSecondary,
+                )
             }
-            val voices = NarratorVoice.entries
             TamyrChoiceChips(
-                options = listOf(stringResource(Res.string.profile_narrator_male), stringResource(Res.string.profile_narrator_female)),
-                selectedIndex = voices.indexOf(voice),
-                onSelect = { index -> onSelect(voices[index]) },
+                options = listOf(
+                    stringResource(Res.string.profile_narrator_male),
+                    stringResource(Res.string.profile_narrator_female),
+                ),
+                selectedIndex = NarratorVoice.entries.indexOf(voice),
+                onSelect = { index -> onSelect(NarratorVoice.entries[index]) },
             )
         }
     }

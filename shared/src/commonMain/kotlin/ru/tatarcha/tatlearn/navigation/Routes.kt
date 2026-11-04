@@ -29,5 +29,7 @@ data class ResultKey(
     val streakExtended: Boolean = false,
 ) : NavKey
 
+@Serializable data object AboutKey : NavKey
+
 /** Каталог дизайн-системы только для отладки. */
 @Serializable data object ShowcaseKey : NavKey

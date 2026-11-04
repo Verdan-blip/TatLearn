@@ -15,6 +15,7 @@ fun HomeScene(
     onStartLesson: (lessonId: String) -> Unit,
     onOpenModule: (moduleId: String) -> Unit,
     onEditProfile: () -> Unit,
+    onOpenAbout: () -> Unit,
     onOpenDebug: () -> Unit,
     showDebugTools: Boolean = false,
     viewModel: HomeViewModel = koinViewModel(),
@@ -36,6 +37,7 @@ fun HomeScene(
         profileTab = { modifier ->
             ProfileScene(
                 onEdit = onEditProfile,
+                onOpenAbout = onOpenAbout,
                 modifier = modifier,
                 // Вход в инструменты отладки живёт на вкладке «Профиль» и только в отладочной сборке.
                 onOpenDebug = if (showDebugTools) onOpenDebug else null,

@@ -29,6 +29,7 @@ data class ProfileUiState(
 
 sealed interface ProfileUiEvent : UiEvent {
     data object EditClicked : ProfileUiEvent
+    data object AboutClicked : ProfileUiEvent
     data object ToastDismissed : ProfileUiEvent
     data class HapticsToggled(val enabled: Boolean) : ProfileUiEvent
     data class SoundsToggled(val enabled: Boolean) : ProfileUiEvent
@@ -39,4 +40,5 @@ sealed interface ProfileUiEvent : UiEvent {
 
 sealed interface ProfileUiEffect : UiEffect {
     data object NavigateToEdit : ProfileUiEffect
+    data object NavigateToAbout : ProfileUiEffect
 }
