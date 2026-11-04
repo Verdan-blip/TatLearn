@@ -1,5 +1,6 @@
 package ru.tatarcha.tatlearn.core.designsystem.theme
 
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -40,7 +41,10 @@ fun TamyrTheme(content: @Composable () -> Unit) {
         LocalTypography provides typography,
     ) {
         MaterialTheme(colorScheme = material) {
-            content()
+            // Провайдер внутри MaterialTheme: иначе он вернёт стандартную волну Material.
+            CompositionLocalProvider(LocalIndication provides TamyrPressIndication) {
+                content()
+            }
         }
     }
 }
