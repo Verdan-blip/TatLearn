@@ -1,7 +1,7 @@
 # Тамыр (TatLearn) — conventions
 
 App for learning Tatar (Russian-speaking audience). Kotlin Multiplatform + Compose Multiplatform, Android + iOS, all UI/logic in `commonMain`.
-Source of truth for UI: `design/Tatar App Screens.dc.html` (43 screens, 390×844; the mascot there is the new ginger cat from `design/mascot/png`, profile settings and «О приложении» are screens 26, 33, 38, 42, 43). Skills: `design` (what "design" means here), `design-extend` (how to draw new screens/elements), `compose-style`.
+Source of truth for UI: `design/Tatar App Screens.dc.html` (49 screens, 390×844; the mascot there is the new ginger cat from `design/mascot/png`, profile settings and «О приложении» are screens 26, 33, 38, 42, 43; the new home as a module roadmap is screen 03 plus states 45-49, animations in `design/home-animations.md`, plan in `.docs/21-course-roadmap.md`; the home is drawn in the design but NOT implemented in code yet). Skills: `design` (what "design" means here), `design-extend` (how to draw new screens/elements), `compose-style`.
 
 ## Modules / build
 - `:shared` — all code (KMP library, iOS framework `Shared`); `:androidApp` — Android entry point; `iosApp/` — Xcode project (entry point only).
