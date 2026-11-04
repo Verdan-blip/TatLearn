@@ -11,11 +11,11 @@ description: Что в проекте Тамыр (TatLearn) называется
 
 | Путь | Что это |
 |---|---|
-| `design/Tatar App Screens.dc.html` | Источник истины для UI: 15 экранов 390×844 на одном холсте (HTML, сгенерирован Claude Design) |
+| `design/Tatar App Screens.dc.html` | Источник истины для UI: 43 экрана 390×844 на одном холсте (HTML, сгенерирован Claude Design) |
 | `design/support.js` | Скрипт поддержки холста `.dc.html`, подключается самим макетом. Не менять без необходимости |
 | `design/screens/NN.png` | Эталонные рендеры экранов (Playwright + системный Chrome) |
 | `design/icons/*` | Логотипы сторонних сервисов (Google, VK) для кнопок входа; те же файлы лежат в `composeResources/drawable` |
-| `design/mascot/*.svg`, `design/mascot-prompt.md` | Исходники и бриф маскота Мырауҗан |
+| `design/mascot/png/*.png`, `design/mascot/*.svg`, `design/mascot-prompt.md` | Новый маскот Мыраужан (PNG 512 px, подключены в макет относительными путями; `render_screens.py` копирует их в рендер), старые SVG-исходники (история), бриф |
 | `design/OFL-PTSans.txt` | Лицензия шрифта PT Sans |
 
 Если пользователь говорит «в дизайне нет X», надо искать X именно здесь, а не спрашивать, о каком дизайне речь.
