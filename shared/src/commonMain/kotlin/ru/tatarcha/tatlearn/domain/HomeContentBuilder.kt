@@ -32,6 +32,8 @@ object HomeContentBuilder {
                 lockedBy = required?.id,
                 lockedByTitleTt = required?.titleTt,
                 lockedByTitleRu = required?.titleRu,
+                completedLessons = done,
+                totalLessons = module.lessons.size,
             )
         }
 

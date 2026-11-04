@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -26,5 +27,18 @@ fun Modifier.dashedBottomBorder(color: Color, thickness: Dp = 2.dp, dash: Dp = 6
         end = Offset(size.width, y),
         strokeWidth = thickness.toPx(),
         pathEffect = PathEffect.dashPathEffect(floatArrayOf(dash.toPx(), gap.toPx())),
+    )
+}
+
+/** Пунктирная рамка по контуру фигуры, например у закрытого модуля на ленте. */
+fun Modifier.dashedBorder(color: Color, shape: Shape, width: Dp = 1.5.dp, dash: Dp = 5.dp, gap: Dp = 4.dp): Modifier = drawBehind {
+    val outline = shape.createOutline(size, layoutDirection, this)
+    drawOutline(
+        outline = outline,
+        color = color,
+        style = Stroke(
+            width = width.toPx(),
+            pathEffect = PathEffect.dashPathEffect(floatArrayOf(dash.toPx(), gap.toPx())),
+        ),
     )
 }

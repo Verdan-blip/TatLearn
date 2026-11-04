@@ -54,6 +54,8 @@ data class LearningModule(
     val lockedBy: String?,
     val lockedByTitleTt: String?,
     val lockedByTitleRu: String?,
+    val completedLessons: Int = 0,
+    val totalLessons: Int = 0,
 ) {
     val isLocked: Boolean get() = lockedBy != null
 }

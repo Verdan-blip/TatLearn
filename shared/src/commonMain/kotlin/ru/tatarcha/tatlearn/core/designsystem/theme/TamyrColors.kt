@@ -15,6 +15,8 @@ data class TamyrColors(
     val borderStrong: Color,
     /** Пунктирная строка ответа в сборке предложения. */
     val dashedLine: Color,
+    /** Контур не-текстовых элементов (пустой эчпочмак, замок, закрытая плитка): контраст не ниже 3:1. */
+    val contour: Color,
 
     val textPrimary: Color,
     val textSecondary: Color,
@@ -54,6 +56,7 @@ val LightTamyrColors = TamyrColors(
     border = Color(0xFFE5DEC6),
     borderStrong = Color(0xFFD9CFB2),
     dashedLine = Color(0xFFC9C0A4),
+    contour = Color(0xFF8A8468),
 
     textPrimary = Color(0xFF3D3A2D),
     textSecondary = Color(0xFF5A5642),

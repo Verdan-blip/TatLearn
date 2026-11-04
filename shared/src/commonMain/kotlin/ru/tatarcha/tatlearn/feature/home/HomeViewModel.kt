@@ -5,12 +5,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import ru.tatarcha.tatlearn.core.common.AutoDismiss
 import ru.tatarcha.tatlearn.core.common.ErrorCodes
 import ru.tatarcha.tatlearn.core.common.LoadState
 import ru.tatarcha.tatlearn.core.common.MviViewModel
 import ru.tatarcha.tatlearn.core.common.errorCode
-import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
 import ru.tatarcha.tatlearn.domain.HomeContentBuilder
 import ru.tatarcha.tatlearn.domain.HomeProgressTracker
 import ru.tatarcha.tatlearn.domain.model.CourseModule
@@ -33,8 +31,6 @@ class HomeViewModel(
         avatar = profile.profile.value?.avatar ?: Avatar.Default,
     ),
 ) {
-
-    private val toastTimer = AutoDismiss(viewModelScope, TamyrMotion.TOAST_VISIBLE_MS)
 
     /** Каталог с сервера и локальный прогресс; главная пересобирается при изменении любого из них. */
     private var catalog: List<CourseModule>? = null
@@ -66,24 +62,12 @@ class HomeViewModel(
                     sendEffect(HomeUiEffect.NavigateToLesson(content.data.currentLesson.lesson.id))
                 }
             }
-            // TODO(design): списка модулей («Все») нет, пока показываем заглушку; вкладки словаря, соревнований и профиля — заглушка-экран 16.
+            // Вкладки словаря и соревнований это заглушка-экран 16.
             is HomeUiEvent.ModuleClicked -> sendEffect(HomeUiEffect.NavigateToModule(event.moduleId))
-            HomeUiEvent.AllModulesClicked -> showToast(HomeToast.AllModulesUnavailable)
-            is HomeUiEvent.NavItemClicked -> setState { copy(tab = event.item, toast = null) }
-            HomeUiEvent.ToastDismissed -> hideToast()
+            is HomeUiEvent.NavItemClicked -> setState { copy(tab = event.item) }
             HomeUiEvent.ProgressGainStarted -> (state.value.content as? LoadState.Content)?.let { tracker.commit(it.data) }
             HomeUiEvent.ProgressGainFinished -> setState { copy(progressGain = null) }
         }
-    }
-
-    private fun showToast(toast: HomeToast) {
-        setState { copy(toast = toast) }
-        toastTimer.start { setState { copy(toast = null) } }
-    }
-
-    private fun hideToast() {
-        toastTimer.cancel()
-        setState { copy(toast = null) }
     }
 
     private fun load() {

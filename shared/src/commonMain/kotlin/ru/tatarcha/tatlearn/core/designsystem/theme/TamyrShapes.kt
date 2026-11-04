@@ -17,4 +17,6 @@ data class TamyrShapes(
     val progress: Shape = RoundedCornerShape(5.dp),
     val sheet: Shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
     val circle: Shape = CircleShape,
+    val roadmapCard: Shape = RoundedCornerShape(22.dp),
+    val moduleBase: Shape = RoundedCornerShape(18.dp),
 )

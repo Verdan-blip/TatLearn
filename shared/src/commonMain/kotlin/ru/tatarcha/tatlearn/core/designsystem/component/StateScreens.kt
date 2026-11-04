@@ -126,41 +126,33 @@ fun SkeletonBlock(modifier: Modifier = Modifier, radius: Dp = 6.dp) {
     Box(modifier.clip(androidx.compose.foundation.shape.RoundedCornerShape(radius)).background(TamyrTheme.colors.surfaceMuted))
 }
 
-/** Заглушка в форме главного экрана, используется в [LoadingState] по умолчанию. */
+/** Заглушка в форме главной (шапка, карточка текущего модуля, два модуля ленты), используется в [LoadingState] по умолчанию. */
 @Composable
 fun HomeSkeleton(modifier: Modifier = Modifier) {
     val spacing = TamyrTheme.spacing
-    Column(modifier.padding(horizontal = spacing.screen, vertical = spacing.l), verticalArrangement = Arrangement.spacedBy(spacing.l)) {
+    Column(modifier.padding(horizontal = spacing.screen, vertical = spacing.l), verticalArrangement = Arrangement.spacedBy(spacing.xl)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Column(verticalArrangement = Arrangement.spacedBy(spacing.s)) {
                 SkeletonBlock(Modifier.width(90.dp).height(12.dp))
                 SkeletonBlock(Modifier.width(120.dp).height(20.dp), radius = 8.dp)
             }
-            SkeletonBlock(Modifier.size(46.dp), radius = 23.dp)
+            SkeletonBlock(Modifier.width(150.dp).height(40.dp), radius = 20.dp)
         }
-        TamyrCard {
-            Column(verticalArrangement = Arrangement.spacedBy(spacing.m)) {
-                SkeletonBlock(Modifier.fillMaxWidth(0.4f).height(12.dp))
-                SkeletonBlock(Modifier.fillMaxWidth(0.65f).height(18.dp), radius = 8.dp)
-                SkeletonBlock(Modifier.fillMaxWidth().height(8.dp), radius = 4.dp)
-                SkeletonBlock(Modifier.fillMaxWidth().height(46.dp), radius = 12.dp)
-            }
-        }
-        TamyrCard(contentPadding = spacing.m) {
-            Row(horizontalArrangement = Arrangement.spacedBy(spacing.blockGap), verticalAlignment = Alignment.CenterVertically) {
-                SkeletonBlock(Modifier.size(TamyrSizes.streakBadgeCompact), radius = 12.dp)
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(spacing.s)) {
-                    SkeletonBlock(Modifier.fillMaxWidth(0.6f).height(12.dp))
-                    SkeletonBlock(Modifier.fillMaxWidth().height(6.dp), radius = 3.dp)
+        TamyrCard(shape = TamyrTheme.shapes.roadmapCard, contentPadding = 0.dp) {
+            SkeletonBlock(Modifier.fillMaxWidth().height(TamyrSizes.roadmapBand), radius = 0.dp)
+            Column(Modifier.padding(spacing.l), verticalArrangement = Arrangement.spacedBy(spacing.m)) {
+                SkeletonBlock(Modifier.fillMaxWidth(0.6f).height(22.dp), radius = 8.dp)
+                Row(horizontalArrangement = Arrangement.spacedBy(spacing.xxs)) {
+                    repeat(5) { SkeletonBlock(Modifier.size(TamyrSizes.echpochmakCard), radius = 6.dp) }
                 }
+                SkeletonBlock(Modifier.fillMaxWidth().height(TamyrSizes.roadmapCardButton), radius = 14.dp)
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(spacing.m)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
             repeat(2) {
-                TamyrCard(Modifier.weight(1f).height(110.dp), shape = TamyrTheme.shapes.tile) {
-                    SkeletonBlock(Modifier.size(34.dp), radius = 10.dp)
-                    Box(Modifier.height(spacing.s))
-                    SkeletonBlock(Modifier.fillMaxWidth(0.7f).height(12.dp))
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(spacing.s)) {
+                    SkeletonBlock(Modifier.size(width = TamyrSizes.moduleBaseWidth, height = TamyrSizes.moduleBaseHeight + 24.dp), radius = 18.dp)
+                    SkeletonBlock(Modifier.width(90.dp).height(12.dp))
                 }
             }
         }

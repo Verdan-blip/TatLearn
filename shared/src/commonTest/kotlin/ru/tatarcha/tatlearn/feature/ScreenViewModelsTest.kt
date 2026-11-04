@@ -45,7 +45,6 @@ import ru.tatarcha.tatlearn.feature.auth.EmailError
 import ru.tatarcha.tatlearn.feature.auth.PasswordError
 import ru.tatarcha.tatlearn.feature.auth.SocialProvider
 import ru.tatarcha.tatlearn.feature.home.HomeNavItem
-import ru.tatarcha.tatlearn.feature.home.HomeToast
 import ru.tatarcha.tatlearn.feature.home.HomeUiEffect
 import ru.tatarcha.tatlearn.feature.home.HomeUiEvent
 import ru.tatarcha.tatlearn.domain.HomeProgressTracker
@@ -295,7 +294,6 @@ class ScreenViewModelsTest {
         assertEquals(HomeUiEffect.NavigateToModule("food"), vm.effects.first())
         vm.onEvent(HomeUiEvent.ModuleClicked("nature"))
         assertEquals(HomeUiEffect.NavigateToModule("nature"), vm.effects.first())
-        assertNull(vm.state.value.toast)
     }
 
     @Test fun finishedLessonMovesCurrentLessonAndUpdatesProgress() = runTest {
@@ -343,24 +341,12 @@ class ScreenViewModelsTest {
         assertEquals(LoadState.Error("NOT_FOUND"), vm.state.value.content)
     }
 
-    @Test fun allModulesAndNavItemsShowStubToasts() = runTest {
+    @Test fun navItemsSwitchTabs() = runTest {
         val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth(), FakeProfile(), HomeProgressTracker())
-        vm.onEvent(HomeUiEvent.AllModulesClicked)
-        assertEquals(HomeToast.AllModulesUnavailable, vm.state.value.toast)
-        vm.onEvent(HomeUiEvent.ToastDismissed)
-        vm.onEvent(HomeUiEvent.NavItemClicked(HomeNavItem.Home))
-        assertNull(vm.state.value.toast)
         vm.onEvent(HomeUiEvent.NavItemClicked(HomeNavItem.Profile))
         assertEquals(HomeNavItem.Profile, vm.state.value.tab)
         vm.onEvent(HomeUiEvent.NavItemClicked(HomeNavItem.Home))
         assertEquals(HomeNavItem.Home, vm.state.value.tab)
-    }
-
-    @Test fun homeToastDisappearsAfterFiveSeconds() = runTest {
-        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth(), FakeProfile(), HomeProgressTracker())
-        vm.onEvent(HomeUiEvent.AllModulesClicked)
-        testScheduler.advanceTimeBy(TamyrMotion.TOAST_VISIBLE_MS + 1)
-        assertNull(vm.state.value.toast)
     }
 
     // --- Результат ---

@@ -71,6 +71,24 @@ object TamyrSizes {
     val settingsIcon = 22.dp
     val chipIcon = 18.dp
     val chevron = 20.dp
+    val moduleBaseWidth = 96.dp
+    val moduleBaseHeight = 48.dp
+    val moduleIllustrationWidth = 92.dp
+    val moduleIllustrationHeight = 80.dp
+    val moduleIllustrationLift = 44.dp
+    val moduleBlockWidth = 116.dp
+    val moduleNumberBadge = 24.dp
+    val moduleSeal = 28.dp
+    val moduleLabelWidth = 150.dp
+    val echpochmak = 20.dp
+    val echpochmakCard = 24.dp
+    val roadmapConnector = 72.dp
+    val roadmapDiamond = 8.dp
+    val roadmapBand = 98.dp
+    val roadmapCardIllustrationWidth = 110.dp
+    val roadmapCardIllustrationHeight = 96.dp
+    val roadmapCat = 78.dp
+    val roadmapCardButton = 54.dp
     /** Отступ подписи «+1 урок» от верха содержимого карточки: она стоит на строке названия. */
     val gainChipTop = 28.dp
 }
