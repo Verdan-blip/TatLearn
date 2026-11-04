@@ -33,6 +33,9 @@ data class ModuleDetails(
     val lockedBy: RequiredModule?,
     val nextLesson: Lesson?,
     val nextModule: CourseModule?,
+    /** Номер модуля в курсе (с единицы) и число модулей: «Модуль 3 из 9» на баннере. */
+    val number: Int = 1,
+    val totalModules: Int = 1,
 ) {
     val isLocked: Boolean get() = lockedBy != null
     val isCompleted: Boolean get() = lessons.isNotEmpty() && completedLessons == lessons.size

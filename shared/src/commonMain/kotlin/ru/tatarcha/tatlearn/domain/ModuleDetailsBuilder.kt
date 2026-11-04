@@ -37,6 +37,8 @@ object ModuleDetailsBuilder {
             },
             nextLesson = if (required == null) firstOpen else null,
             nextModule = modules.getOrNull(index + 1),
+            number = index + 1,
+            totalModules = modules.size,
         )
     }
 }

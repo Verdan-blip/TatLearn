@@ -160,6 +160,9 @@
     <string name="home_nav_dictionary">Сүзлек</string>
     <string name="home_nav_contest">Ярыш</string>
     <string name="home_nav_profile">Профиль</string>
+    <string name="module_plate">Модуль %1$d из %2$d</string>
+    <string name="module_banner_done">Модуль пройден · %1$d из %2$d</string>
+    <string name="module_stamp">ТӘМАМ</string>
     <string name="module_back_description">Назад на главную</string>
     <string name="module_progress_label">Пройдено уроков</string>
     <string name="module_progress_value">%1$d из %2$d</string>

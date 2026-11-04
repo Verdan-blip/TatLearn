@@ -212,26 +212,28 @@ private const val PREVIOUS_ROW_OFFSET = 3
 
 /**
  * Где карточка текущего модуля относительно экрана; от этого зависит плавающая панель и направление её стрелки.
- * Гистерезис [HYSTERESIS]: панель прячется, когда карточка видна целиком с запасом, а появляется, только когда она вышла за край,
+ * Гистерезис [HYSTERESIS]: панель прячется, когда кнопка урока в карточке видна с запасом, а появляется, только когда кнопка вышла за край,
  * поэтому на границе не мигает.
  */
 @Composable
 fun rememberCurrentCardVisibility(state: LazyListState, cardIndex: Int): State<CurrentCardVisibility> {
     val margin = with(LocalDensity.current) { HYSTERESIS.toPx() }
-    return produceState(CurrentCardVisibility.Visible, state, cardIndex, margin) {
+    val buttonZone = with(LocalDensity.current) { BUTTON_ZONE.toPx() }
+    return produceState(CurrentCardVisibility.Visible, state, cardIndex, margin, buttonZone) {
         snapshotFlow {
             val info = state.layoutInfo
             val card = info.visibleItemsInfo.firstOrNull { it.key == CURRENT_KEY }
             if (card == null) {
                 if (state.firstVisibleItemIndex > cardIndex) CardPlace.Above else CardPlace.Below
             } else {
-                val top = card.offset.toFloat()
+                // Кнопка урока стоит внизу карточки: пока она на экране, плавающая панель её не дублирует.
                 val bottom = (card.offset + card.size).toFloat()
+                val buttonTop = bottom - buttonZone
                 val end = info.viewportEndOffset.toFloat()
                 when {
-                    top >= margin && bottom <= end - margin -> CardPlace.Inside
-                    top >= 0f && bottom <= end -> CardPlace.Edge
-                    top < 0f -> CardPlace.Above
+                    buttonTop >= margin && bottom <= end - margin -> CardPlace.Inside
+                    buttonTop >= 0f && bottom <= end -> CardPlace.Edge
+                    buttonTop < 0f -> CardPlace.Above
                     else -> CardPlace.Below
                 }
             }
@@ -249,6 +251,9 @@ fun rememberCurrentCardVisibility(state: LazyListState, cardIndex: Int): State<C
 private enum class CardPlace { Inside, Edge, Above, Below }
 
 private val HYSTERESIS = 24.dp
+
+// Высота кнопки урока с отступами внизу карточки.
+private val BUTTON_ZONE = 80.dp
 
 private fun previewRow(number: Int, state: ModuleState, hint: Boolean = false) = RoadmapEntry(
     module = LearningModule(
