@@ -208,6 +208,7 @@ private fun HomeLoaded(
                     RoadmapHeader(
                         userName = userName,
                         stats = stats,
+                        modifier = Modifier.padding(bottom = TamyrTheme.spacing.xl),
                     )
                 },
                 onModuleClick = { moduleId -> onEvent(HomeUiEvent.ModuleClicked(moduleId)) },

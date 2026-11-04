@@ -67,12 +67,13 @@ fun ModuleRoadmap(
     ) {
         item(key = HEADER_KEY) { header() }
         rows.forEachIndexed { index, row ->
-            item(key = "connector_$index") {
+            // Тропа идёт от модуля к модулю; к первому модулю сверху её нет (она никуда не ведёт).
+            if (index > 0) item(key = "connector_$index") {
                 val toCurrent = row is RoadmapRow.Current
                 RoadmapConnector(
-                    from = if (index == 0) TrailSide.Center else rows[index - 1].exitSide(),
+                    from = rows[index - 1].exitSide(),
                     to = row.entrySide(),
-                    passed = index > 0 && rows[index - 1].lastState() == ModuleState.Done,
+                    passed = rows[index - 1].lastState() == ModuleState.Done,
                     reveal = if (toCurrent) ({ animation.trail.value }) else ({ 1f }),
                     pulsing = toCurrent && pulsing,
                 )
@@ -189,10 +190,10 @@ private fun RoadmapRow.lastState(): ModuleState = when (this) {
     is RoadmapRow.Current -> entry.state
 }
 
-/** Индекс элемента списка, где стоит карточка текущего модуля (или конец ленты, если курс пройден). */
+/** Индекс элемента списка, где стоит карточка текущего модуля (или конец ленты, если курс пройден): шапка, ряд 0, затем пары «тропа, ряд». */
 internal fun roadmapCurrentItemIndex(rows: List<RoadmapRow>): Int {
     val cardRow = rows.indexOfFirst { it is RoadmapRow.Current }
-    return if (cardRow >= 0) 1 + ITEMS_PER_ROW * cardRow + 1 else 1 + ITEMS_PER_ROW * rows.size + 1
+    return if (cardRow >= 0) ITEMS_PER_ROW * cardRow + 1 else ITEMS_PER_ROW * rows.size + 1
 }
 
 /** Элемент списка, с которого лента открывается: над карточкой текущего модуля остаётся ряд пройденного (или шапка). */
