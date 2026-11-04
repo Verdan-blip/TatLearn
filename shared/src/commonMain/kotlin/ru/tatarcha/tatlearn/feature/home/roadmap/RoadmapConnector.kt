@@ -1,22 +1,46 @@
 package ru.tatarcha.tatlearn.feature.home.roadmap
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import kotlin.math.abs
+import org.jetbrains.compose.resources.imageResource
 import ru.tatarcha.tatlearn.core.designsystem.component.PreviewFrame
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrSizes
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
+import tatlearn.shared.generated.resources.Res
+import tatlearn.shared.generated.resources.mascot_greeting
 
 private val DiamondStep = 15.dp
+private val CatSize = 62.dp
+private const val PULSE_COUNT = 3
+private const val PULSE_CYCLE_MS = 1_200
+private const val PULSE_PHASE_STEP = 0.1667f
+private const val PULSE_MIN_ALPHA = 0.35f
+private const val PULSE_MIN_SCALE = 0.85f
+private const val PULSE_MAX_SCALE = 1.1f
 
 /**
  * Тропа из ромбов между рядами ленты: плавная S-кривая от [from] к [to]. Пройденный участок золотой, будущий контурный.
+ * [reveal] (0..1) показывает, какая доля ромбов уже золотая, пока тропа заливается после модуля; [catProgress] ведёт по ней Мыраужана;
+ * [pulsing] включает «волну к цели» на последних трёх ромбах перед карточкой текущего модуля.
  * Тропа это декор: без нажатий и не читается скринридером.
  */
 @Composable
@@ -25,9 +49,14 @@ fun RoadmapConnector(
     to: TrailSide,
     passed: Boolean,
     modifier: Modifier = Modifier,
+    reveal: () -> Float = { 1f },
+    catProgress: () -> Float? = { null },
+    pulsing: Boolean = false,
 ) {
     val filled = TamyrTheme.colors.gold
     val outline = TamyrTheme.colors.contour
+    val cycle: State<Float>? = if (pulsing) rememberPulseCycle() else null
+    val catImage = if (catProgress() != null) imageResource(Res.drawable.mascot_greeting) else null
     Canvas(
         modifier = modifier
             .fillMaxWidth()
@@ -41,19 +70,55 @@ fun RoadmapConnector(
         }
         val measure = PathMeasure().apply { setPath(path, false) }
         val step = DiamondStep.toPx()
+        val count = ((measure.length - step / 2) / step).toInt() + 1
+        val revealed = reveal()
+        var index = 0
         var distance = step / 2
         while (distance < measure.length) {
-            drawTrailDiamond(
-                center = measure.getPosition(distance),
-                half = TamyrSizes.roadmapDiamond.toPx() / 2,
-                passed = passed,
-                filledColor = filled,
-                outlineColor = outline,
-            )
+            val isGold = passed && (index + 0.5f) / count <= revealed
+            val fromEnd = count - 1 - index
+            val pulse = if (cycle != null && fromEnd < PULSE_COUNT) pulseValue(cycle.value, PULSE_COUNT - 1 - fromEnd) else 1f
+            val center = measure.getPosition(distance)
+            val half = TamyrSizes.roadmapDiamond.toPx() / 2
+            if (pulse < 1f || cycle != null) {
+                val scale = PULSE_MIN_SCALE + (PULSE_MAX_SCALE - PULSE_MIN_SCALE) * pulse
+                scale(scale = scale, pivot = center) {
+                    drawTrailDiamond(center = center, half = half, passed = isGold, filledColor = filled.copy(alpha = pulseAlpha(pulse)), outlineColor = outline.copy(alpha = pulseAlpha(pulse)))
+                }
+            } else {
+                drawTrailDiamond(center = center, half = half, passed = isGold, filledColor = filled, outlineColor = outline)
+            }
             distance += step
+            index++
+        }
+        val progress = catProgress()
+        if (progress != null && catImage != null) {
+            val position: Offset = measure.getPosition(measure.length * progress)
+            val side = CatSize.toPx()
+            drawImage(
+                image = catImage,
+                dstOffset = IntOffset((position.x - side / 2).toInt(), (position.y - side * 0.7f).toInt()),
+                dstSize = IntSize(side.toInt(), side.toInt()),
+            )
         }
     }
 }
+
+/** Тройка ромбов пульсирует волной: каждый следующий отстаёт по фазе, треугольная волна. */
+private fun pulseValue(cycle: Float, order: Int): Float {
+    val phase = ((cycle - order * PULSE_PHASE_STEP) % 1f + 1f) % 1f
+    return 1f - abs(2f * phase - 1f)
+}
+
+private fun pulseAlpha(pulse: Float): Float = PULSE_MIN_ALPHA + (1f - PULSE_MIN_ALPHA) * pulse
+
+@Composable
+private fun rememberPulseCycle(): State<Float> = rememberInfiniteTransition(label = "trail-pulse").animateFloat(
+    initialValue = 0f,
+    targetValue = 1f,
+    animationSpec = infiniteRepeatable(tween(PULSE_CYCLE_MS, easing = LinearEasing), RepeatMode.Restart),
+    label = "trail-pulse-cycle",
+)
 
 @Preview(name = "Passed, right to left")
 @Composable
@@ -72,5 +137,17 @@ private fun RoadmapConnectorAheadPreview() = PreviewFrame {
         from = TrailSide.Left,
         to = TrailSide.Left,
         passed = false,
+    )
+}
+
+@Preview(name = "Half revealed with the cat")
+@Composable
+private fun RoadmapConnectorRevealPreview() = PreviewFrame {
+    RoadmapConnector(
+        from = TrailSide.Left,
+        to = TrailSide.Right,
+        passed = true,
+        reveal = { 0.5f },
+        catProgress = { 0.5f },
     )
 }

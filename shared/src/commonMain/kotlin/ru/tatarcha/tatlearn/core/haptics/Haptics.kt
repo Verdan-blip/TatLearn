@@ -32,6 +32,9 @@ interface Haptics {
 
     /** Урок пройден (экран результата): короткая нарастающая серия. Не вызывается, если урок не засчитан. */
     fun celebrate()
+
+    /** Открылся новый модуль на главной: один очень лёгкий тик (единственный отклик на главной). */
+    fun unlocked()
 }
 
 /**
@@ -53,6 +56,8 @@ class PatternHaptics(
         delay(WRONG_GAP_MS)
         platform.tickLight()
     }
+
+    override fun unlocked() = play { platform.tickLight() }
 
     override fun celebrate() = play {
         platform.success()

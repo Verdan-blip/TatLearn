@@ -296,12 +296,16 @@ class ProfileViewModelsTest {
         haptics.celebrate()
         testScheduler.advanceUntilIdle()
         assertEquals(listOf("success", "light", "light", "success", "light", "medium"), platform.events)
+        clock.now += 500
+        haptics.unlocked()
+        testScheduler.advanceUntilIdle()
+        assertEquals(listOf("success", "light", "light", "success", "light", "medium", "light"), platform.events)
         // Выключено в профиле: тишина.
         settings.setEnabled(false)
         clock.now += 500
         haptics.correct()
         testScheduler.advanceUntilIdle()
-        assertEquals(6, platform.events.size)
+        assertEquals(7, platform.events.size)
     }
 
     // --- Изменение профиля ---

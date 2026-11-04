@@ -9,11 +9,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.State
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.tatarcha.tatlearn.core.designsystem.component.PreviewFrame
@@ -47,9 +48,13 @@ fun ModuleRoadmap(
     onModuleClick: (moduleId: String) -> Unit,
     onStartLesson: () -> Unit,
     state: LazyListState,
+    animation: RoadmapAnimation,
+    reduceMotion: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val courseDone = current.kind == HomeCardKind.AllDone
+    // Пульсация «волна к цели» только в покое: не при прокрутке, не во время анимации урока и не при «уменьшить анимацию».
+    val pulsing = !reduceMotion && !animation.running && !state.isScrollInProgress
     LazyColumn(
         modifier = modifier,
         state = state,
@@ -63,10 +68,14 @@ fun ModuleRoadmap(
         item(key = HEADER_KEY) { header() }
         rows.forEachIndexed { index, row ->
             item(key = "connector_$index") {
+                val toCurrent = row is RoadmapRow.Current
                 RoadmapConnector(
                     from = if (index == 0) TrailSide.Center else rows[index - 1].exitSide(),
                     to = row.entrySide(),
                     passed = index > 0 && rows[index - 1].lastState() == ModuleState.Done,
+                    reveal = if (toCurrent) ({ animation.trail.value }) else ({ 1f }),
+                    catProgress = if (toCurrent && animation.catVisible) ({ animation.cat.value }) else ({ null }),
+                    pulsing = toCurrent && pulsing,
                 )
             }
             item(key = if (row is RoadmapRow.Current) CURRENT_KEY else "row_$index") {
@@ -76,6 +85,8 @@ fun ModuleRoadmap(
                     totalModules = totalModules,
                     onModuleClick = onModuleClick,
                     onStartLesson = onStartLesson,
+                    animation = animation,
+                    reduceMotion = reduceMotion,
                 )
             }
         }
@@ -99,6 +110,8 @@ private fun RoadmapRowContent(
     totalModules: Int,
     onModuleClick: (moduleId: String) -> Unit,
     onStartLesson: () -> Unit,
+    animation: RoadmapAnimation,
+    reduceMotion: Boolean,
 ) {
     when (row) {
         is RoadmapRow.Current -> RoadmapCurrentCard(
@@ -106,6 +119,7 @@ private fun RoadmapRowContent(
             current = current,
             totalModules = totalModules,
             onStart = onStartLesson,
+            animation = animation,
         )
         is RoadmapRow.Tiles -> Box(modifier = Modifier.fillMaxWidth()) {
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -113,12 +127,16 @@ private fun RoadmapRowContent(
                     entry = row.left,
                     totalModules = totalModules,
                     onModuleClick = onModuleClick,
+                    animation = animation,
+                    reduceMotion = reduceMotion,
                     modifier = Modifier.weight(1f),
                 )
                 TileSlot(
                     entry = row.right,
                     totalModules = totalModules,
                     onModuleClick = onModuleClick,
+                    animation = animation,
+                    reduceMotion = reduceMotion,
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -139,14 +157,19 @@ private fun TileSlot(
     entry: RoadmapEntry?,
     totalModules: Int,
     onModuleClick: (moduleId: String) -> Unit,
+    animation: RoadmapAnimation,
+    reduceMotion: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier, contentAlignment = Alignment.TopCenter) {
         if (entry != null) {
+            val stamping = animation.isModuleDone && animation.gain?.moduleId == entry.module.id
             RoadmapTile(
                 entry = entry,
                 totalModules = totalModules,
                 onClick = { onModuleClick(entry.module.id) },
+                sealProgress = if (stamping) ({ animation.stamp.value }) else ({ 1f }),
+                reduceMotion = reduceMotion,
             )
         }
     }
@@ -187,22 +210,45 @@ fun rememberRoadmapListState(rows: List<RoadmapRow>): LazyListState =
 // Элементы перед карточкой: тропа к ней и предыдущий ряд.
 private const val PREVIOUS_ROW_OFFSET = 3
 
-/** Плавающая кнопка нужна, пока карточка текущего модуля не показана целиком; направление стрелки зависит от того, где она. */
+/**
+ * Где карточка текущего модуля относительно экрана; от этого зависит плавающая панель и направление её стрелки.
+ * Гистерезис [HYSTERESIS]: панель прячется, когда карточка видна целиком с запасом, а появляется, только когда она вышла за край,
+ * поэтому на границе не мигает.
+ */
 @Composable
-fun rememberCurrentCardVisibility(state: LazyListState, cardIndex: Int): CurrentCardVisibility {
-    val visibility by remember(state, cardIndex) {
-        derivedStateOf {
+fun rememberCurrentCardVisibility(state: LazyListState, cardIndex: Int): State<CurrentCardVisibility> {
+    val margin = with(LocalDensity.current) { HYSTERESIS.toPx() }
+    return produceState(CurrentCardVisibility.Visible, state, cardIndex, margin) {
+        snapshotFlow {
             val info = state.layoutInfo
             val card = info.visibleItemsInfo.firstOrNull { it.key == CURRENT_KEY }
-            when {
-                card != null && card.offset >= 0 && card.offset + card.size <= info.viewportEndOffset -> CurrentCardVisibility.Visible
-                state.firstVisibleItemIndex > cardIndex -> CurrentCardVisibility.Above
-                else -> CurrentCardVisibility.Below
+            if (card == null) {
+                if (state.firstVisibleItemIndex > cardIndex) CardPlace.Above else CardPlace.Below
+            } else {
+                val top = card.offset.toFloat()
+                val bottom = (card.offset + card.size).toFloat()
+                val end = info.viewportEndOffset.toFloat()
+                when {
+                    top >= margin && bottom <= end - margin -> CardPlace.Inside
+                    top >= 0f && bottom <= end -> CardPlace.Edge
+                    top < 0f -> CardPlace.Above
+                    else -> CardPlace.Below
+                }
+            }
+        }.collect { place ->
+            when (place) {
+                CardPlace.Inside -> value = CurrentCardVisibility.Visible
+                CardPlace.Edge -> Unit
+                CardPlace.Above -> value = CurrentCardVisibility.Above
+                CardPlace.Below -> value = CurrentCardVisibility.Below
             }
         }
     }
-    return visibility
 }
+
+private enum class CardPlace { Inside, Edge, Above, Below }
+
+private val HYSTERESIS = 24.dp
 
 private fun previewRow(number: Int, state: ModuleState, hint: Boolean = false) = RoadmapEntry(
     module = LearningModule(
@@ -256,6 +302,8 @@ private fun ModuleRoadmapPreview() = PreviewFrame {
         onModuleClick = {},
         onStartLesson = {},
         state = rememberLazyListState(),
+        animation = RoadmapAnimation(gain = null, reduceMotion = false),
+        reduceMotion = false,
     )
 }
 

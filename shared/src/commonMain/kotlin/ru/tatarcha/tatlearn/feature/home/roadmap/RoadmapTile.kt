@@ -1,5 +1,8 @@
 package ru.tatarcha.tatlearn.feature.home.roadmap
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,9 +15,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -27,6 +36,7 @@ import ru.tatarcha.tatlearn.core.designsystem.component.PreviewFrame
 import ru.tatarcha.tatlearn.core.designsystem.component.dashedBorder
 import ru.tatarcha.tatlearn.core.designsystem.component.icon.CheckIcon
 import ru.tatarcha.tatlearn.core.designsystem.component.solidShadow
+import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrSizes
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import ru.tatarcha.tatlearn.domain.model.LearningModule
@@ -49,6 +59,10 @@ private val NumberShift = 2.dp
 private val IllustrationShift = 2.dp
 private val SealDiamond = 20.dp
 private val SealCheck = 15.dp
+private const val LOCK_TILT_FIRST = 14f
+private const val LOCK_TILT_SECOND = 10f
+private const val LOCK_TILT_THIRD = 6f
+private const val SEAL_START_SCALE = 1.5f
 
 /** Плитка-«кочка» модуля: иллюстрация на основании, номер, печать «Тәмам» или замок, подпись. Нажатие открывает модуль. */
 @Composable
@@ -57,9 +71,21 @@ fun RoadmapTile(
     totalModules: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    sealProgress: () -> Float = { 1f },
+    reduceMotion: Boolean = false,
 ) {
     val module = entry.module
     val locked = entry.state == ModuleState.Locked
+    val shake = remember { Animatable(0f) }
+    var shakes by remember { mutableIntStateOf(0) }
+    LaunchedEffect(shakes) {
+        if (shakes > 0 && !reduceMotion) {
+            shake.animateTo(-LOCK_TILT_FIRST, tween(TamyrMotion.SHAKE_MS / 4, easing = FastOutSlowInEasing))
+            shake.animateTo(LOCK_TILT_SECOND, tween(TamyrMotion.SHAKE_MS / 4, easing = FastOutSlowInEasing))
+            shake.animateTo(-LOCK_TILT_THIRD, tween(TamyrMotion.SHAKE_MS / 4, easing = FastOutSlowInEasing))
+            shake.animateTo(0f, tween(TamyrMotion.SHAKE_MS / 4, easing = FastOutSlowInEasing))
+        }
+    }
     val title = moduleTitle(module.titleTt, module.titleRu)
     val description = when (entry.state) {
         ModuleState.Done -> stringResource(Res.string.roadmap_module_done_description, title, entry.number, totalModules, module.completedLessons, module.totalLessons)
@@ -71,12 +97,15 @@ fun RoadmapTile(
         modifier = modifier
             .width(TamyrSizes.moduleLabelWidth)
             .heightIn(min = TamyrSizes.topBarAction)
-            .clickable(role = Role.Button, onClick = onClick)
+            .clickable(role = Role.Button) {
+                if (locked) shakes++
+                onClick()
+            }
             .semantics(mergeDescendants = true) { contentDescription = description },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.s),
     ) {
-        TileBlock(entry = entry, locked = locked)
+        TileBlock(entry = entry, locked = locked, sealProgress = sealProgress, lockTilt = { shake.value })
         TileLabel(entry = entry, title = title)
     }
 }
@@ -85,6 +114,8 @@ fun RoadmapTile(
 private fun TileBlock(
     entry: RoadmapEntry,
     locked: Boolean,
+    sealProgress: () -> Float,
+    lockTilt: () -> Float,
 ) {
     val lift = TamyrSizes.moduleIllustrationLift
     val baseModifier = Modifier
@@ -124,8 +155,8 @@ private fun TileBlock(
             modifier = Modifier.offset(x = NumberShift, y = lift + 30.dp),
         )
         when (entry.state) {
-            ModuleState.Done -> DoneSeal(modifier = Modifier.offset(x = SealShift, y = lift + 26.dp))
-            ModuleState.Locked -> LockBadge(modifier = Modifier.offset(x = SealShift, y = lift + 26.dp))
+            ModuleState.Done -> DoneSeal(progress = sealProgress, modifier = Modifier.offset(x = SealShift, y = lift + 26.dp))
+            ModuleState.Locked -> LockBadge(tilt = lockTilt, modifier = Modifier.offset(x = SealShift, y = lift + 26.dp))
             ModuleState.Current, ModuleState.Open -> Unit
         }
     }
@@ -158,9 +189,20 @@ private fun NumberBadge(
 }
 
 @Composable
-private fun DoneSeal(modifier: Modifier = Modifier) {
+private fun DoneSeal(
+    progress: () -> Float,
+    modifier: Modifier = Modifier,
+) {
     Box(
-        modifier = modifier.size(TamyrSizes.moduleSeal),
+        modifier = modifier
+            .size(TamyrSizes.moduleSeal)
+            .graphicsLayer {
+                // Печать опускается: из увеличенной и прозрачной в обычную (анимация E2).
+                val value = progress()
+                scaleX = SEAL_START_SCALE - (SEAL_START_SCALE - 1f) * value
+                scaleY = scaleX
+                alpha = value
+            },
         contentAlignment = Alignment.Center,
     ) {
         Box(
@@ -179,10 +221,17 @@ private fun DoneSeal(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun LockBadge(modifier: Modifier = Modifier) {
+private fun LockBadge(
+    tilt: () -> Float,
+    modifier: Modifier = Modifier,
+) {
     Box(
         modifier = modifier
             .size(TamyrSizes.moduleSeal)
+            .graphicsLayer {
+                rotationZ = tilt()
+                transformOrigin = TransformOrigin(0.5f, 0.2f)
+            }
             .clip(TamyrTheme.shapes.circle)
             .background(TamyrTheme.colors.surface)
             .border(1.5.dp, TamyrTheme.colors.contour, TamyrTheme.shapes.circle),

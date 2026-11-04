@@ -14,6 +14,7 @@ data class HomeUiState(
     /** Серия и XP приходят из локальной базы, независимо от запроса главной. */
     val stats: UserStats = UserStats.Empty,
     val content: LoadState<HomeContent> = LoadState.Loading,
+    val toast: HomeToast? = null,
     /** Выбранная вкладка нижнего меню; всё, кроме [HomeNavItem.Home], пока заглушка. */
     val tab: HomeNavItem = HomeNavItem.Home,
     /** Аватар из профиля (цвет с буквой имени или поза Мыраужана). */
@@ -26,6 +27,7 @@ sealed interface HomeUiEvent : UiEvent {
     data object RetryClicked : HomeUiEvent
     data object StartLessonClicked : HomeUiEvent
     data class ModuleClicked(val moduleId: String) : HomeUiEvent
+    data object ToastDismissed : HomeUiEvent
     data class NavItemClicked(val item: HomeNavItem) : HomeUiEvent
 
     /** Анимация прироста началась на экране: показанный прогресс запоминается, повторно она не сыграет. */

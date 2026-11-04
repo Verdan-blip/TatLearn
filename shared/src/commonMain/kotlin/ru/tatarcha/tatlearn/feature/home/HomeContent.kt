@@ -1,5 +1,15 @@
 package ru.tatarcha.tatlearn.feature.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,12 +18,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.stringResource
 import ru.tatarcha.tatlearn.core.common.LoadState
 import ru.tatarcha.tatlearn.core.designsystem.component.BottomBarItem
@@ -21,6 +39,9 @@ import ru.tatarcha.tatlearn.core.designsystem.component.ComingSoonState
 import ru.tatarcha.tatlearn.core.designsystem.component.LoadStateContent
 import ru.tatarcha.tatlearn.core.designsystem.component.PreviewFrame
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrBottomBar
+import ru.tatarcha.tatlearn.core.designsystem.component.TamyrToastData
+import ru.tatarcha.tatlearn.core.designsystem.component.TamyrToastHost
+import ru.tatarcha.tatlearn.core.designsystem.component.TamyrToastKind
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import ru.tatarcha.tatlearn.domain.RoadmapBuilder
 import ru.tatarcha.tatlearn.domain.model.CardGain
@@ -36,6 +57,7 @@ import ru.tatarcha.tatlearn.feature.home.roadmap.ModuleRoadmap
 import ru.tatarcha.tatlearn.feature.home.roadmap.RoadmapFloatingLesson
 import ru.tatarcha.tatlearn.feature.home.roadmap.RoadmapHeader
 import ru.tatarcha.tatlearn.feature.home.roadmap.rememberCurrentCardVisibility
+import ru.tatarcha.tatlearn.feature.home.roadmap.rememberRoadmapAnimation
 import ru.tatarcha.tatlearn.feature.home.roadmap.rememberRoadmapListState
 import ru.tatarcha.tatlearn.feature.home.roadmap.roadmapCurrentItemIndex
 import ru.tatarcha.tatlearn.feature.home.roadmap.roadmapScrollTarget
@@ -49,6 +71,7 @@ import tatlearn.shared.generated.resources.home_nav_contest
 import tatlearn.shared.generated.resources.home_nav_dictionary
 import tatlearn.shared.generated.resources.home_nav_home
 import tatlearn.shared.generated.resources.home_nav_profile
+import tatlearn.shared.generated.resources.roadmap_locked_toast
 
 @Composable
 fun HomeContent(
@@ -56,6 +79,10 @@ fun HomeContent(
     onEvent: (HomeUiEvent) -> Unit,
     /** Содержимое вкладки «Профиль»; нижнее меню рисует главная. */
     profileTab: @Composable (Modifier) -> Unit = {},
+    /** Включена системная настройка «уменьшить анимацию»: итог показывается сразу, без движения. */
+    reduceMotion: Boolean = false,
+    /** Лёгкий гаптик, когда после модуля открылся следующий. */
+    onUnlocked: () -> Unit = {},
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         if (state.tab == HomeNavItem.Home) {
@@ -72,6 +99,8 @@ fun HomeContent(
                     stats = state.stats,
                     content = content,
                     progressGain = state.progressGain,
+                    reduceMotion = reduceMotion,
+                    onUnlocked = onUnlocked,
                     onEvent = onEvent,
                 )
             }
@@ -83,8 +112,21 @@ fun HomeContent(
         } else {
             ComingSoonTab(tab = state.tab, onEvent = onEvent)
         }
+        TamyrToastHost(
+            toast = state.toast?.let { toast -> homeToastData(toast) },
+            onDismiss = { onEvent(HomeUiEvent.ToastDismissed) },
+            modifier = Modifier.align(Alignment.TopCenter),
+        )
     }
 }
+
+@Composable
+private fun homeToastData(toast: HomeToast): TamyrToastData = TamyrToastData(
+    text = when (toast) {
+        is HomeToast.ModuleLocked -> stringResource(Res.string.roadmap_locked_toast, toast.afterTitle)
+    },
+    kind = TamyrToastKind.Info,
+)
 
 /** Заглушка вкладки, которой ещё нет (экран 16); нижнее меню остаётся, «Өй» ведёт на главную. */
 @Composable
@@ -113,23 +155,49 @@ private fun HomeLoaded(
     stats: UserStats,
     content: HomeContent,
     progressGain: ProgressGain?,
+    reduceMotion: Boolean,
+    onUnlocked: () -> Unit,
     onEvent: (HomeUiEvent) -> Unit,
 ) {
-    // TODO(design): после урока эчпочмак «зажигается» (design/home-animations.md, кадры D); пока прирост лишь помечается показанным.
-    LaunchedEffect(progressGain) {
-        if (progressGain != null) {
-            onEvent(HomeUiEvent.ProgressGainStarted)
-            onEvent(HomeUiEvent.ProgressGainFinished)
-        }
-    }
     val rows = remember(content) { RoadmapBuilder.build(content) }
     val listState = rememberRoadmapListState(rows)
     val cardIndex = roadmapCurrentItemIndex(rows)
-    val visibility = rememberCurrentCardVisibility(listState, cardIndex)
+    val visibility by rememberCurrentCardVisibility(listState, cardIndex)
     val scope = rememberCoroutineScope()
     val current = content.currentLesson
-    // Текущий модуль сменился (урок пройден, открылся следующий): лента сразу встаёт на него.
-    LaunchedEffect(current.moduleId) { listState.scrollToItem(roadmapScrollTarget(rows)) }
+    val animation = rememberRoadmapAnimation(
+        gain = progressGain,
+        reduceMotion = reduceMotion,
+        // Анимация ждёт, пока карточка не окажется на экране, но не дольше трёх секунд (design/home-animations.md, D).
+        awaitVisible = {
+            withTimeoutOrNull(VISIBLE_WAIT_MS) {
+                snapshotFlow { visibility }.first { it == CurrentCardVisibility.Visible }
+            } != null
+        },
+        onUnlocked = onUnlocked,
+        onStarted = { onEvent(HomeUiEvent.ProgressGainStarted) },
+        onFinished = { onEvent(HomeUiEvent.ProgressGainFinished) },
+    )
+    // Текущий модуль сменился (открылся следующий): лента встаёт на него. Возврат с экрана модуля позицию не трогает.
+    var scrolledFor by rememberSaveable { mutableStateOf(current.moduleId) }
+    LaunchedEffect(current.moduleId) {
+        if (scrolledFor != current.moduleId) {
+            listState.scrollToItem(roadmapScrollTarget(rows))
+            scrolledFor = current.moduleId
+        }
+    }
+    // Проявление при первом открытии (A1); при возврате с экрана модуля лента не мигает.
+    var introPlayed by rememberSaveable { mutableStateOf(reduceMotion) }
+    val intro = remember { Animatable(if (introPlayed) 1f else 0f) }
+    LaunchedEffect(Unit) {
+        if (!introPlayed) {
+            intro.animateTo(1f, tween(INTRO_MS, easing = CubicBezierEasing(0.2f, 0f, 0f, 1f)))
+            introPlayed = true
+        }
+    }
+    var pointsUp by remember { mutableStateOf(true) }
+    if (visibility != CurrentCardVisibility.Visible) pointsUp = visibility == CurrentCardVisibility.Above
+    val showFloating = current.kind != HomeCardKind.AllDone && visibility != CurrentCardVisibility.Visible
     Column(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.weight(1f)) {
             ModuleRoadmap(
@@ -145,20 +213,53 @@ private fun HomeLoaded(
                 onModuleClick = { moduleId -> onEvent(HomeUiEvent.ModuleClicked(moduleId)) },
                 onStartLesson = { onEvent(HomeUiEvent.StartLessonClicked) },
                 state = listState,
+                animation = animation,
+                reduceMotion = reduceMotion,
+                modifier = Modifier.graphicsLayer { alpha = intro.value },
             )
-            if (current.kind != HomeCardKind.AllDone && visibility != CurrentCardVisibility.Visible) {
-                RoadmapFloatingLesson(
-                    lessonText = stringResource(Res.string.home_lesson_button, current.lesson.number, current.lesson.titleTt),
-                    pointsUp = visibility == CurrentCardVisibility.Above,
-                    onStart = { onEvent(HomeUiEvent.StartLessonClicked) },
-                    onScrollToCurrent = { scope.launch { listState.animateScrollToItem(cardIndex) } },
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                )
-            }
+            FloatingLesson(
+                visible = showFloating,
+                reduceMotion = reduceMotion,
+                lessonText = stringResource(Res.string.home_lesson_button, current.lesson.number, current.lesson.titleTt),
+                pointsUp = pointsUp,
+                onStart = { onEvent(HomeUiEvent.StartLessonClicked) },
+                onScrollToCurrent = { scope.launch { listState.animateScrollToItem(cardIndex) } },
+                modifier = Modifier.align(Alignment.BottomCenter),
+            )
         }
         HomeBottomBar(selected = HomeNavItem.Home, onItemClick = { item -> onEvent(HomeUiEvent.NavItemClicked(item)) })
     }
 }
+
+/** Плавающая панель появляется и исчезает мягко: затухание и сдвиг на четверть высоты за 200 мс. */
+@Composable
+private fun FloatingLesson(
+    visible: Boolean,
+    reduceMotion: Boolean,
+    lessonText: String,
+    pointsUp: Boolean,
+    onStart: () -> Unit,
+    onScrollToCurrent: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    AnimatedVisibility(
+        visible = visible,
+        modifier = modifier,
+        enter = if (reduceMotion) EnterTransition.None else fadeIn(tween(FLOATING_MS)) + slideInVertically(tween(FLOATING_MS)) { it / 4 },
+        exit = if (reduceMotion) ExitTransition.None else fadeOut(tween(FLOATING_MS)) + slideOutVertically(tween(FLOATING_MS)) { it / 4 },
+    ) {
+        RoadmapFloatingLesson(
+            lessonText = lessonText,
+            pointsUp = pointsUp,
+            onStart = onStart,
+            onScrollToCurrent = onScrollToCurrent,
+        )
+    }
+}
+
+private const val VISIBLE_WAIT_MS = 3_000L
+private const val INTRO_MS = 200
+private const val FLOATING_MS = 200
 
 @Composable
 private fun HomeBottomBar(selected: HomeNavItem, onItemClick: (HomeNavItem) -> Unit) {

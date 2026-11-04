@@ -5,14 +5,17 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import ru.tatarcha.tatlearn.core.common.AutoDismiss
 import ru.tatarcha.tatlearn.core.common.ErrorCodes
 import ru.tatarcha.tatlearn.core.common.LoadState
 import ru.tatarcha.tatlearn.core.common.MviViewModel
 import ru.tatarcha.tatlearn.core.common.errorCode
+import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrMotion
 import ru.tatarcha.tatlearn.domain.HomeContentBuilder
 import ru.tatarcha.tatlearn.domain.HomeProgressTracker
 import ru.tatarcha.tatlearn.domain.model.CourseModule
 import ru.tatarcha.tatlearn.domain.model.LessonProgress
+import ru.tatarcha.tatlearn.domain.model.moduleTitle
 import ru.tatarcha.tatlearn.domain.repository.AuthRepository
 import ru.tatarcha.tatlearn.domain.model.Avatar
 import ru.tatarcha.tatlearn.domain.repository.LessonsRepository
@@ -31,6 +34,8 @@ class HomeViewModel(
         avatar = profile.profile.value?.avatar ?: Avatar.Default,
     ),
 ) {
+
+    private val toastTimer = AutoDismiss(viewModelScope, TamyrMotion.TOAST_VISIBLE_MS)
 
     /** Каталог с сервера и локальный прогресс; главная пересобирается при изменении любого из них. */
     private var catalog: List<CourseModule>? = null
@@ -63,11 +68,29 @@ class HomeViewModel(
                 }
             }
             // Вкладки словаря и соревнований это заглушка-экран 16.
-            is HomeUiEvent.ModuleClicked -> sendEffect(HomeUiEffect.NavigateToModule(event.moduleId))
-            is HomeUiEvent.NavItemClicked -> setState { copy(tab = event.item) }
+            is HomeUiEvent.ModuleClicked -> openModule(event.moduleId)
+            is HomeUiEvent.NavItemClicked -> setState { copy(tab = event.item, toast = null) }
+            HomeUiEvent.ToastDismissed -> hideToast()
             HomeUiEvent.ProgressGainStarted -> (state.value.content as? LoadState.Content)?.let { tracker.commit(it.data) }
             HomeUiEvent.ProgressGainFinished -> setState { copy(progressGain = null) }
         }
+    }
+
+    /** Закрытый модуль не открывается: тост называет модуль, после которого он станет доступен (макет 12, анимации C). */
+    private fun openModule(moduleId: String) {
+        val module = (state.value.content as? LoadState.Content)?.data?.modules?.firstOrNull { it.id == moduleId }
+        if (module != null && module.isLocked) {
+            val after = moduleTitle(module.lockedByTitleTt.orEmpty(), module.lockedByTitleRu.orEmpty())
+            setState { copy(toast = HomeToast.ModuleLocked(after)) }
+            toastTimer.start { setState { copy(toast = null) } }
+        } else {
+            sendEffect(HomeUiEffect.NavigateToModule(moduleId))
+        }
+    }
+
+    private fun hideToast() {
+        toastTimer.cancel()
+        setState { copy(toast = null) }
     }
 
     private fun load() {

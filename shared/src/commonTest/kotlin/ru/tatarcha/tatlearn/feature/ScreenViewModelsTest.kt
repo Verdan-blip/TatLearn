@@ -45,6 +45,7 @@ import ru.tatarcha.tatlearn.feature.auth.EmailError
 import ru.tatarcha.tatlearn.feature.auth.PasswordError
 import ru.tatarcha.tatlearn.feature.auth.SocialProvider
 import ru.tatarcha.tatlearn.feature.home.HomeNavItem
+import ru.tatarcha.tatlearn.feature.home.HomeToast
 import ru.tatarcha.tatlearn.feature.home.HomeUiEffect
 import ru.tatarcha.tatlearn.feature.home.HomeUiEvent
 import ru.tatarcha.tatlearn.domain.HomeProgressTracker
@@ -288,12 +289,27 @@ class ScreenViewModelsTest {
         assertEquals(HomeUiEffect.NavigateToLesson("lesson_3"), vm.effects.first())
     }
 
-    @Test fun moduleClickOpensItsScreenEvenWhenLocked() = runTest {
+    @Test fun openModuleClickOpensItsScreen() = runTest {
         val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth(), FakeProfile(), HomeProgressTracker())
         vm.onEvent(HomeUiEvent.ModuleClicked("food"))
         assertEquals(HomeUiEffect.NavigateToModule("food"), vm.effects.first())
+        assertNull(vm.state.value.toast)
+    }
+
+    @Test fun lockedModuleClickShowsToastWithTheRequiredModule() = runTest {
+        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth(), FakeProfile(), HomeProgressTracker())
         vm.onEvent(HomeUiEvent.ModuleClicked("nature"))
-        assertEquals(HomeUiEffect.NavigateToModule("nature"), vm.effects.first())
+        val toast = vm.state.value.toast as HomeToast.ModuleLocked
+        assertTrue(toast.afterTitle.isNotEmpty())
+        vm.onEvent(HomeUiEvent.ToastDismissed)
+        assertNull(vm.state.value.toast)
+    }
+
+    @Test fun lockedModuleToastDisappearsAfterFiveSeconds() = runTest {
+        val vm = HomeViewModel(HomeLessons(Result.success(catalog())), StatsProgress(), FakeAuth(), FakeProfile(), HomeProgressTracker())
+        vm.onEvent(HomeUiEvent.ModuleClicked("nature"))
+        testScheduler.advanceTimeBy(TamyrMotion.TOAST_VISIBLE_MS + 1)
+        assertNull(vm.state.value.toast)
     }
 
     @Test fun finishedLessonMovesCurrentLessonAndUpdatesProgress() = runTest {

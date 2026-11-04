@@ -59,8 +59,13 @@ fun RoadmapCurrentCard(
     totalModules: Int,
     onStart: () -> Unit,
     modifier: Modifier = Modifier,
+    animation: RoadmapAnimation? = null,
 ) {
     val module = entry.module
+    val lit = animation?.takeIf { it.isLessonGain }
+    val litFrom = lit?.gain?.card?.fromCompleted
+    val shownDone = litFrom ?: module.completedLessons
+    val shownCounter = if (lit != null && !lit.counterReached) shownDone else module.completedLessons
     val title = moduleTitle(module.titleTt, module.titleRu)
     val description = stringResource(
         Res.string.roadmap_module_current_description,
@@ -71,80 +76,93 @@ fun RoadmapCurrentCard(
         module.totalLessons,
     )
     val isStart = module.completedLessons == 0
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .solidShadow(TamyrTheme.colors.gold, CardShadow, TamyrTheme.shapes.roadmapCard)
-            .clip(TamyrTheme.shapes.roadmapCard)
-            .background(TamyrTheme.colors.surface)
-            .border(TamyrSizes.borderAccent, TamyrTheme.colors.gold, TamyrTheme.shapes.roadmapCard)
-            .semantics { contentDescription = description },
-    ) {
-        CardBand(entry = entry)
+    Box(modifier = modifier.fillMaxWidth()) {
         Column(
-            modifier = Modifier.padding(
-                start = TamyrTheme.spacing.l,
-                end = TamyrTheme.spacing.l,
-                top = TamyrTheme.spacing.m,
-                bottom = TamyrTheme.spacing.l,
-            ),
-            verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.m),
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(if (animation != null && (animation.isLessonGain || animation.isModuleDone)) Modifier.gainRing(animation, TamyrTheme.shapes.roadmapCard) else Modifier)
+                .solidShadow(TamyrTheme.colors.gold, CardShadow, TamyrTheme.shapes.roadmapCard)
+                .clip(TamyrTheme.shapes.roadmapCard)
+                .background(TamyrTheme.colors.surface)
+                .border(TamyrSizes.borderAccent, TamyrTheme.colors.gold, TamyrTheme.shapes.roadmapCard)
+                .semantics { contentDescription = description },
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+            CardBand(entry = entry)
+            Column(
+                modifier = Modifier.padding(
+                    start = TamyrTheme.spacing.l,
+                    end = TamyrTheme.spacing.l,
+                    top = TamyrTheme.spacing.m,
+                    bottom = TamyrTheme.spacing.l,
+                ),
+                verticalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.m),
             ) {
-                Text(
-                    text = title,
-                    style = TamyrTheme.typography.title22,
-                    color = TamyrTheme.colors.textPrimary,
-                    modifier = Modifier.weight(1f),
-                )
-                Text(
-                    text = stringResource(if (isStart) Res.string.roadmap_tag_start else Res.string.roadmap_tag_continue),
-                    style = TamyrTheme.typography.tag,
-                    color = TamyrTheme.colors.onPrimary,
-                    modifier = Modifier
-                        .padding(start = TamyrTheme.spacing.s)
-                        .clip(TamyrTheme.shapes.tag)
-                        .background(TamyrTheme.colors.primary)
-                        .padding(horizontal = TamyrTheme.spacing.s, vertical = TamyrTheme.spacing.xxs / 2),
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                EchpochmakRow(
-                    done = module.completedLessons,
-                    total = module.totalLessons,
-                    iconSize = TamyrSizes.echpochmakCard,
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.xxs)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     Text(
-                        text = stringResource(Res.string.roadmap_fraction, module.completedLessons, module.totalLessons),
-                        style = TamyrTheme.typography.body15Bold,
+                        text = title,
+                        style = TamyrTheme.typography.title22,
                         color = TamyrTheme.colors.textPrimary,
+                        modifier = Modifier.weight(1f),
                     )
                     Text(
-                        text = stringResource(Res.string.roadmap_lessons_unit),
-                        style = TamyrTheme.typography.body15,
+                        text = stringResource(if (isStart) Res.string.roadmap_tag_start else Res.string.roadmap_tag_continue),
+                        style = TamyrTheme.typography.tag,
+                        color = TamyrTheme.colors.onPrimary,
+                        modifier = Modifier
+                            .padding(start = TamyrTheme.spacing.s)
+                            .clip(TamyrTheme.shapes.tag)
+                            .background(TamyrTheme.colors.primary)
+                            .padding(horizontal = TamyrTheme.spacing.s, vertical = TamyrTheme.spacing.xxs / 2),
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    EchpochmakRow(
+                        done = shownDone,
+                        total = module.totalLessons,
+                        iconSize = TamyrSizes.echpochmakCard,
+                        litIndex = litFrom,
+                        animation = lit,
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(TamyrTheme.spacing.xxs)) {
+                        Text(
+                            text = stringResource(Res.string.roadmap_fraction, shownCounter, module.totalLessons),
+                            style = TamyrTheme.typography.body15Bold,
+                            color = TamyrTheme.colors.textPrimary,
+                        )
+                        Text(
+                            text = stringResource(Res.string.roadmap_lessons_unit),
+                            style = TamyrTheme.typography.body15,
+                            color = TamyrTheme.colors.textSecondary,
+                        )
+                    }
+                }
+                if (current.restartsLesson) {
+                    Text(
+                        text = stringResource(Res.string.home_lesson_restart_hint),
+                        style = TamyrTheme.typography.caption13,
                         color = TamyrTheme.colors.textSecondary,
                     )
                 }
-            }
-            if (current.restartsLesson) {
-                Text(
-                    text = stringResource(Res.string.home_lesson_restart_hint),
-                    style = TamyrTheme.typography.caption13,
-                    color = TamyrTheme.colors.textSecondary,
+                TamyrButton(
+                    text = stringResource(Res.string.home_lesson_button, current.lesson.number, current.lesson.titleTt),
+                    onClick = onStart,
                 )
             }
-            TamyrButton(
-                text = stringResource(Res.string.home_lesson_button, current.lesson.number, current.lesson.titleTt),
-                onClick = onStart,
+        }
+        if (lit != null) {
+            RoadmapGainChip(
+                animation = lit,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = TamyrSizes.roadmapBand - TamyrTheme.spacing.s, end = TamyrTheme.spacing.l),
             )
         }
     }

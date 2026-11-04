@@ -149,6 +149,8 @@
     <string name="roadmap_module_locked_description">%1$s, модуль %2$d из %3$d, закрыт</string>
     <string name="roadmap_to_current_up">К текущему модулю, вверх</string>
     <string name="roadmap_to_current_down">К текущему модулю, вниз</string>
+    <string name="roadmap_locked_toast">Пока закрыто · Откроется после «%1$s»</string>
+    <string name="roadmap_gain_chip">+1 урок</string>
     <string name="roadmap_finish_title">Финиш A1</string>
     <string name="roadmap_finish_next">Дальше: A2 · готовим, без сроков</string>
     <string name="roadmap_done_title">A1 тәмам · Курс пройден</string>

@@ -50,6 +50,7 @@ internal class RecordingHaptics : Haptics {
     override fun correct() { events += "correct" }
     override fun wrong() { events += "wrong" }
     override fun celebrate() { events += "celebrate" }
+    override fun unlocked() { events += "unlocked" }
 }
 
 /** Записывает смысловые звуки вместо воспроизведения. */
