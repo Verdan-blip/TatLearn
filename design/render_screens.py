@@ -63,6 +63,8 @@ def main():
     try:
         shutil.copy(os.path.join(ROOT, "support.js"), work)
         shutil.copytree(os.path.join(ROOT, "icons"), os.path.join(work, "icons"))
+        # Картинки маскота (PNG) подключены в макете относительными путями, поэтому нужны и во временной папке рендера.
+        shutil.copytree(os.path.join(ROOT, "mascot", "png"), os.path.join(work, "mascot", "png"))
         page = open(SRC, encoding="utf-8").read().replace("</body>", COLLECT, 1)
         page = page.replace("</head>", "<style>html,body{background:transparent !important}</style></head>", 1)
         open(os.path.join(work, "page.html"), "w", encoding="utf-8").write(page)
