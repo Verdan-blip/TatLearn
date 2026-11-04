@@ -20,3 +20,6 @@ node_modules/
 
 # Черновики иконки (пересоздаются скриптом design/icon/generate_icon_drafts.py)
 design/icon/drafts/
+
+# Личные настройки Claude Code (права только для этого компьютера)
+.claude/settings.local.json
