@@ -74,7 +74,6 @@ fun ModuleRoadmap(
                     to = row.entrySide(),
                     passed = index > 0 && rows[index - 1].lastState() == ModuleState.Done,
                     reveal = if (toCurrent) ({ animation.trail.value }) else ({ 1f }),
-                    catProgress = if (toCurrent && animation.catVisible) ({ animation.cat.value }) else ({ null }),
                     pulsing = toCurrent && pulsing,
                 )
             }

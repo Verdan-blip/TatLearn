@@ -26,7 +26,7 @@ private val InOut = CubicBezierEasing(0.42f, 0f, 0.58f, 1f)
  * Анимация главной после урока (design/home-animations.md, D и E). Две формы одного прироста:
  * [isLessonGain]: прибавился урок в текущем модуле, эчпочмак «румянится», счётчик меняется, всплывает «+1 урок»;
  * [isModuleDone]: модуль закончен, на его плитке опускается печать «Тәмам», тропа до нового модуля заливается золотом,
- * по ней едет Мыраужан, у новой карточки вспыхивает кольцо и срабатывает один лёгкий гаптик.
+ * у новой карточки вспыхивает кольцо и срабатывает один лёгкий гаптик.
  * Пока [running] ложно, лента показывает обычное состояние; одновременно идёт одна анимация.
  */
 @Stable
@@ -49,10 +49,6 @@ class RoadmapAnimation(val gain: ProgressGain?, private val reduceMotion: Boolea
 
     /** Сколько ромбов тропы до нового модуля уже золотые, 0..1. */
     val trail = Animatable(if (isModuleDone) 0f else 1f)
-
-    /** Положение Мыраужана на тропе, 0..1; null пока кот не выехал или уже приехал. */
-    val cat = Animatable(0f)
-    var catVisible by mutableStateOf(false)
 
     var running by mutableStateOf(gain != null)
         private set
@@ -105,12 +101,7 @@ class RoadmapAnimation(val gain: ProgressGain?, private val reduceMotion: Boolea
         delay(TamyrMotion.GAIN_DELAY_MS.toLong())
         stamp.animateTo(1f, tween(STAMP_MS, easing = CubicBezierEasing(0.2f, 0f, 0f, 1f)))
         delay(STAMP_GAP_MS)
-        catVisible = true
-        coroutineScope {
-            launch { trail.animateTo(1f, tween(TRAIL_MS, easing = InOut)) }
-            cat.animateTo(1f, tween(TRAIL_MS, easing = InOut))
-        }
-        catVisible = false
+        trail.animateTo(1f, tween(TRAIL_MS, easing = InOut))
         onUnlocked()
         ring.animateTo(1f, tween(TamyrMotion.GAIN_RING_IN_MS))
         delay(RING_HOLD_MS)
@@ -134,7 +125,6 @@ class RoadmapAnimation(val gain: ProgressGain?, private val reduceMotion: Boolea
         sparks.snapTo(0f)
         stamp.snapTo(1f)
         trail.snapTo(1f)
-        catVisible = false
         counterReached = true
         running = false
     }

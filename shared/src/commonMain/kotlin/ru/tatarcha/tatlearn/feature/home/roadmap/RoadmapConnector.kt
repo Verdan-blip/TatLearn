@@ -12,24 +12,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlin.math.abs
-import org.jetbrains.compose.resources.imageResource
 import ru.tatarcha.tatlearn.core.designsystem.component.PreviewFrame
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrSizes
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
-import tatlearn.shared.generated.resources.Res
-import tatlearn.shared.generated.resources.mascot_greeting
 
 private val DiamondStep = 15.dp
-private val CatSize = 62.dp
 private const val PULSE_COUNT = 3
 private const val PULSE_CYCLE_MS = 1_200
 private const val PULSE_PHASE_STEP = 0.1667f
@@ -39,7 +32,7 @@ private const val PULSE_MAX_SCALE = 1.1f
 
 /**
  * Тропа из ромбов между рядами ленты: плавная S-кривая от [from] к [to]. Пройденный участок золотой, будущий контурный.
- * [reveal] (0..1) показывает, какая доля ромбов уже золотая, пока тропа заливается после модуля; [catProgress] ведёт по ней Мыраужана;
+ * [reveal] (0..1) показывает, какая доля ромбов уже золотая, пока тропа заливается после модуля;
  * [pulsing] включает «волну к цели» на последних трёх ромбах перед карточкой текущего модуля.
  * Тропа это декор: без нажатий и не читается скринридером.
  */
@@ -50,13 +43,11 @@ fun RoadmapConnector(
     passed: Boolean,
     modifier: Modifier = Modifier,
     reveal: () -> Float = { 1f },
-    catProgress: () -> Float? = { null },
     pulsing: Boolean = false,
 ) {
     val filled = TamyrTheme.colors.gold
     val outline = TamyrTheme.colors.contour
     val cycle: State<Float>? = if (pulsing) rememberPulseCycle() else null
-    val catImage = if (catProgress() != null) imageResource(Res.drawable.mascot_greeting) else null
     Canvas(
         modifier = modifier
             .fillMaxWidth()
@@ -90,16 +81,6 @@ fun RoadmapConnector(
             }
             distance += step
             index++
-        }
-        val progress = catProgress()
-        if (progress != null && catImage != null) {
-            val position: Offset = measure.getPosition(measure.length * progress)
-            val side = CatSize.toPx()
-            drawImage(
-                image = catImage,
-                dstOffset = IntOffset((position.x - side / 2).toInt(), (position.y - side * 0.7f).toInt()),
-                dstSize = IntSize(side.toInt(), side.toInt()),
-            )
         }
     }
 }
@@ -140,7 +121,7 @@ private fun RoadmapConnectorAheadPreview() = PreviewFrame {
     )
 }
 
-@Preview(name = "Half revealed with the cat")
+@Preview(name = "Half revealed")
 @Composable
 private fun RoadmapConnectorRevealPreview() = PreviewFrame {
     RoadmapConnector(
@@ -148,6 +129,5 @@ private fun RoadmapConnectorRevealPreview() = PreviewFrame {
         to = TrailSide.Right,
         passed = true,
         reveal = { 0.5f },
-        catProgress = { 0.5f },
     )
 }
