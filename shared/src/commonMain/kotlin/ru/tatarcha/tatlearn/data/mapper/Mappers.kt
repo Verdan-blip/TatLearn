@@ -7,9 +7,11 @@ import ru.tatarcha.tatlearn.data.remote.dto.SessionDto
 import ru.tatarcha.tatlearn.domain.model.CourseModule
 import ru.tatarcha.tatlearn.domain.model.Lesson
 import ru.tatarcha.tatlearn.domain.model.LessonContent
+import ru.tatarcha.tatlearn.domain.model.LessonRule
 import ru.tatarcha.tatlearn.domain.model.ListeningTask
 import ru.tatarcha.tatlearn.domain.model.MatchingExercise
 import ru.tatarcha.tatlearn.domain.model.QuizQuestion
+import ru.tatarcha.tatlearn.domain.model.RuleExample
 import ru.tatarcha.tatlearn.domain.model.SentenceTask
 import ru.tatarcha.tatlearn.domain.model.TranslationTask
 import ru.tatarcha.tatlearn.domain.model.UserSession
@@ -26,6 +28,7 @@ fun LessonContentDto.toDomain() = LessonContent(
     listening = listening.map { ListeningTask(it.audioUrl, it.options, it.correctIndex, it.explanation) },
     sentences = sentences.map { SentenceTask(it.promptRu, it.wordBank, it.answer, it.explanation, it.wordAudio, it.audioUrl) },
     translations = translations.map { TranslationTask(it.promptRu, it.acceptedAnswers, it.audioUrl, it.explanation) },
+    rule = rule?.let { LessonRule(it.title, it.text, it.examples.map { example -> RuleExample(example.tatar, example.russian, example.highlight, example.audioUrl) }) },
 )
 
 fun SessionDto.toDomain() = UserSession(name, email)

@@ -66,6 +66,7 @@ class LessonViewModel(
             is LessonUiEvent.TextChanged -> if (state.value.feedback == null) setState { copy(input = StepInput.Translation(event.value)) }
             is LessonUiEvent.LetterClicked -> onLetter(event.letter)
             is LessonUiEvent.PlayAudioClicked -> playAudio(event.slow)
+            is LessonUiEvent.PlayWordClicked -> playWord(event.url)
             LessonUiEvent.CheckClicked -> check()
             LessonUiEvent.ContinueClicked -> next()
             LessonUiEvent.CloseClicked -> setState { copy(showExitDialog = true) }
@@ -103,6 +104,7 @@ class LessonViewModel(
         is ExerciseStep.Quiz, is ExerciseStep.Listening -> StepInput.Choice()
         is ExerciseStep.SentenceBuilder -> StepInput.Sentence()
         is ExerciseStep.Translation -> StepInput.Translation()
+        is ExerciseStep.WordIntro, is ExerciseStep.Rule -> StepInput.None
     }
 
     // endregion
@@ -186,7 +188,10 @@ class LessonViewModel(
     /** Путь озвучки с учётом выбранного в профиле голоса диктора. */
     private fun voiced(url: String) = narrator.voice.value.resolve(url)
 
-    private fun playWord(url: String) = player.play(voiced(url))
+    private fun playWord(url: String) {
+        setState { copy(lastWordUrl = url) }
+        player.play(voiced(url))
+    }
 
     // region проверка
 
@@ -226,8 +231,12 @@ class LessonViewModel(
 
     private fun finishStep(correct: Boolean, feedback: StepFeedback) {
         val step = state.value.step ?: return
-        checkedSteps++
-        if (correct) correctSteps++ else mistakeIds += step.id
+        val retry = isRetry(step)
+        // Вернувшееся слово (повтор после ошибки) не влияет на точность, XP и список ошибок: это тренировка, а не новая попытка.
+        if (!retry) {
+            checkedSteps++
+            if (correct) correctSteps++ else mistakeIds += step.id
+        }
         player.stop()
         // Вибро и звук следуют за панелью ответа (feedback.isCorrect), а не за учётом точности (correct): в сопоставлении
         // шаг с ошибкой портит точность, но панель показывает успех, и отклик не должен ей противоречить.
@@ -235,6 +244,11 @@ class LessonViewModel(
         // наложения нет. На тапы и пары звуков нет.
         if (feedback.isCorrect) haptics.correct() else haptics.wrong()
         if (feedback.isCorrect) sounds.correct() else sounds.wrong()
+        if (retry) {
+            setState { copy(feedback = feedback) }
+            return
+        }
+        if (!correct) scheduleRetry(step)
         viewModelScope.launch {
             val outcome = progress.recordExerciseResult(ExerciseResult(key.lessonId, step.type, if (correct) 1 else 0, 1))
             xpEarned += outcome.xpEarned
@@ -243,9 +257,31 @@ class LessonViewModel(
         }
     }
 
+    private fun isRetry(step: ExerciseStep): Boolean = (step as? ExerciseStep.Quiz)?.isRetry == true || (step as? ExerciseStep.Listening)?.isRetry == true
+
+    /**
+     * Слово, на котором ошиблись в квизе или аудировании, возвращается в этом же уроке через несколько шагов (макет 54).
+     * В «повторе ошибок» (заданы `stepIds`) не возвращается: пользователь уже повторяет ошибки.
+     */
+    private fun scheduleRetry(step: ExerciseStep) {
+        if (key.stepIds.isNotEmpty()) return
+        val retryStep = when (step) {
+            is ExerciseStep.Quiz -> step.copy(id = "${step.id}-retry", isRetry = true)
+            is ExerciseStep.Listening -> step.copy(id = "${step.id}-retry", isRetry = true)
+            else -> return
+        }
+        setState {
+            val at = minOf(stepIndex + 1 + RETRY_GAP, steps.size)
+            copy(steps = steps.toMutableList().apply { add(at, retryStep) })
+        }
+    }
+
     private fun next() {
         val current = state.value
-        if (current.feedback == null) return
+        val step = current.step ?: return
+        // Карточки слов и правила проверки не имеют: «Дальше» работает сразу.
+        val needsFeedback = step !is ExerciseStep.WordIntro && step !is ExerciseStep.Rule
+        if (needsFeedback && current.feedback == null) return
         val lastStep = current.stepIndex >= current.steps.lastIndex
         if (lastStep) {
             finishLesson()
@@ -271,6 +307,8 @@ class LessonViewModel(
 
     private companion object {
         const val WRONG_FLASH_MS = 700L
+        /** Сколько шагов проходит между ошибкой и возвратом слова (учитель: через 3–5). */
+        const val RETRY_GAP = 3
         const val SLOW_RATE = 0.75f
         const val MILLIS_PER_SECOND = 1000
         const val CODE_EMPTY_LESSON = "NO_EXERCISES"

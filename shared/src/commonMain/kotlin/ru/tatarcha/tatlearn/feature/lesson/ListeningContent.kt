@@ -13,12 +13,15 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.tatarcha.tatlearn.core.audio.AudioPlayerState
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrCard
+import ru.tatarcha.tatlearn.core.designsystem.component.TamyrTagKind
 import ru.tatarcha.tatlearn.core.designsystem.component.exercise.AnswerOption
 import ru.tatarcha.tatlearn.core.designsystem.component.exercise.SlowPlayLink
 import ru.tatarcha.tatlearn.core.designsystem.component.exercise.WavePlayButton
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import ru.tatarcha.tatlearn.domain.exercise.ExerciseStep
 import tatlearn.shared.generated.resources.Res
+import tatlearn.shared.generated.resources.lesson_retry_hint
+import tatlearn.shared.generated.resources.lesson_retry_tag
 import tatlearn.shared.generated.resources.listening_audio_error
 import tatlearn.shared.generated.resources.listening_play_description
 import tatlearn.shared.generated.resources.listening_slower
@@ -36,7 +39,12 @@ fun ListeningContent(
 ) {
     val spacing = TamyrTheme.spacing
     val task = step.task
-    ExerciseTitle(title = stringResource(Res.string.listening_title), tag = stringResource(Res.string.listening_tag))
+    ExerciseTitle(
+        title = stringResource(Res.string.listening_title),
+        tag = stringResource(if (step.isRetry) Res.string.lesson_retry_tag else Res.string.listening_tag),
+        tagKind = if (step.isRetry) TamyrTagKind.Gold else TamyrTagKind.Success,
+        subtitle = if (step.isRetry) stringResource(Res.string.lesson_retry_hint) else null,
+    )
     Column(Modifier.padding(horizontal = spacing.screen).padding(top = spacing.l)) {
         TamyrCard(Modifier.fillMaxWidth(), contentPadding = 26.dp) {
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(18.dp), horizontalAlignment = Alignment.CenterHorizontally) {

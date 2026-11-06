@@ -20,11 +20,15 @@ import tatlearn.shared.generated.resources.pt_sans_regular
 @Immutable
 data class TamyrTypography(
     val headline32: TextStyle,
+    /** Слово на карточке нового слова. */
+    val display40: TextStyle,
     val display30: TextStyle,
     val headline26: TextStyle,
     val headline24: TextStyle,
     val title22: TextStyle,
     val title20: TextStyle,
+    /** Перевод на карточке нового слова. */
+    val body20: TextStyle,
     val title19: TextStyle,
     val title18: TextStyle,
     val body17: TextStyle,
@@ -65,11 +69,13 @@ fun tamyrTypography(family: FontFamily): TamyrTypography {
     )
     return TamyrTypography(
         headline32 = style(32, bold = true, lineHeightEm = 1.15f),
+        display40 = style(40, bold = true, lineHeightEm = 1.12f),
         display30 = style(30, bold = true, lineHeightEm = 1.15f),
         headline26 = style(26, bold = true),
         headline24 = style(24, bold = true),
         title22 = style(22, bold = true),
         title20 = style(20, bold = true),
+        body20 = style(20),
         title19 = style(19, bold = true),
         title18 = style(18, bold = true),
         body17 = style(17),

@@ -69,4 +69,5 @@ data class LessonContent(
     val listening: List<ListeningTask>,
     val sentences: List<SentenceTask>,
     val translations: List<TranslationTask>,
+    val rule: LessonRule? = null,
 )

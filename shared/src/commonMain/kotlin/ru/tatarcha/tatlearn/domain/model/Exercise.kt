@@ -3,7 +3,7 @@ package ru.tatarcha.tatlearn.domain.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class ExerciseType { Matching, Quiz, Listening, SentenceBuilder, Translation }
+enum class ExerciseType { Matching, Quiz, Listening, SentenceBuilder, Translation, Intro, Rule }
 
 /**
  * Татарские слова в упражнениях — данные, и их нужно проверить носителем (см. флаги в JSON уроков).
@@ -40,5 +40,11 @@ data class SentenceTask(
     val wordAudio: Map<String, String> = emptyMap(),
     val audioUrl: String? = null,
 )
+
+/** Пример на карточке-правиле: [highlight] это окончание, которое подчёркивается в [tatar]; [audioUrl] озвучивает фразу. */
+data class RuleExample(val tatar: String, val russian: String, val highlight: String? = null, val audioUrl: String? = null)
+
+/** Мини-правило урока (карточка перед упражнениями): одна мысль в [text] и примеры. Содержимое: needs native-speaker review. */
+data class LessonRule(val title: String, val text: String, val examples: List<RuleExample>)
 
 data class TranslationTask(val promptRu: String, val acceptedAnswers: List<String>, val audioUrl: String?, val explanation: String? = null)

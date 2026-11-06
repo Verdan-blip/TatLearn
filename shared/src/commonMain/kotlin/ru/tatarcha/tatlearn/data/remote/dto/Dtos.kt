@@ -64,6 +64,12 @@ data class TranslationTaskDto(
 )
 
 @Serializable
+data class RuleExampleDto(val tatar: String, val russian: String, val highlight: String? = null, val audioUrl: String? = null)
+
+@Serializable
+data class LessonRuleDto(val title: String, val text: String, val examples: List<RuleExampleDto> = emptyList())
+
+@Serializable
 data class LessonContentDto(
     val lesson: LessonDto,
     /** Контент написан без носителя языка; перед релизом его нужно проверить. */
@@ -73,6 +79,7 @@ data class LessonContentDto(
     val listening: List<ListeningTaskDto>,
     val sentences: List<SentenceTaskDto>,
     val translations: List<TranslationTaskDto>,
+    val rule: LessonRuleDto? = null,
 )
 
 @Serializable

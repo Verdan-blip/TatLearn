@@ -12,6 +12,9 @@ import ru.tatarcha.tatlearn.navigation.ResultKey
 
 /** Что пользователь уже ввёл на текущем шаге; по одному варианту на каждый вид упражнения. */
 sealed interface StepInput {
+    /** Карточки новых слов и правила: ввода нет. */
+    data object None : StepInput
+
     /** Квиз и аудирование: индекс выбранного варианта. */
     data class Choice(val selected: Int? = null) : StepInput
 
@@ -53,6 +56,8 @@ data class LessonUiState(
     val input: StepInput = StepInput.Choice(),
     val feedback: StepFeedback? = null,
     val audio: AudioPlayerState = AudioPlayerState.Idle,
+    /** Путь последней озвученной карточкой записи: по нему видно, какая кнопка звука или чип сейчас играет. */
+    val lastWordUrl: String? = null,
     val showExitDialog: Boolean = false,
 ) : UiState {
     val step: ExerciseStep? get() = steps.getOrNull(stepIndex)
@@ -72,6 +77,7 @@ sealed interface LessonUiEvent : UiEvent {
     data class TextChanged(val value: TextFieldValue) : LessonUiEvent
     data class LetterClicked(val letter: String) : LessonUiEvent
     data class PlayAudioClicked(val slow: Boolean = false) : LessonUiEvent
+    data class PlayWordClicked(val url: String) : LessonUiEvent
     data object CheckClicked : LessonUiEvent
     data object ContinueClicked : LessonUiEvent
     data object CloseClicked : LessonUiEvent

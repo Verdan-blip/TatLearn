@@ -40,6 +40,7 @@ import ru.tatarcha.tatlearn.core.designsystem.component.ErrorState
 import ru.tatarcha.tatlearn.core.designsystem.component.LoadingState
 import ru.tatarcha.tatlearn.core.designsystem.component.PreviewFrame
 import ru.tatarcha.tatlearn.core.designsystem.component.exercise.AnswerFeedback
+import ru.tatarcha.tatlearn.core.designsystem.component.exercise.ExerciseContinueBar
 import ru.tatarcha.tatlearn.core.designsystem.component.exercise.ExerciseFooter
 import ru.tatarcha.tatlearn.core.designsystem.component.exercise.ExerciseHeader
 import ru.tatarcha.tatlearn.core.designsystem.component.TamyrConfirmSheet
@@ -56,6 +57,9 @@ import tatlearn.shared.generated.resources.exercise_exit_stay
 import tatlearn.shared.generated.resources.exercise_exit_title
 import tatlearn.shared.generated.resources.exercise_spell_hint
 import tatlearn.shared.generated.resources.exercise_xp_gain
+import tatlearn.shared.generated.resources.lesson_intro_next
+import tatlearn.shared.generated.resources.lesson_intro_start
+import tatlearn.shared.generated.resources.lesson_rule_continue
 
 @Composable
 fun LessonRoute(
@@ -137,10 +141,17 @@ private fun ExerciseFrame(state: LessonUiState, onEvent: (LessonUiEvent) -> Unit
                     is ExerciseStep.Listening -> ListeningContent(step, state.input as StepInput.Choice, feedback, state.audio, onEvent)
                     is ExerciseStep.SentenceBuilder -> SentenceContent(step, state.input as StepInput.Sentence, feedback, onEvent)
                     is ExerciseStep.Translation -> TranslationContent(step, state.input as StepInput.Translation, feedback, state.audio, onEvent)
+                    is ExerciseStep.WordIntro -> IntroWordContent(step, state.playingUrl(), onEvent)
+                    is ExerciseStep.Rule -> RuleContent(step, state.playingUrl(), onEvent)
                 }
             }
         }
-        ExerciseFooter(
+        if (step is ExerciseStep.WordIntro || step is ExerciseStep.Rule) {
+            ExerciseContinueBar(
+                text = stringResource(introButtonText(step)),
+                onClick = { onEvent(LessonUiEvent.ContinueClicked) },
+            )
+        } else ExerciseFooter(
             feedback = when {
                 feedback == null -> AnswerFeedback.None
                 feedback.isCorrect -> AnswerFeedback.Correct
@@ -178,7 +189,17 @@ private fun LessonUiState.canCheck(): Boolean {
         is StepInput.Matching -> false
         is StepInput.Sentence -> (step as? ExerciseStep.SentenceBuilder)?.let { input.placed.size == it.task.answer.size } ?: false
         is StepInput.Translation -> input.value.text.isNotBlank()
+        StepInput.None -> false
     }
+}
+
+/** Какая запись сейчас звучит: из последнего нажатия на слово, пока плеер играет. */
+private fun LessonUiState.playingUrl(): String? = lastWordUrl.takeIf { audio == AudioPlayerState.Playing }
+
+private fun introButtonText(step: ExerciseStep) = when {
+    step is ExerciseStep.Rule -> Res.string.lesson_rule_continue
+    (step as? ExerciseStep.WordIntro)?.isLast == true -> Res.string.lesson_intro_start
+    else -> Res.string.lesson_intro_next
 }
 
 // region Превью

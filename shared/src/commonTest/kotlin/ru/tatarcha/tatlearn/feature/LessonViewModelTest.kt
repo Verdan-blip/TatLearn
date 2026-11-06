@@ -121,10 +121,53 @@ class LessonViewModelTest {
 
     @Test fun loadsAndPlansAllSteps() = runTest {
         val vm = viewModel()
-        // Аудирование без audioUrl не планируется (MVP), поэтому 5 шагов, а не 6.
-        assertEquals(5, vm.state.value.steps.size)
+        // Аудирование без audioUrl не планируется (MVP): 3 карточки слов и 5 упражнений, а не 6.
+        assertEquals(8, vm.state.value.steps.size)
         assertIs<LoadState.Content<Unit>>(vm.state.value.load)
+        assertIs<ExerciseStep.WordIntro>(vm.step())
+    }
+
+    @Test fun introCardsMoveOnWithoutACheckAndDoNotTouchAccuracyOrXp() = runTest {
+        val vm = viewModel()
+        repeat(3) { vm.onEvent(LessonUiEvent.ContinueClicked) }
         assertIs<ExerciseStep.Matching>(vm.step())
+        assertTrue(progress.recorded.isEmpty())
+        assertEquals(StepInput.Matching(), vm.state.value.input)
+    }
+
+    @Test fun introCardPlaysItsWordWithTheChosenVoiceAndRemembersTheUrl() = runTest {
+        val vm = viewModel()
+        vm.onEvent(LessonUiEvent.PlayWordClicked("https://x/ipi.m4a"))
+        assertEquals(listOf("https://x/ipi.m4a"), audio.urls)
+        assertEquals("https://x/ipi.m4a", vm.state.value.lastWordUrl)
+    }
+
+    private fun quizOnlyLessons() = FakeLessons(
+        Result.success(testLessonContent().copy(matching = MatchingExercise(emptyList()), listening = emptyList(), sentences = emptyList(), translations = emptyList())),
+    )
+
+    @Test fun wrongQuizWordReturnsLaterInTheSameLessonWithoutChangingAccuracy() = runTest {
+        val vm = viewModel(lessons = quizOnlyLessons())
+        assertEquals(listOf("quiz-0", "quiz-1"), vm.state.value.steps.map { it.id })
+        vm.onEvent(LessonUiEvent.OptionSelected(1)); vm.onEvent(LessonUiEvent.CheckClicked) // quiz-0 неверно (правильный индекс 0)
+        assertEquals(listOf("quiz-0", "quiz-1", "quiz-0-retry"), vm.state.value.steps.map { it.id })
+        assertTrue((vm.state.value.steps.last() as ExerciseStep.Quiz).isRetry)
+        vm.onEvent(LessonUiEvent.ContinueClicked)
+        vm.onEvent(LessonUiEvent.OptionSelected(1)); vm.onEvent(LessonUiEvent.CheckClicked) // quiz-1 верно
+        vm.onEvent(LessonUiEvent.ContinueClicked)
+        vm.onEvent(LessonUiEvent.OptionSelected(1)); vm.onEvent(LessonUiEvent.CheckClicked) // повтор снова неверно
+        assertEquals(false, vm.state.value.feedback!!.isCorrect)
+        assertEquals(2, progress.recorded.size) // повтор не записан: ни точности, ни XP
+        vm.onEvent(LessonUiEvent.ContinueClicked)
+        val result = (vm.effects.first() as LessonUiEffect.NavigateToResult).key
+        assertEquals(50, result.accuracyPercent)
+        assertEquals(listOf("quiz-0"), result.mistakeStepIds)
+    }
+
+    @Test fun mistakesRunDoesNotScheduleRetries() = runTest {
+        val vm = viewModel(listOf("quiz-0"), quizOnlyLessons())
+        vm.onEvent(LessonUiEvent.OptionSelected(1)); vm.onEvent(LessonUiEvent.CheckClicked)
+        assertEquals(listOf("quiz-0"), vm.state.value.steps.map { it.id })
     }
 
     @Test fun loadFailureShowsErrorCode() = runTest {

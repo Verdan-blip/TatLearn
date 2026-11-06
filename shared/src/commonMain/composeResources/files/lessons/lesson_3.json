@@ -6,6 +6,14 @@
     "titleRu": "Еда и напитки"
   },
   "needsNativeReview": true,
+  "rule": {
+    "title": "«Я» прячется в конце глагола",
+    "text": "Окончание -м после основы глагола значит «я»: чәй эчәм, «я пью чай».",
+    "examples": [
+      { "tatar": "Мин чәй эчәм.", "russian": "Я пью чай.", "highlight": "м", "audioUrl": "audio/min_chay_echam.m4a" },
+      { "tatar": "Мин алма ашыйм.", "russian": "Я ем яблоко.", "highlight": "м", "audioUrl": "audio/min_alma_ashyym.m4a" }
+    ]
+  },
   "matching": {
     "pairs": [
       {

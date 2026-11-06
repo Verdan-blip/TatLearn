@@ -20,6 +20,8 @@ import ru.tatarcha.tatlearn.core.designsystem.component.exercise.PlayButton
 import ru.tatarcha.tatlearn.core.designsystem.theme.TamyrTheme
 import ru.tatarcha.tatlearn.domain.exercise.ExerciseStep
 import tatlearn.shared.generated.resources.Res
+import tatlearn.shared.generated.resources.lesson_retry_hint
+import tatlearn.shared.generated.resources.lesson_retry_tag
 import tatlearn.shared.generated.resources.listening_play_description
 import tatlearn.shared.generated.resources.quiz_tag_new_word
 import tatlearn.shared.generated.resources.quiz_title
@@ -37,8 +39,13 @@ fun QuizContent(
     val spacing = TamyrTheme.spacing
     ExerciseTitle(
         title = stringResource(Res.string.quiz_title),
-        tag = if (q.isNewWord) stringResource(Res.string.quiz_tag_new_word) else null,
-        tagKind = TamyrTagKind.Error,
+        tag = when {
+            step.isRetry -> stringResource(Res.string.lesson_retry_tag)
+            q.isNewWord -> stringResource(Res.string.quiz_tag_new_word)
+            else -> null
+        },
+        tagKind = if (step.isRetry) TamyrTagKind.Gold else TamyrTagKind.Error,
+        subtitle = if (step.isRetry) stringResource(Res.string.lesson_retry_hint) else null,
     )
     Column(Modifier.padding(horizontal = spacing.screen).padding(top = spacing.l)) {
         TamyrCard(Modifier.fillMaxWidth(), contentPadding = 22.dp) {
