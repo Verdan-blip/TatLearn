@@ -4,7 +4,7 @@
 
 ## Как проверить
 1. `python3 design/asr/make_phrases.py` собирает `phrases.csv` (27 слов и 18 фраз из уроков; татарский текст из уроков, needs native-speaker review).
-2. Записать каждую строку (лучше все, минимум 20 слов и 10 фраз) голосами: мама, папа, бабушка и вы (как изучающий, с вашим произношением). Формат: WAV, 16 кГц, моно; имя `<голос>_<id>.wav`, например `mama_l1_w1.wav`, в папку `design/asr/recordings/`. Записи это личные данные, папка в `.gitignore`, в репозиторий не добавлять.
+2. Записать (проще всего диктофоном: `/tmp/asr-venv/bin/pip install sounddevice soundfile numpy`, затем `/tmp/asr-venv/bin/python design/asr/record.py --voice mama`, Enter начинает и останавливает запись, повторный запуск продолжает с места остановки; голоса: `mama`, `papa`, `babushka`, `islam`). Можно и вручную: каждую строку (лучше все, минимум 20 слов и 10 фраз) голосами: мама, папа, бабушка и вы (как изучающий, с вашим произношением). Формат: WAV, 16 кГц, моно; имя `<голос>_<id>.wav`, например `mama_l1_w1.wav`, в папку `design/asr/recordings/`. Записи это личные данные, папка в `.gitignore`, в репозиторий не добавлять.
 3. Окружение и запуск (модель скачивается и запускается на вашем компьютере, делайте в отдельном виртуальном окружении):
    ```
    python3 -m venv /tmp/asr-venv && /tmp/asr-venv/bin/pip install torch transformers librosa soundfile "optimum[onnxruntime]"
