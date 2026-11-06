@@ -46,7 +46,16 @@ def hit_rate(expected, recognized):
     return hits / len(want)
 
 
-def load_recognizer(model, backend, language):
+def load_recognizer(model, backend, language, cli=None):
+    if backend == "cpp":
+        # whisper.cpp: model это путь к файлу ggml, cli это путь к whisper-cli (замер квантованной модели, как будет на телефоне).
+        import subprocess
+
+        def run(path, audio):
+            done = subprocess.run([cli, "-m", model, "-f", path, "-l", language, "-nt", "-np"], capture_output=True, text=True, check=True)
+            return done.stdout.strip()
+
+        return run
     if backend == "onnx":
         from optimum.onnxruntime import ORTModelForSpeechSeq2Seq
         from transformers import AutoProcessor, pipeline
@@ -56,7 +65,7 @@ def load_recognizer(model, backend, language):
     else:
         from transformers import pipeline
         pipe = pipeline("automatic-speech-recognition", model=model)
-    return lambda audio: pipe(audio, generate_kwargs={"language": language, "task": "transcribe"})["text"]
+    return lambda path, audio: pipe({"raw": audio, "sampling_rate": 16000}, generate_kwargs={"language": language, "task": "transcribe"})["text"]
 
 
 def main():
@@ -64,14 +73,15 @@ def main():
     parser.add_argument("--model", required=True)
     parser.add_argument("--audio", default=os.path.join(os.path.dirname(__file__), "recordings"))
     parser.add_argument("--phrases", default=os.path.join(os.path.dirname(__file__), "phrases.csv"))
-    parser.add_argument("--backend", choices=["transformers", "onnx"], default="transformers")
+    parser.add_argument("--backend", choices=["transformers", "onnx", "cpp"], default="transformers")
+    parser.add_argument("--cli", help="для --backend cpp: путь к whisper-cli из whisper.cpp")
     parser.add_argument("--language", default="tt", help="код языка Whisper, для татарского tt")
     args = parser.parse_args()
 
     import librosa
 
     phrases = {row["id"]: row for row in csv.DictReader(open(args.phrases, encoding="utf-8"))}
-    recognize = load_recognizer(args.model, args.backend, args.language)
+    recognize = load_recognizer(args.model, args.backend, args.language, args.cli)
     results = []
     for path in sorted(glob.glob(os.path.join(args.audio, "*.wav"))):
         name = os.path.splitext(os.path.basename(path))[0]
@@ -80,7 +90,7 @@ def main():
             print("пропуск (нет такой фразы):", name, file=sys.stderr)
             continue
         audio, _ = librosa.load(path, sr=16000)
-        text = recognize({"raw": audio, "sampling_rate": 16000})
+        text = recognize(path, audio)
         rate = hit_rate(phrases[phrase_id]["tatar"], text)
         results.append((voice, phrase_id, phrases[phrase_id]["kind"], phrases[phrase_id]["tatar"], text.strip(), round(rate, 2)))
         print(f"{voice:10} {phrase_id:8} {rate:4.0%}  ожидали «{phrases[phrase_id]['tatar']}», услышали «{text.strip()}»")
