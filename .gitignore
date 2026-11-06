@@ -23,3 +23,7 @@ design/icon/drafts/
 
 # Личные настройки Claude Code (права только для этого компьютера)
 .claude/settings.local.json
+
+# Записи голосов для проверки распознавания (личные данные), в репозиторий не добавлять
+design/asr/recordings/
+design/asr/results_*.csv
